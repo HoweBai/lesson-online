@@ -15,7 +15,7 @@ class TestPasswordResetService:
 
     def test_generate_reset_token(self, db_session, test_user):
         """Test generating a password reset token."""
-        service = PasswordResetService()
+        service = PasswordResetService(db=db_session)
         token = service.generate_reset_token(str(test_user.id))
 
         assert token is not None
@@ -30,7 +30,7 @@ class TestPasswordResetService:
 
     def test_generate_reset_token_expires_in_one_hour(self, db_session, test_user):
         """Test that the token expires in approximately 1 hour."""
-        service = PasswordResetService()
+        service = PasswordResetService(db=db_session)
         token = service.generate_reset_token(str(test_user.id))
         payload = service.decode_token(token)
 
@@ -45,7 +45,7 @@ class TestPasswordResetService:
 
     def test_reset_password_success(self, db_session, test_user):
         """Test successful password reset."""
-        service = PasswordResetService()
+        service = PasswordResetService(db=db_session)
         token = service.generate_reset_token(str(test_user.id))
         new_password = "NewSecurePass123!"
 
@@ -60,14 +60,14 @@ class TestPasswordResetService:
 
     def test_reset_password_invalid_token(self, db_session):
         """Test reset with an invalid token."""
-        service = PasswordResetService()
+        service = PasswordResetService(db=db_session)
         result = service.reset_password("invalid-token-string", "NewPassword123!")
 
         assert result is False
 
     def test_reset_password_expired_token(self, db_session, test_user):
         """Test reset with an expired token."""
-        service = PasswordResetService()
+        service = PasswordResetService(db=db_session)
         # Create an expired token manually
         expired_payload = {
             "sub": str(test_user.id),
@@ -81,7 +81,7 @@ class TestPasswordResetService:
 
     def test_reset_password_wrong_token_type(self, db_session, test_user):
         """Test reset with a token that is not a password reset token."""
-        service = PasswordResetService()
+        service = PasswordResetService(db=db_session)
         # Create an access token (wrong type)
         from src.services.auth_service import AuthService
         auth_service = AuthService()
@@ -92,7 +92,7 @@ class TestPasswordResetService:
 
     def test_reset_password_user_not_found(self, db_session):
         """Test reset for a non-existent user."""
-        service = PasswordResetService()
+        service = PasswordResetService(db=db_session)
         token = service.generate_reset_token("non-existent-user-id")
 
         result = service.reset_password(token, "NewPassword123!")

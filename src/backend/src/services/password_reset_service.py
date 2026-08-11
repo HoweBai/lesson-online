@@ -4,6 +4,7 @@ import logging
 from datetime import datetime, timedelta
 from typing import Optional, Dict
 from jose import JWTError, jwt
+from sqlalchemy.orm import Session
 
 from ..models.user import User
 from ..database import SessionLocal
@@ -16,6 +17,15 @@ RESET_TOKEN_EXPIRE_HOURS = 1
 
 class PasswordResetService:
     """Service for handling password reset via JWT tokens."""
+
+    def __init__(self, db: Optional[Session] = None):
+        self.db = db
+
+    def _get_db(self) -> Session:
+        """Get database session, using injected one or creating a new one."""
+        if self.db is not None:
+            return self.db
+        return SessionLocal()
 
     def generate_reset_token(self, user_id: str) -> str:
         """
@@ -51,14 +61,15 @@ class PasswordResetService:
             if payload.get("type") != "password_reset":
                 return None
             # Check if user still exists
-            db = SessionLocal()
+            db = self._get_db()
             try:
                 user = db.query(User).filter(User.id == payload.get("sub")).first()
                 if not user:
                     return None
                 return payload
             finally:
-                db.close()
+                if self.db is None:
+                    db.close()
         except JWTError:
             return None
 
@@ -79,7 +90,7 @@ class PasswordResetService:
             return False
 
         user_id = payload["sub"]
-        db = SessionLocal()
+        db = self._get_db()
         try:
             user = db.query(User).filter(User.id == user_id).first()
             if not user:
@@ -94,4 +105,5 @@ class PasswordResetService:
             db.rollback()
             return False
         finally:
-            db.close()
+            if self.db is None:
+                db.close()
