@@ -481,10 +481,11 @@ async def get_chapter_status(
 @tutorials_router.get("/{tutorial_id}/chapters", response_model=Dict[str, Any])
 async def list_chapters(
     tutorial_id: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ) -> Dict[str, Any]:
     """List all chapters for a tutorial (summary only, no content)."""
-    tutorial = db.query(Tutorial).filter(Tutorial.id == tutorial_id).first()
+    tutorial = Tutorial.get_by_id(db=db, tutorial_id=tutorial_id)
     if not tutorial:
         raise HTTPException(status_code=404, detail="Tutorial not found")
 
@@ -508,10 +509,11 @@ async def list_chapters(
 async def get_chapter_content(
     tutorial_id: str,
     chapter_number: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ) -> Dict[str, Any]:
     """Get full chapter content including sections."""
-    tutorial = db.query(Tutorial).filter(Tutorial.id == tutorial_id).first()
+    tutorial = Tutorial.get_by_id(db=db, tutorial_id=tutorial_id)
     if not tutorial:
         raise HTTPException(status_code=404, detail="Tutorial not found")
 
