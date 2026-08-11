@@ -1,0 +1,96 @@
+# Dependencies
+node_modules/
+__pycache__/
+*/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+pip-delete-this-directory.txt
+.env
+.env.local
+.env.*.local
+
+# Virtual environments
+venv/
+env/
+ENV/
+venv_local/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+deploy.log
+
+# Database
+*.db
+*.db-journal
+db/
+
+# Build outputs
+build/
+dist/
+out/
+*.egg-info/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg
+
+# Docker
+.docker/
+
+# Test coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nyc_output/
+
+# Node
+package-lock.json
+yarn.lock
+npm-debug.log*
+
+# Production env (contains secrets)
+.env.production
+
+# Claude
+.claude/
+
+# Temporary fix scripts (for reference only)
+check_*.py
+debug_*.py
+fix_*.py
+verify_*.py
+find_*.py
+get_*.py
+render_*.py
+final_*.py
+final_test.py
+final_check.py
+final_verify.py
+complete_fix.py
+comprehensive_test.py
+e2e_test.py
+full_deploy_verify.py
+deployed_*.tsx
+apply_*.py
+
+# Docs (generated)
+docs/implementation-status-report.md
