@@ -7,6 +7,9 @@ from sqlalchemy.pool import StaticPool
 import os
 from dotenv import load_dotenv
 
+# Import all models to register them with Base.metadata
+from src.models.audit_log import AuditLog
+
 load_dotenv()
 
 # Use SQLite for local development, PostgreSQL for production
