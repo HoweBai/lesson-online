@@ -194,6 +194,19 @@ async def generate_outline(
             task_log.finished_at = datetime.utcnow()
             db.commit()
 
+            # 检查大纲安全性
+            outline_data = result.get("outline", {})
+            security_scan = outline_data.get('_security_scan', {})
+
+            if security_scan.get('needs_review'):
+                task_log.details_json = {
+                    **task_log.details_json,
+                    'security_scan': security_scan,
+                    'needs_review': True
+                }
+                db.commit()
+                logger.warning(f"Outline flagged for review: {security_scan.get('reasons', [])}")
+
             return OutlineStatusResponse(
                 task_id=task_id,
                 status=OutlineStatus.COMPLETED,

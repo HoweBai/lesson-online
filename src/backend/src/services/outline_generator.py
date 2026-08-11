@@ -11,7 +11,11 @@ from ..services.knowledge_inferencer import DynamicKnowledgeInferencer
 from ..services.llm_adapter import ClaudeAdapter, OpenAIAAdapter
 from ..services.claude_config_service import ClaudeConfigService
 from .crypto_service import SecureCryptoService
+from ..services.content_security import ContentSecurityService
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class OutlineGenerator:
@@ -24,6 +28,7 @@ class OutlineGenerator:
         self.claude_service = claude_config_service
         self.checker = PrerequisiteChecker()
         self.inferencer = DynamicKnowledgeInferencer()
+        self.security_service = ContentSecurityService()
 
     def build_outline_prompt(self, profile: Dict[str, Any], mastery_map: Dict[str, str],
                              topics: List[str]) -> str:
@@ -113,6 +118,17 @@ DO NOT add any conversational text before or after the JSON output."""
             outline_data = json.loads(clean_text.strip())
         except (json.JSONDecodeError, Exception) as e:
             outline_data = {"error": f"Failed to parse outline: {str(e)}", "raw": outline_text[:500]}
+
+        # Scan outline content for security issues
+        try:
+            scan_result = self.security_service.scan_content(
+                json.dumps(outline_data),
+                str(user_id)
+            )
+            outline_data['_security_scan'] = scan_result
+        except Exception as scan_err:
+            logger.warning(f"Outline security scan failed: {scan_err}")
+            outline_data['_security_scan'] = {"error": str(scan_err), "needs_review": False}
 
         # Cleanup
         llm_adapter.close()
