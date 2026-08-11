@@ -478,6 +478,50 @@ async def get_chapter_status(
     raise HTTPException(status_code=404, detail="Chapter not found")
 
 
+@tutorials_router.get("/{tutorial_id}/chapters", response_model=Dict[str, Any])
+async def list_chapters(
+    tutorial_id: str,
+    db: Session = Depends(get_db)
+) -> Dict[str, Any]:
+    """List all chapters for a tutorial (summary only, no content)."""
+    tutorial = db.query(Tutorial).filter(Tutorial.id == tutorial_id).first()
+    if not tutorial:
+        raise HTTPException(status_code=404, detail="Tutorial not found")
+
+    chapters = db.query(Chapter).filter_by(tutorial_id=tutorial_id).order_by(Chapter.chapter_number).all()
+    return {
+        "data": [
+            {
+                "id": c.id,
+                "chapter_number": c.chapter_number,
+                "title": c.title,
+                "status": c.status,
+                "generated_at": c.generated_at.isoformat() if c.generated_at else None,
+            }
+            for c in chapters
+        ],
+        "total": len(chapters)
+    }
+
+
+@tutorials_router.get("/{tutorial_id}/chapters/{chapter_number}", response_model=Dict[str, Any])
+async def get_chapter_content(
+    tutorial_id: str,
+    chapter_number: int,
+    db: Session = Depends(get_db)
+) -> Dict[str, Any]:
+    """Get full chapter content including sections."""
+    tutorial = db.query(Tutorial).filter(Tutorial.id == tutorial_id).first()
+    if not tutorial:
+        raise HTTPException(status_code=404, detail="Tutorial not found")
+
+    chapter = Chapter.get_by_number(db=db, tutorial_id=tutorial_id, chapter_number=chapter_number)
+    if not chapter:
+        raise HTTPException(status_code=404, detail=f"Chapter {chapter_number} not found")
+
+    return chapter.to_dict(include_content=True)
+
+
 # ============ Tutorial CRUD Endpoints ============
 
 @tutorials_router.get("/", response_model=Dict[str, Any])
