@@ -8,6 +8,7 @@ from .tutorial import Tutorial
 from .chapter import Chapter
 from .public_catalog import PublicCatalog
 from .task_log import TaskLog
+from .audit_log import AuditLog
 
 __all__ = [
     'User',
@@ -18,4 +19,5 @@ __all__ = [
     'Chapter',
     'PublicCatalog',
     'TaskLog',
+    'AuditLog',
 ]
