@@ -39,16 +39,13 @@ class ContentSecurityService:
 
         # 1. 检测不当语言
         has_profanity = False
-        if self.profanity_filter:
-            try:
-                result = self.profanity_filter.contains(content)
-                if result:
-                    has_profanity = True
-                    reasons.append("包含不当语言")
-                    flagged = self.profanity_filter.find(content)
-                    flagged_terms.extend(flagged)
-            except Exception as e:
-                logger.warning(f"Profanity check failed: {e}")
+        content_lower = content.lower()
+        for word in self.profanity_words:
+            if word.lower() in content_lower:
+                has_profanity = True
+                reasons.append("包含不当语言")
+                flagged_terms.append(word)
+                break
 
         # 2. 检测危险内容模式
         has_dangerous = False
