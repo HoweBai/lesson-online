@@ -23,6 +23,7 @@ from ..api.alerts import router as alerts_router
 from ..api.security import security_router
 from ..api.bookmarks import router as bookmarks_router
 from ..api.comments import router as comments_router, router_comment as comment_likes_router
+from ..api.password_reset import router as password_reset_router
 from ..middleware.rate_limiter import limiter, rate_limit_handler
 from slowapi.errors import RateLimitExceeded
 
@@ -56,6 +57,7 @@ app.include_router(security_router, prefix="/api/v1", tags=["security"])
 app.include_router(bookmarks_router, prefix="/api/v1", tags=["bookmarks"])
 app.include_router(comments_router, prefix="/api/v1", tags=["comments"])
 app.include_router(comment_likes_router, prefix="/api/v1", tags=["comments"])
+app.include_router(password_reset_router, prefix="/api/v1")
 
 # Register rate limiter
 app.state.limiter = limiter
