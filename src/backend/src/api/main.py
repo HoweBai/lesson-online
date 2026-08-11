@@ -21,6 +21,8 @@ from ..api.monitor import router as monitor_router
 from ..api.backup import router as backup_router
 from ..api.alerts import router as alerts_router
 from ..api.security import security_router
+from ..middleware.rate_limiter import limiter, rate_limit_handler
+from slowapi.errors import RateLimitExceeded
 
 # Configure logging
 logging.basicConfig(
@@ -49,6 +51,10 @@ app.include_router(monitor_router)
 app.include_router(backup_router)
 app.include_router(alerts_router)
 app.include_router(security_router, prefix="/api/v1", tags=["security"])
+
+# Register rate limiter
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, rate_limit_handler)
 
 # CORS middleware
 app.add_middleware(
