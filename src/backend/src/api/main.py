@@ -20,6 +20,7 @@ from ..api.export import router as export_router
 from ..api.monitor import router as monitor_router
 from ..api.backup import router as backup_router
 from ..api.alerts import router as alerts_router
+from ..api.security import security_router
 
 # Configure logging
 logging.basicConfig(
@@ -47,6 +48,7 @@ app.include_router(export_router, prefix="/api/v1", tags=["export"])
 app.include_router(monitor_router)
 app.include_router(backup_router)
 app.include_router(alerts_router)
+app.include_router(security_router, prefix="/api/v1", tags=["security"])
 
 # CORS middleware
 app.add_middleware(
