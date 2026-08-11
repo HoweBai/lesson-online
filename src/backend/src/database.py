@@ -44,8 +44,10 @@ def get_db():
 
 def init_db():
     """Initialize database tables."""
-    # Lazy import to avoid circular dependency
+    # Lazy imports to avoid circular dependency
     from src.models.audit_log import AuditLog
+    from src.models.bookmark import Bookmark
+    from src.models.comment import Comment
     Base.metadata.create_all(bind=engine)
 
 

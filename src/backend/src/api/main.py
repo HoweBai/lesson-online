@@ -21,6 +21,7 @@ from ..api.monitor import router as monitor_router
 from ..api.backup import router as backup_router
 from ..api.alerts import router as alerts_router
 from ..api.security import security_router
+from ..api.bookmarks import router as bookmarks_router
 from ..middleware.rate_limiter import limiter, rate_limit_handler
 from slowapi.errors import RateLimitExceeded
 
@@ -51,6 +52,7 @@ app.include_router(monitor_router)
 app.include_router(backup_router)
 app.include_router(alerts_router)
 app.include_router(security_router, prefix="/api/v1", tags=["security"])
+app.include_router(bookmarks_router, prefix="/api/v1", tags=["bookmarks"])
 
 # Register rate limiter
 app.state.limiter = limiter
