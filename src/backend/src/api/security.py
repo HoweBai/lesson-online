@@ -17,7 +17,6 @@ security_router = APIRouter(prefix="/security", tags=["security"])
 async def get_security_scans(
     db: Session = Depends(get_db),
     user_id: Optional[str] = Query(None, description="Filter by user ID"),
-    action_type: Optional[str] = Query(None, description="Filter by action type"),
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100)
 ) -> Dict[str, Any]:
@@ -26,8 +25,6 @@ async def get_security_scans(
 
     if user_id:
         query = query.filter(AuditLog.user_id == user_id)
-    if action_type:
-        query = query.filter(AuditLog.action_type == action_type)
 
     total = query.count()
     offset = (page - 1) * limit
