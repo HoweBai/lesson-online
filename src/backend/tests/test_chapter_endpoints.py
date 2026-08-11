@@ -23,18 +23,6 @@ def override_get_db():
 
 app.dependency_overrides[get_db] = override_get_db
 
-# Mock current user
-from src.models.user import User
-def override_get_current_user():
-    user = User(id="test-user-1", username="testuser", email="test@test.com")
-    return user
-
-app.dependency_overrides[User] = override_get_current_user
-
-# Actually need to override the dependency directly
-from src.services.auth_service import get_current_user
-app.dependency_overrides[get_current_user] = override_get_current_user
-
 client = TestClient(app)
 
 

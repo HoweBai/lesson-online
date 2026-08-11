@@ -481,8 +481,7 @@ async def get_chapter_status(
 @tutorials_router.get("/{tutorial_id}/chapters", response_model=Dict[str, Any])
 async def list_chapters(
     tutorial_id: str,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    db: Session = Depends(get_db)
 ) -> Dict[str, Any]:
     """List all chapters for a tutorial (summary only, no content)."""
     tutorial = Tutorial.get_by_id(db=db, tutorial_id=tutorial_id)
@@ -509,8 +508,7 @@ async def list_chapters(
 async def get_chapter_content(
     tutorial_id: str,
     chapter_number: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    db: Session = Depends(get_db)
 ) -> Dict[str, Any]:
     """Get full chapter content including sections."""
     tutorial = Tutorial.get_by_id(db=db, tutorial_id=tutorial_id)
