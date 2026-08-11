@@ -39,6 +39,7 @@ def migrate(db_path: str):
     col_defs = ", ".join(f"{col} {target_schema[col]}" for col in all_columns)
 
     # Backup existing data
+    cursor.execute("PRAGMA foreign_keys = OFF")
     cursor.execute("CREATE TABLE IF NOT EXISTS tutorials_backup AS SELECT * FROM tutorials")
 
     # Drop and recreate with new schema
