@@ -7,6 +7,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import CodeBlock from '../components/CodeBlock';
+import { useToast } from '../hooks/useToast';
 
 interface ChapterContent {
   title: string;
@@ -25,6 +26,7 @@ interface ChapterContent {
 }
 
 const TutorialDisplayPage = () => {
+  const toast = useToast();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [chapter, setChapter] = useState<ChapterContent | null>(null);
@@ -89,16 +91,16 @@ const TutorialDisplayPage = () => {
         a.click();
       }
     } catch (e: any) {
-      alert('PDF generation failed: ' + e.message);
+      toast.error('PDF generation failed: ' + e.message);
     }
   };
 
   const handleNextChapter = async () => {
     try {
       await fetch(`/api/v1/tutorials/${id}/generate-next`, { method: 'POST' });
-      alert('Generating next chapter... Please wait');
+      toast.info('Generating next chapter... Please wait');
     } catch (e: any) {
-      alert('Failed to generate next chapter: ' + e.message);
+      toast.error('Failed to generate next chapter: ' + e.message);
     }
   };
 

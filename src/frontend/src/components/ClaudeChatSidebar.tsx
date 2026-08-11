@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { useToast } from '../hooks/useToast';
 
 interface ChatMessage {
   id: string;
@@ -19,6 +20,7 @@ interface ClaudeChatSidebarProps {
 }
 
 const ClaudeChatSidebar = ({ tutorialId = 'default', onChapterGenerated }: ClaudeChatSidebarProps) => {
+  const toast = useToast();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isConnected, setIsConnected] = useState(false);
@@ -46,15 +48,9 @@ const ClaudeChatSidebar = ({ tutorialId = 'default', onChapterGenerated }: Claud
           }]);
         } else if (data.type === 'chapter_generated') {
           onChapterGenerated?.();
-          // Show notification toast
-          const toast = document.createElement('div');
-          toast.className = 'toast toast-success';
-          toast.textContent = 'Chapter generated successfully!';
-          document.body.appendChild(toast);
-          setTimeout(() => toast.remove(), 3000);
+          toast.success('Chapter generated successfully!');
         } else if (data.type === 'error') {
-          // Show error message
-          alert(`Error: ${data.message}`);
+          toast.error(`Error: ${data.message}`);
         }
       } catch (e) {
         console.error('Failed to parse WebSocket message:', e);

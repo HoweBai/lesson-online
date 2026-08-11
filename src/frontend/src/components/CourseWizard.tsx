@@ -3,6 +3,7 @@
  */
 
 import React, { useState } from 'react';
+import { useToast } from '../hooks/useToast';
 import ProfileFormStep from './WizardSteps/ProfileFormStep';
 import ClaudeConfigStep from './WizardSteps/ClaudeConfigStep';
 import OutlineEditorStep from './WizardSteps/OutlineEditorStep';
@@ -21,6 +22,7 @@ interface WizardStep {
 }
 
 export const CourseWizard = ({ onClose }: { onClose?: () => void }) => {
+  const toast = useToast();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [error, setError] = useState('');
@@ -88,10 +90,11 @@ export const CourseWizard = ({ onClose }: { onClose?: () => void }) => {
       if (!response.ok) throw new Error('Failed to generate outline');
 
       const result = await response.json();
-      alert(`Tutorial generated successfully! ID: ${result.tutorialId}`);
+      toast.success(`Tutorial generated successfully! ID: ${result.tutorialId}`);
       onClose?.();
     } catch (err: any) {
       setError(err.message || 'Failed to generate tutorial');
+      toast.error(err.message || 'Failed to generate tutorial');
     }
   };
 

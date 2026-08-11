@@ -6,8 +6,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import { User, UserProfile } from '../types';
+import { useToast } from '../hooks/useToast';
 
 const ProfilePage = () => {
+  const toast = useToast();
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -69,7 +71,7 @@ const ProfilePage = () => {
   const handleInferKnowledge = async () => {
     const result = await api.inferKnowledge();
     if (result.success) {
-      alert('Knowledge mapping updated!');
+      toast.success('Knowledge mapping updated!');
       loadData();
     }
   };
