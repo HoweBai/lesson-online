@@ -30,6 +30,8 @@ def client_with_limiter(app_with_limiter):
 
 def test_rate_limiter_default_limit(client_with_limiter):
     """Requests without explicit rate limits should use the default limit."""
+    # First two requests should succeed under the default 60/minute limit
+    assert client_with_limiter.get("/test").status_code == 200
     assert client_with_limiter.get("/test").status_code == 200
 
 
