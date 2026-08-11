@@ -3,13 +3,12 @@
 import re
 import logging
 from typing import Dict, Any, List
-from uuid import UUID
 
-try:
-    import badwords
-    _BADWORDS = badwords.Badwords()
-except (ImportError, AttributeError):
-    _BADWORDS = None
+# Bundled Chinese profanity words (fallback since badwords package lacks Badwords class)
+_DEFAULT_PROFANITY_WORDS = [
+    '他妈的', '操你', '日你', '傻逼', 'fuck', 'shit', 'ass', 'damn',
+    'nmld', 'nmsl', 'caonima', 'tmd', 'tm', 'sb', 'cnm',
+]
 
 from ..models.audit_log import AuditLog
 from ..database import get_session
@@ -31,7 +30,7 @@ class ContentSecurityService:
     """Scan AI-generated content for security issues."""
 
     def __init__(self):
-        self.profanity_filter = _BADWORDS
+        self.profanity_words = _DEFAULT_PROFANITY_WORDS
         self.dangerous_patterns = _COMPILED_PATTERNS
 
     def scan_content(self, content: str, user_id: str) -> Dict[str, Any]:
