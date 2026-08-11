@@ -1,5 +1,9 @@
 """Service for generating individual tutorial chapters."""
 
+import json
+import logging
+import uuid
+from datetime import datetime
 from typing import Dict, Any, List, Optional
 from uuid import UUID
 from sqlalchemy.orm import Session
@@ -10,7 +14,10 @@ from ..models.claude_config import ClaudeConfig
 from ..services.llm_adapter import ClaudeAdapter, OpenAIAAdapter
 from ..services.claude_config_service import ClaudeConfigService
 from ..services.prerequisite_checker import PrerequisiteChecker
+from ..services.content_security import ContentSecurityService
 from .crypto_service import SecureCryptoService
+
+logger = logging.getLogger(__name__)
 
 
 class ChapterGenerator:
@@ -22,6 +29,7 @@ class ChapterGenerator:
         self.crypto = crypto
         self.claude_service = claude_config_service
         self.checker = PrerequisiteChecker()
+        self.security_service = ContentSecurityService()
 
     def build_chapter_prompt(self, chapter_number: int, chapter_title: str,
                             mastery_map: Dict[str, str],
@@ -127,6 +135,13 @@ IMPORTANT: Make sure to include formula derivations step-by-step. For code sampl
             chapter_content = json.loads(clean_text.strip())
         except Exception as e:
             chapter_content = {"error": f"Parsing failed: {str(e)}", "raw": chapter_text[:500]}
+
+        # 扫描生成的内容
+        content_to_scan = json.dumps(chapter_content) if isinstance(chapter_content, dict) else chapter_text
+        scan_result = self.security_service.scan_content(content_to_scan, str(user_id))
+
+        # 将扫描结果存入章节
+        chapter_content['_security_scan'] = scan_result
 
         llm_adapter.close()
 

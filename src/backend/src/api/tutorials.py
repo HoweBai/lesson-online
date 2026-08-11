@@ -379,6 +379,14 @@ async def generate_next_chapter(
         )
         db.add(chapter)
 
+        # 获取扫描结果（已在章节内容中）
+        security_scan = chapter_content.get('_security_scan', {})
+
+        # 如果内容需要审核，标记教程状态
+        if security_scan.get('needs_review'):
+            tutorial.status = TutorialStatus.REVIEWING.value
+            logger.warning(f"Chapter {next_number} flagged for review: {security_scan.get('reasons', [])}")
+
         # Update tutorial
         tutorial.current_chapter = next_number + 1
         if next_number >= (tutorial.total_chapters or 10):
