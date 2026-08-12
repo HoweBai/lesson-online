@@ -8,6 +8,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import CodeBlock from '../components/CodeBlock';
 import ClaudeChatSidebar from '../components/ClaudeChatSidebar';
+import CommentSection from '../components/CommentSection';
 import { api } from '../api/client';
 import { useToast } from '../hooks/useToast';
 
@@ -499,6 +500,9 @@ const TutorialDisplayPage = () => {
           onChapterGenerated={handleChapterGenerated}
         />
       )}
+
+      {/* Comments Section */}
+      <CommentSection tutorialId={id} />
     </div>
   );
 };

@@ -137,6 +137,10 @@ class ApiClient {
     return this.request<any>('POST', `/api/v1/tutorials/${tutorialId}/generate-next`);
   }
 
+  async getTutorialChapters(tutorialId: string) {
+    return this.request<any>('GET', `/api/v1/tutorials/${tutorialId}/chapters`);
+  }
+
   async getChapterStatus(tutorialId: string, chapterNumber: number) {
     return this.request<any>('GET', `/api/v1/tutorials/${tutorialId}/chapters/${chapterNumber}/status`);
   }
@@ -171,6 +175,17 @@ class ApiClient {
 
   async reportTutorial(id: string, reason: string) {
     return this.request<any>('POST', `/api/v1/catalog/${id}/report`, { reason });
+  }
+
+  async getComments(tutorialId: string) {
+    return this.request<any>('GET', `/api/v1/tutorials/${tutorialId}/comments`);
+  }
+
+  async createComment(tutorialId: string, content: string, parentId?: string) {
+    return this.request<any>('POST', `/api/v1/tutorials/${tutorialId}/comments`, {
+      content,
+      parent_id: parentId
+    });
   }
 
   async getPopularTutorials() {
