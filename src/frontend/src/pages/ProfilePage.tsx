@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import { User, UserProfile } from '../types';
 import { useToast } from '../hooks/useToast';
+import { LearningChart } from '../components/LearningChart';
 
 const ProfilePage = () => {
   const toast = useToast();
@@ -33,32 +34,44 @@ const ProfilePage = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [userRes, profileRes, progressRes, statsRes] = await Promise.all([
-        api.getMe(),
-        api.getProfile(),
-        api.getLearningProgress(),
-        api.getLearningStats()
-      ]);
+      // User info
+      try {
+        const userRes = await api.getMe();
+        if (userRes.success) setUser(userRes.data);
+      } catch {}
 
-      if (userRes.success) setUser(userRes.data);
-      if (profileRes.success) setProfile(profileRes.data?.profile);
-      if (progressRes.success) setProgress(progressRes.data);
-      if (statsRes.success) setStats(statsRes.data);
+      // Profile
+      try {
+        const profileRes = await api.getProfile();
+        if (profileRes.success) {
+          setProfile(profileRes.data?.profile);
+          if (profileRes.data?.knowledge_mapping?.mastery_map) {
+            setKnowledgeMap(profileRes.data.knowledge_mapping.mastery_map);
+          }
+          if (profileRes.data?.profile) {
+            setFormData({
+              programming_level: profileRes.data.profile.programming_level || 1,
+              math_background: profileRes.data.profile.math_background || '',
+              learning_goal: profileRes.data.profile.learning_goal || 'general',
+              available_hours_per_day: profileRes.data.profile.available_hours_per_day || 2,
+              preferred_style: profileRes.data.profile.preferred_style || 'text'
+            });
+          }
+        }
+      } catch {}
 
-      // Extract knowledge map from profile response
-      if (profileRes.success && profileRes.data?.knowledge_mapping?.mastery_map) {
-        setKnowledgeMap(profileRes.data.knowledge_mapping.mastery_map);
-      }
+      // Progress
+      try {
+        const progressRes = await api.getLearningProgress();
+        if (progressRes.success) setProgress(progressRes.data);
+      } catch {}
 
-      if (profileRes.data?.profile) {
-        setFormData({
-          programming_level: profileRes.data.profile.programming_level || 1,
-          math_background: profileRes.data.profile.math_background || '',
-          learning_goal: profileRes.data.profile.learning_goal || 'general',
-          available_hours_per_day: profileRes.data.profile.available_hours_per_day || 2,
-          preferred_style: profileRes.data.profile.preferred_style || 'text'
-        });
-      }
+      // Stats
+      try {
+        const statsRes = await api.getLearningStats();
+        if (statsRes.success) setStats(statsRes.data);
+      } catch {}
+
     } catch (error) {
       toast.error('Failed to load profile. Please try again.');
     } finally {
@@ -176,37 +189,17 @@ const ProfilePage = () => {
           </div>
 
           {/* Statistics Card */}
-          <div className="card p-6 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+          <div className="card p-6 animate-slide-up md:col-span-2" style={{ animationDelay: '0.2s' }}>
             <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <span>📈</span> Statistics
+              <span>📈</span> Learning Statistics
             </h3>
             {stats ? (
-              <div className="space-y-4">
-                {stats.tutorial_stats && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-700 mb-2">Tutorials by Month</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {Object.entries(stats.tutorial_stats.by_month || {}).map(([month, count]) => (
-                        <span key={month} className="px-2 py-1 bg-primary-100 text-primary-700 rounded-lg text-xs font-medium">
-                          {`${month}: ${count}`}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {stats.chapter_stats && (
-                  <div className="pt-4 border-t border-gray-100">
-                    <p className="text-sm font-medium text-gray-700 mb-2">Chapter Status</p>
-                    <div className="space-y-2">
-                      <p className="text-success-600 text-sm">✅ Completed: {stats.chapter_stats.completed}</p>
-                      <p className="text-yellow-600 text-sm">⏳ Ready: {stats.chapter_stats.ready}</p>
-                      <p className="text-primary-600 text-sm">📖 In Progress: {stats.chapter_stats.in_progress}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <LearningChart
+                tutorialStats={stats.tutorial_stats || null}
+                chapterStats={stats.chapter_stats || null}
+              />
             ) : (
-              <p className="text-gray-500 text-center py-8">No stats available</p>
+              <p className="text-gray-500 text-center py-8">No stats available yet</p>
             )}
           </div>
 
