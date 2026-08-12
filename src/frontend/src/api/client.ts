@@ -149,10 +149,6 @@ class ApiClient {
     return this.request<any>('GET', `/api/v1/tutorials/${tutorialId}/chapters/${chapterNumber}`);
   }
 
-  async getTutorialChapters(tutorialId: string) {
-    return this.request<any>('GET', `/api/v1/tutorials/${tutorialId}/chapters`);
-  }
-
   // Catalog endpoints
   async getCatalog(search?: string, sort_by = 'publish_time', order = 'desc') {
     let url = '/api/v1/catalog/?';
@@ -175,6 +171,12 @@ class ApiClient {
 
   async unbookmarkTutorial(id: string) {
     return this.request<any>('DELETE', `/api/v1/bookmarks/${id}/bookmark`);
+  }
+
+  async isBookmarked(tutorialId: string): Promise<boolean> {
+    const result = await this.request<any>('GET', '/api/v1/bookmarks/bookmarks');
+    if (!result.success || !result.data?.data) return false;
+    return result.data.data.some((b: { tutorial_id: string }) => b.tutorial_id === tutorialId);
   }
 
   async reportTutorial(id: string, reason: string) {
