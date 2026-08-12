@@ -8,6 +8,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import CodeBlock from '../components/CodeBlock';
 import ClaudeChatSidebar from '../components/ClaudeChatSidebar';
+import { api } from '../api/client';
 import { useToast } from '../hooks/useToast';
 
 interface ChapterContent {
@@ -37,10 +38,12 @@ const TutorialDisplayPage = () => {
   useEffect(() => {
     const fetchChapter = async () => {
       try {
-        const response = await fetch(`/api/v1/tutorials/${id}/chapters/1`);
-        if (!response.ok) throw new Error('Failed to load chapter');
-        const data = await response.json();
-        setChapter(data);
+        const result = await api.getChapterContent(id!, 1);
+        if (result.success) {
+          setChapter(result.data);
+        } else {
+          throw new Error(result.error || 'Failed to load chapter');
+        }
       } catch (err: any) {
         console.error('Error loading chapter:', err);
       } finally {
@@ -51,15 +54,27 @@ const TutorialDisplayPage = () => {
     fetchChapter();
   }, [id]);
 
-  const handleChapterGenerated = useCallback(() => {
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleChapterGenerated = useCallback(async () => {
     // Refresh the chapter data after generation
     if (id) {
-      fetch(`/api/v1/tutorials/${id}/chapters/1`)
-        .then(res => res.json())
-        .then(data => setChapter(data))
-        .catch(err => console.error('Error refreshing chapter:', err));
+      setRefreshing(true);
+      try {
+        const result = await api.getChapterContent(id, 1);
+        if (result.success) {
+          setChapter(result.data);
+        } else {
+          toast.error('Failed to refresh chapter');
+        }
+      } catch (err: any) {
+        toast.error('Failed to refresh chapter');
+        console.error('Error refreshing chapter:', err);
+      } finally {
+        setRefreshing(false);
+      }
     }
-  }, [id]);
+  }, [id, toast]);
 
   if (loading) {
     return (
@@ -92,7 +107,10 @@ const TutorialDisplayPage = () => {
 
   const handleDownloadPDF = async () => {
     try {
-      const res = await fetch(`/api/v1/tutorials/${id}/chapters/1/download/pdf`, { method: 'POST' });
+      const res = await fetch(`/api/v1/tutorials/${id}/chapters/1/download/pdf`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${api.getToken()}` }
+      });
       if (res.ok) {
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
@@ -108,8 +126,12 @@ const TutorialDisplayPage = () => {
 
   const handleNextChapter = async () => {
     try {
-      await fetch(`/api/v1/tutorials/${id}/generate-next`, { method: 'POST' });
-      toast.info('Generating next chapter... Please wait');
+      const result = await api.generateNextChapter(id!);
+      if (result.success) {
+        toast.info('Generating next chapter... Please wait');
+      } else {
+        toast.error(result.error || 'Failed to generate next chapter');
+      }
     } catch (e: any) {
       toast.error('Failed to generate next chapter: ' + e.message);
     }

@@ -141,6 +141,10 @@ class ApiClient {
     return this.request<any>('GET', `/api/v1/tutorials/${tutorialId}/chapters/${chapterNumber}/status`);
   }
 
+  async getChapterContent(tutorialId: string, chapterNumber: number) {
+    return this.request<any>('GET', `/api/v1/tutorials/${tutorialId}/chapters/${chapterNumber}`);
+  }
+
   // Catalog endpoints
   async getCatalog(search?: string, sort_by = 'publish_time', order = 'desc') {
     let url = '/api/v1/catalog/?';
