@@ -74,6 +74,14 @@ class ApiClient {
     return this.request<any>('POST', '/api/v1/auth/register', { username, email, password });
   }
 
+  async forgotPassword(email: string) {
+    return this.request<any>('POST', '/api/v1/auth/forgot-password', { email });
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    return this.request<any>('POST', '/api/v1/auth/reset-password', { token, new_password: newPassword });
+  }
+
   async logout() {
     this.clearToken();
     return { success: true };

@@ -13,7 +13,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const value: ToastContextType = {
     success: (message: string) => toast.success(message),
     error: (message: string) => toast.error(message),
-    info: (message: string) => toast.info(message),
+    info: (message: string) => toast(message),
   };
   return (
     <ToastContext.Provider value={value}>

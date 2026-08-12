@@ -1,6 +1,6 @@
 /** Main application component for the Online Learning Platform. */
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useParams } from 'react-router-dom';
 import AuthPage from './pages/AuthPage';
 import TutorialListPage from './pages/TutorialListPage';
 import TutorialDisplayPage from './pages/TutorialDisplayPage';
@@ -25,6 +25,11 @@ const App = () => {
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem('auth_token');
+  };
+
+  const ResetPasswordRoute = () => {
+    const { token } = useParams<{ token: string }>();
+    return <AuthPage mode="reset-password" resetToken={token} />;
   };
 
   if (loading) {
@@ -75,6 +80,8 @@ const App = () => {
               <>
                 <Route path="/login" element={<AuthPage mode="login" />} />
                 <Route path="/register" element={<AuthPage mode="register" />} />
+                <Route path="/forgot-password" element={<AuthPage mode="forgot-password" />} />
+                <Route path="/reset-password/:token" element={<ResetPasswordRoute />} />
                 <Route path="*" element={<Navigate to="/login" replace />} />
               </>
             ) : (
