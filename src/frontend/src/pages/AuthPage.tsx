@@ -62,6 +62,7 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
       if (mode === 'register') {
         const result = await api.register(formData.username, formData.email, formData.password);
         if (!result.success) throw new Error(result.error || 'Registration failed');
+        if (result.data?.token) api.setToken(result.data.token);
         toast.success('Account created successfully!');
         navigate('/');
         return;
@@ -69,6 +70,7 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
 
       const result = await api.login(formData.email, formData.password);
       if (!result.success) throw new Error(result.error || 'Login failed');
+      if (result.data?.token) api.setToken(result.data.token);
       toast.success('Login successful!');
       navigate('/');
     } catch (err: any) {
