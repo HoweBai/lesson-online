@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  # Application Web Service
+  web:
+    build: .
+    command: uvicorn backend.src.api.main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/platform
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=${SECRET_KEY:-development-secret-key}
+      - CRYPTO_KEY=${CRYPTO_KEY:-dummy-32-byte-key-for-dev-use}
+      - MINIO_ENDPOINT=http://minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+    depends_on:
+      - db
+      - redis
+      - minio
+    volumes:
+      - ./src/backend:/app/src/backend
+      - ./src/frontend:/app/src/frontend
+
+  # Database (PostgreSQL)
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=platform
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  # Redis (for Celery, cache, WebSocket state)
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redisdata:/data
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  # MinIO Object Storage (for tutorial content and exports)
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9001:9000"  # MinIO UI
+      - "9002:9001"  # API endpoint
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    volumes:
+      - minio-data:/data
+    command: server /data --console-address ":9001"
+    restart: unless-stopped
+
+  # Celery Worker (for async AI generation tasks)
+  celery-worker:
+    build: .
+    command: celery -A backend.src.tasks worker --loglevel=info -E
+    depends_on:
+      - redis
+      - db
+      - minio
+    volumes:
+      - ./src/backend:/app/src/backend
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/platform
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=${SECRET_KEY:-development-secret-key}
+      - CRYPTO_KEY=${CRYPTO_KEY:-dummy-32-byte-key-for-dev-use}
+    restart: on-failure
+
+  # Nginx Reverse Proxy (optional for production)
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - web
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  redisdata:
+  minio-data:
