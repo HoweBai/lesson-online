@@ -37,28 +37,6 @@ const TutorialDisplayPage = () => {
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
 
-  useEffect(() => {
-    const fetchChapter = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const result = await api.getChapterContent(id!, 1);
-        if (result.success) {
-          setChapter(result.data);
-        } else {
-          throw new Error(result.error || 'Failed to load chapter');
-        }
-      } catch (err: any) {
-        console.error('Error loading chapter:', err);
-        setError(err?.message || 'Failed to load tutorial chapter. Please try again.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchChapter();
-  }, [id]);
-
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchChapter = useCallback(async () => {
