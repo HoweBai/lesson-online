@@ -18,10 +18,27 @@ const TutorialListPage = () => {
   const [sortBy, setSortBy] = useState('publish_time');
   const [sortOrder, setSortOrder] = useState('desc');
   const [activeTab, setActiveTab] = useState<'public' | 'mine'>('public');
+  const [bookmarks, setBookmarks] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    fetchBookmarks();
+  }, []);
 
   useEffect(() => {
     fetchTutorials();
   }, [activeTab, searchTerm, sortBy, sortOrder]);
+
+  const fetchBookmarks = async () => {
+    try {
+      const result = await api.request<any>('GET', '/api/v1/bookmarks/bookmarks');
+      if (result.success && result.data?.data) {
+        const bookmarkIds = result.data.data.map((b: any) => b.tutorial_id);
+        setBookmarks(new Set(bookmarkIds));
+      }
+    } catch {
+      // Ignore bookmark fetch errors; bookmarks are non-critical
+    }
+  };
 
   const fetchTutorials = async () => {
     setLoading(true);
@@ -46,6 +63,22 @@ const TutorialListPage = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     fetchTutorials();
+  };
+
+  const handleBookmark = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const isBookmarked = bookmarks.has(id);
+    const result = isBookmarked
+      ? await api.unbookmarkTutorial(id)
+      : await api.bookmarkTutorial(id);
+    if (result.success) {
+      setBookmarks(prev => {
+        const next = new Set(prev);
+        if (isBookmarked) next.delete(id);
+        else next.add(id);
+        return next;
+      });
+    }
   };
 
   const handleLike = async (id: string, e: React.MouseEvent) => {
@@ -203,6 +236,8 @@ const TutorialListPage = () => {
                   tutorial={tutorial}
                   onClick={(id) => navigate(`/tutorial/${id}`)}
                   onLike={(e) => handleLike(tutorial.id, e)}
+                  isBookmarked={bookmarks.has(tutorial.id)}
+                  onBookmark={(e) => handleBookmark(tutorial.id, e)}
                 />
               </div>
             ))}

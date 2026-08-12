@@ -161,6 +161,14 @@ class ApiClient {
     return this.request<any>('POST', `/api/v1/catalog/${id}/like`);
   }
 
+  async bookmarkTutorial(id: string) {
+    return this.request<any>('POST', `/api/v1/bookmarks/${id}/bookmark`);
+  }
+
+  async unbookmarkTutorial(id: string) {
+    return this.request<any>('DELETE', `/api/v1/bookmarks/${id}/bookmark`);
+  }
+
   async reportTutorial(id: string, reason: string) {
     return this.request<any>('POST', `/api/v1/catalog/${id}/report`, { reason });
   }

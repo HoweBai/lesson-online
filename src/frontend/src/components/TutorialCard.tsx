@@ -10,9 +10,11 @@ interface TutorialCardProps {
   tutorial: Tutorial;
   onClick: (id: string) => void;
   onLike?: (e: React.MouseEvent) => void;
+  isBookmarked?: boolean;
+  onBookmark?: (e: React.MouseEvent) => void;
 }
 
-const TutorialCard = ({ tutorial, onClick, onLike }: TutorialCardProps) => {
+const TutorialCard = ({ tutorial, onClick, onLike, isBookmarked, onBookmark }: TutorialCardProps) => {
   return (
     <div
       className="card p-6 cursor-pointer group hover:-translate-y-1 transition-all duration-300 hover:shadow-hover"
@@ -67,6 +69,17 @@ const TutorialCard = ({ tutorial, onClick, onLike }: TutorialCardProps) => {
             className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200 hover:scale-105"
           >
             <span>❤️</span> Like
+          </button>
+        )}
+        {onBookmark && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onBookmark(e);
+            }}
+            className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200 hover:scale-105"
+          >
+            <span>{isBookmarked ? '🔖' : '📑'}</span> {isBookmarked ? 'Bookmarked' : 'Bookmark'}
           </button>
         )}
       </div>
