@@ -26,16 +26,16 @@ class TestAuthExtended:
         """Test registration with duplicate email."""
         c = TestClient(app)
         payload = {
-            "username": "dupuser",
-            "email": "dup@test.com",
+            "username": "dupuser99",
+            "email": "dup99@test.com",
             "password": "testpass123"
         }
         response1 = c.post("/api/v1/auth/register", json=payload)
         assert response1.status_code in [201, 400]
 
         payload2 = {
-            "username": "dupuser2",
-            "email": "dup@test.com",
+            "username": "dupuser99b",
+            "email": "dup99@test.com",
             "password": "testpass123"
         }
         response2 = c.post("/api/v1/auth/register", json=payload2)
@@ -45,15 +45,15 @@ class TestAuthExtended:
         """Test registration with duplicate username."""
         c = TestClient(app)
         payload = {
-            "username": "sameuser",
-            "email": "same1@test.com",
+            "username": "sameuser99",
+            "email": "same99a@test.com",
             "password": "testpass123"
         }
         c.post("/api/v1/auth/register", json=payload)
 
         payload2 = {
-            "username": "sameuser",
-            "email": "same2@test.com",
+            "username": "sameuser99",
+            "email": "same99b@test.com",
             "password": "testpass123"
         }
         response = c.post("/api/v1/auth/register", json=payload2)
@@ -76,7 +76,12 @@ class TestAuthExtended:
         """Test getting current user info."""
         auth = AuthService()
         with Session(bind=engine) as db:
-            result = auth.register(db, "meuser", "me@test.com", "testpass123")
+            try:
+                result = auth.register(db, "meuser2", "me2@test.com", "testpass123")
+            except ValueError:
+                from src.models.user import User
+                user = db.query(User).filter(User.email == "me2@test.com").first()
+                result = {"token": auth.create_access_token(data={"sub": str(user.id)})}
             token = result["token"]
 
         c = TestClient(app)

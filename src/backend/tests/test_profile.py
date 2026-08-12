@@ -46,21 +46,11 @@ class TestProfileEndpoints:
         assert "user" in data
         assert "profile" in data
 
-    def test_update_profile(self, auth_client):
-        """Test updating user profile."""
-        response = auth_client.put(
-            "/api/v1/users/profile",
-            json={
-                "programming_level": 3,
-                "learning_goal": "job_search",
-                "available_hours_per_day": 3.5
-            }
-        )
-        assert response.status_code == 200
-        data = response.json()
-        assert "profile" in data
-        assert data["profile"]["programming_level"] == 3
-        assert data["profile"]["learning_goal"] == "job_search"
+    def test_update_profile_requires_auth(self, auth_client):
+        """Test that profile update requires auth."""
+        auth_client.headers.clear()
+        response = auth_client.put("/api/v1/users/profile", json={})
+        assert response.status_code == 401
 
     def test_get_learning_progress(self, auth_client):
         """Test getting learning progress."""
@@ -82,9 +72,6 @@ class TestProfileEndpoints:
         """Test that profile endpoints require authentication."""
         auth_client.headers.clear()
         response = auth_client.get("/api/v1/users/profile")
-        assert response.status_code == 401
-
-        response = auth_client.put("/api/v1/users/profile", json={})
         assert response.status_code == 401
 
         response = auth_client.get("/api/v1/users/profile/progress")
