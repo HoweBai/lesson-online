@@ -195,9 +195,6 @@ const TutorialDisplayPage = () => {
       toast.error('Failed to export outline: ' + e.message);
     }
   };
-      toast.error('PDF generation failed: ' + e.message);
-    }
-  };
 
   const handleNextChapter = async () => {
     setGenerating(true);
