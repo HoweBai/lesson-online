@@ -24,18 +24,20 @@ class TestAuthExtended:
 
     def test_register_duplicate_email(self):
         """Test registration with duplicate email."""
+        import uuid
+        unique_id = str(uuid.uuid4())[:8]
         c = TestClient(app)
         payload = {
-            "username": "dupuser99",
-            "email": "dup99@test.com",
+            "username": f"dupuser_{unique_id}",
+            "email": f"dup_{unique_id}@test.com",
             "password": "testpass123"
         }
         response1 = c.post("/api/v1/auth/register", json=payload)
         assert response1.status_code in [201, 400]
 
         payload2 = {
-            "username": "dupuser99b",
-            "email": "dup99@test.com",
+            "username": f"dupuser2_{unique_id}",
+            "email": f"dup_{unique_id}@test.com",
             "password": "testpass123"
         }
         response2 = c.post("/api/v1/auth/register", json=payload2)
@@ -43,17 +45,19 @@ class TestAuthExtended:
 
     def test_register_duplicate_username(self):
         """Test registration with duplicate username."""
+        import uuid
+        unique_id = str(uuid.uuid4())[:8]
         c = TestClient(app)
         payload = {
-            "username": "sameuser99",
-            "email": "same99a@test.com",
+            "username": f"sameuser_{unique_id}",
+            "email": f"samea_{unique_id}@test.com",
             "password": "testpass123"
         }
         c.post("/api/v1/auth/register", json=payload)
 
         payload2 = {
-            "username": "sameuser99",
-            "email": "same99b@test.com",
+            "username": f"sameuser_{unique_id}",
+            "email": f"sameb_{unique_id}@test.com",
             "password": "testpass123"
         }
         response = c.post("/api/v1/auth/register", json=payload2)
@@ -63,11 +67,14 @@ class TestAuthExtended:
         """Test login with wrong password."""
         auth = AuthService()
         with Session(bind=engine) as db:
-            auth.register(db, "wrongpwduser", "wrongpwd@test.com", "correctpass123")
+            try:
+                auth.register(db, "wrongpwduser99", "wrongpwd99@test.com", "correctpass123")
+            except ValueError:
+                pass
 
         c = TestClient(app)
         response = c.post("/api/v1/auth/login", json={
-            "email": "wrongpwd@test.com",
+            "email": "wrongpwd99@test.com",
             "password": "wrongpass"
         })
         assert response.status_code == 401
