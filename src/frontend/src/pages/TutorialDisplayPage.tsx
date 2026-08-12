@@ -142,21 +142,59 @@ const TutorialDisplayPage = () => {
     );
   }
 
-  const handleDownloadPDF = async () => {
+  const handleExportMarkdown = async () => {
     try {
-      const res = await fetch(`/api/v1/tutorials/${id}/chapters/1/download/pdf`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${api.getToken()}` }
-      });
-      if (res.ok) {
-        const blob = await res.blob();
+      const text = await api.exportMarkdown(id!);
+      if (text) {
+        const blob = new Blob([text], { type: 'text/markdown' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${chapter.title}_Chapter_1.pdf`;
+        a.download = `${chapter?.title || 'tutorial'}.md`;
         a.click();
+        URL.revokeObjectURL(url);
+        toast.success('Markdown exported successfully!');
       }
     } catch (e: any) {
+      toast.error('Failed to export markdown: ' + e.message);
+    }
+  };
+
+  const handleExportJSON = async () => {
+    try {
+      const result = await api.exportJSON(id!);
+      if (result.success) {
+        const blob = new Blob([JSON.stringify(result.data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${chapter?.title || 'tutorial'}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        toast.success('JSON exported successfully!');
+      }
+    } catch (e: any) {
+      toast.error('Failed to export JSON: ' + e.message);
+    }
+  };
+
+  const handleExportOutline = async () => {
+    try {
+      const result = await api.exportOutline(id!);
+      if (result.success) {
+        const blob = new Blob([JSON.stringify(result.data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${chapter?.title || 'tutorial'}-outline.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        toast.success('Outline exported successfully!');
+      }
+    } catch (e: any) {
+      toast.error('Failed to export outline: ' + e.message);
+    }
+  };
       toast.error('PDF generation failed: ' + e.message);
     }
   };
@@ -411,16 +449,35 @@ const TutorialDisplayPage = () => {
             </svg>
             Back to Library
           </button>
-          <div className="flex gap-3">
+          <div className="flex gap-2">
             <button
-              onClick={handleDownloadPDF}
-              className="flex items-center gap-2 px-4 py-2 bg-success-600 text-white rounded-xl hover:bg-success-700 transition-all font-medium shadow-soft hover:shadow-hover"
+              onClick={handleExportMarkdown}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-medium shadow-soft"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              Download PDF
+              Markdown
             </button>
+            <button
+              onClick={handleExportJSON}
+              className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-all font-medium shadow-soft"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h7" />
+              </svg>
+              JSON
+            </button>
+            <button
+              onClick={handleExportOutline}
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all font-medium shadow-soft"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+              </svg>
+              Outline
+            </button>
+          </div>
             <button
               onClick={handleNextChapter}
               disabled={generating || refreshing || !chapter?.chapter_number}
