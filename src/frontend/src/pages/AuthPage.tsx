@@ -59,25 +59,17 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
         return;
       }
 
-      const endpoint = mode === 'register' ? '/api/v1/auth/register' : '/api/v1/auth/login';
-      const body: any = {
-        email: formData.email,
-        password: formData.password,
-      };
       if (mode === 'register') {
-        body.username = formData.username;
+        const result = await api.register(formData.username, formData.email, formData.password);
+        if (!result.success) throw new Error(result.error || 'Registration failed');
+        toast.success('Account created successfully!');
+        navigate('/');
+        return;
       }
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
 
-      const data = await response.json();
-
-      if (!response.ok) throw new Error(data.message || (mode === 'register' ? 'Registration failed' : 'Login failed'));
-
-      localStorage.setItem('auth_token', data.token);
+      const result = await api.login(formData.email, formData.password);
+      if (!result.success) throw new Error(result.error || 'Login failed');
+      toast.success('Login successful!');
       navigate('/');
     } catch (err: any) {
       setError(err.message || 'An error occurred');
@@ -223,7 +215,7 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
               </>
             )}
 
-            {mode === 'login' && (
+            {(mode === 'login' || mode === 'register') && (
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-gray-700">
                   Password
