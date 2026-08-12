@@ -53,6 +53,13 @@ const TutorialCard = ({ tutorial, onClick, onLike, isBookmarked, onBookmark }: T
         <span className="flex items-center gap-1 bg-pink-50 text-pink-700 px-2 py-1 rounded-lg group-hover:bg-pink-100 transition-colors duration-300">
           <span>❤️</span> {tutorial.likes || 0} likes
         </span>
+        {onBookmark && (
+          <span className={`flex items-center gap-1 px-2 py-1 rounded-lg transition-colors duration-300 ${
+            isBookmarked ? 'bg-amber-100 text-amber-700' : 'bg-gray-50 text-gray-400'
+          }`}>
+            <span>{isBookmarked ? '🔖' : '📑'}</span> {isBookmarked ? 'Saved' : 'Save'}
+          </span>
+        )}
       </div>
 
       {/* Footer */}
