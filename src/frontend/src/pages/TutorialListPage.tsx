@@ -2,7 +2,7 @@
  * Tutorial List Page - Beautiful modern design with grid layout
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import TutorialCard from '../components/TutorialCard';
@@ -19,6 +19,15 @@ const TutorialListPage = () => {
   const [sortOrder, setSortOrder] = useState('desc');
   const [activeTab, setActiveTab] = useState<'public' | 'mine'>('public');
   const [bookmarks, setBookmarks] = useState<Set<string>>(new Set());
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (searchDebounceRef.current) {
+        clearTimeout(searchDebounceRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     fetchBookmarks();
@@ -60,9 +69,14 @@ const TutorialListPage = () => {
     }
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    fetchTutorials();
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+    if (searchDebounceRef.current) {
+      clearTimeout(searchDebounceRef.current);
+    }
+    searchDebounceRef.current = setTimeout(() => {
+      fetchTutorials();
+    }, 400);
   };
 
   const handleBookmark = async (id: string, e: React.MouseEvent) => {
@@ -172,7 +186,7 @@ const TutorialListPage = () => {
 
         {/* Search and Filter */}
         <div className="bg-white rounded-2xl shadow-soft p-4 mb-8">
-          <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-4">
+          <form className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1 relative">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                 <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -183,7 +197,7 @@ const TutorialListPage = () => {
                 type="text"
                 placeholder="Search tutorials..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => handleSearch(e.target.value)}
                 className="input pl-11"
               />
             </div>
