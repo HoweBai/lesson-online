@@ -7,9 +7,11 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import TutorialCard from '../components/TutorialCard';
 import { Tutorial } from '../types';
+import { useToast } from '../hooks/useToast';
 
 const TutorialListPage = () => {
   const navigate = useNavigate();
+  const toast = useToast();
   const [tutorials, setTutorials] = useState<Tutorial[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -35,7 +37,7 @@ const TutorialListPage = () => {
         setTutorials(result.data.data || []);
       }
     } catch (error) {
-      console.error('Failed to fetch tutorials:', error);
+      toast.error('Failed to fetch tutorials. Please try again.');
     } finally {
       setLoading(false);
     }

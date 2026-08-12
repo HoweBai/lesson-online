@@ -7,6 +7,7 @@ import TutorialDisplayPage from './pages/TutorialDisplayPage';
 import ProfilePage from './pages/ProfilePage';
 import ClaudeConfigPage from './pages/ClaudeConfigPage';
 import CourseWizard from './components/CourseWizard';
+import { GlobalErrorHandler } from './components/GlobalErrorHandler';
 import './App.css';
 
 const App = () => {
@@ -49,8 +50,9 @@ const App = () => {
   }
 
   return (
-    <BrowserRouter>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <GlobalErrorHandler>
+      <BrowserRouter>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
         {user && (
           <header className="sticky top-0 z-40 glass border-b border-white/30 shadow-sm">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -96,8 +98,9 @@ const App = () => {
             )}
           </Routes>
         </main>
-      </div>
-    </BrowserRouter>
+        </div>
+      </BrowserRouter>
+    </GlobalErrorHandler>
   );
 };
 

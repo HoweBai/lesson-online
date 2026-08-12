@@ -54,7 +54,7 @@ const ProfilePage = () => {
         });
       }
     } catch (error) {
-      console.error('Failed to load profile:', error);
+      toast.error('Failed to load profile. Please try again.');
     } finally {
       setLoading(false);
     }
