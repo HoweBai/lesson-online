@@ -33,10 +33,14 @@ const TutorialDisplayPage = () => {
   const navigate = useNavigate();
   const [chapter, setChapter] = useState<ChapterContent | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
     const fetchChapter = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const result = await api.getChapterContent(id!, 1);
         if (result.success) {
@@ -46,6 +50,7 @@ const TutorialDisplayPage = () => {
         }
       } catch (err: any) {
         console.error('Error loading chapter:', err);
+        setError(err?.message || 'Failed to load tutorial chapter. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -55,6 +60,27 @@ const TutorialDisplayPage = () => {
   }, [id]);
 
   const [refreshing, setRefreshing] = useState(false);
+
+  const handleRetry = useCallback(() => {
+    setError(null);
+    const fetchChapter = async () => {
+      setLoading(true);
+      try {
+        const result = await api.getChapterContent(id!, 1);
+        if (result.success) {
+          setChapter(result.data);
+        } else {
+          throw new Error(result.error || 'Failed to load chapter');
+        }
+      } catch (err: any) {
+        console.error('Error loading chapter:', err);
+        setError(err?.message || 'Failed to load tutorial chapter. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchChapter();
+  }, [id]);
 
   const handleChapterGenerated = useCallback(async () => {
     // Refresh the chapter data after generation
@@ -85,6 +111,22 @@ const TutorialDisplayPage = () => {
             <div className="absolute inset-0 border-4 border-primary-600 rounded-full border-t-transparent animate-spin"></div>
           </div>
           <p className="text-gray-600 font-medium">Loading tutorial...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">⚠️</div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Failed to Load Tutorial</h2>
+          <p className="text-gray-500 mb-2">{error}</p>
+          <p className="text-gray-400 text-sm mb-6">Please check your connection and try again.</p>
+          <button onClick={handleRetry} className="btn-primary">
+            Retry
+          </button>
         </div>
       </div>
     );
@@ -125,6 +167,7 @@ const TutorialDisplayPage = () => {
   };
 
   const handleNextChapter = async () => {
+    setGenerating(true);
     try {
       const result = await api.generateNextChapter(id!);
       if (result.success) {
@@ -134,6 +177,8 @@ const TutorialDisplayPage = () => {
       }
     } catch (e: any) {
       toast.error('Failed to generate next chapter: ' + e.message);
+    } finally {
+      setGenerating(false);
     }
   };
 
@@ -332,10 +377,18 @@ const TutorialDisplayPage = () => {
             </button>
             <button
               onClick={handleNextChapter}
-              disabled={!chapter?.chapter_number || refreshing}
+              disabled={generating || !chapter?.chapter_number}
               className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl hover:from-primary-700 hover:to-accent-700 transition-all font-medium shadow-soft hover:shadow-hover disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {refreshing ? (
+              {generating ? (
+                <>
+                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Generating...
+                </>
+              ) : refreshing ? (
                 <>
                   <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
@@ -430,10 +483,18 @@ const TutorialDisplayPage = () => {
           </button>
           <button
             onClick={handleNextChapter}
-            disabled={!chapter?.chapter_number || refreshing}
+            disabled={generating || !chapter?.chapter_number}
             className="btn-primary"
           >
-            {refreshing ? (
+            {generating ? (
+              <>
+                <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Generating...
+              </>
+            ) : refreshing ? (
               <>
                 <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
