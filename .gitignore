@@ -94,3 +94,4 @@ apply_*.py
 
 # Docs (generated)
 docs/implementation-status-report.md
+.worktrees/
