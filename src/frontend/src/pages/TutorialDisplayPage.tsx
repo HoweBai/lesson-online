@@ -41,6 +41,8 @@ const TutorialDisplayPage = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [chapters, setChapters] = useState<Array<{ chapter_number: number; title: string; status: string; id: string }>>([]);
   const [showChapterList, setShowChapterList] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [bookmarkLoading, setBookmarkLoading] = useState(false);
 
   const fetchChapters = useCallback(async () => {
     if (!id) return;
@@ -73,6 +75,15 @@ const TutorialDisplayPage = () => {
     fetchChapter();
     fetchChapters();
   }, [fetchChapter, fetchChapters]);
+
+  useEffect(() => {
+    const checkBookmark = async () => {
+      if (!id) return;
+      const result = await api.isBookmarked(id);
+      setIsBookmarked(result);
+    };
+    checkBookmark();
+  }, [id]);
 
   const handleRetry = useCallback(() => {
     fetchChapter();
@@ -193,6 +204,24 @@ const TutorialDisplayPage = () => {
       }
     } catch (e: any) {
       toast.error('Failed to export outline: ' + e.message);
+    }
+  };
+
+  const handleBookmark = async () => {
+    if (!id || bookmarkLoading) return;
+    setBookmarkLoading(true);
+    try {
+      const result = isBookmarked
+        ? await api.unbookmarkTutorial(id)
+        : await api.bookmarkTutorial(id);
+      if (result.success) {
+        setIsBookmarked(!isBookmarked);
+        toast.success(isBookmarked ? 'Removed from bookmarks' : 'Added to bookmarks');
+      }
+    } catch (e: any) {
+      toast.error('Failed to update bookmark');
+    } finally {
+      setBookmarkLoading(false);
     }
   };
 
@@ -447,6 +476,18 @@ const TutorialDisplayPage = () => {
             Back to Library
           </button>
           <div className="flex gap-2">
+            <button
+              onClick={handleBookmark}
+              disabled={bookmarkLoading}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all font-medium shadow-soft ${
+                isBookmarked
+                  ? 'bg-amber-100 text-amber-700 hover:bg-amber-200'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              } disabled:opacity-50`}
+            >
+              <span>{isBookmarked ? '🔖' : '📑'}</span>
+              {isBookmarked ? 'Bookmarked' : 'Bookmark'}
+            </button>
             <button
               onClick={handleExportMarkdown}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-medium shadow-soft"
