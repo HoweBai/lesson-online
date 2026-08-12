@@ -2,11 +2,12 @@
  * Tutorial Display Page - Beautiful tutorial reading experience
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import CodeBlock from '../components/CodeBlock';
+import ClaudeChatSidebar from '../components/ClaudeChatSidebar';
 import { useToast } from '../hooks/useToast';
 
 interface ChapterContent {
@@ -48,6 +49,16 @@ const TutorialDisplayPage = () => {
     };
 
     fetchChapter();
+  }, [id]);
+
+  const handleChapterGenerated = useCallback(() => {
+    // Refresh the chapter data after generation
+    if (id) {
+      fetch(`/api/v1/tutorials/${id}/chapters/1`)
+        .then(res => res.json())
+        .then(data => setChapter(data))
+        .catch(err => console.error('Error refreshing chapter:', err));
+    }
   }, [id]);
 
   if (loading) {
@@ -392,6 +403,14 @@ const TutorialDisplayPage = () => {
           </button>
         </div>
       </div>
+
+      {/* Claude Chat Sidebar */}
+      {id && (
+        <ClaudeChatSidebar
+          tutorialId={id}
+          onChapterGenerated={handleChapterGenerated}
+        />
+      )}
     </div>
   );
 };

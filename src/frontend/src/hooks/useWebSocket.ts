@@ -1,6 +1,6 @@
 /** Custom React hook for managing WebSocket connections with auto-reconnect. */
 
-import { useState, useEffect, useCallback, RefObject } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 interface WebSocketOptions {
   onOpen?: () => void;
@@ -22,24 +22,24 @@ export function useWebSocket(
   url: string,
   options: Partial<WebSocketOptions> = {}
 ): UseWebSocketResult {
-  const [socket, setSocket] = useState<WebSocket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-
-  const {
-    onOpen = () => {},
-    onMessage = () => {},
-    onClose = () => {},
-    onError = () => {},
-    reconnectionDelay = 3000
-  } = options;
+  const socketRef = useRef<WebSocket | null>(null);
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
 
   const connect = useCallback(() => {
+    if (socketRef.current) {
+      socketRef.current.close();
+    }
+
     const ws = new WebSocket(url);
+    socketRef.current = ws;
+    const { onOpen, onMessage, onClose, onError, reconnectionDelay } = optionsRef.current;
 
     ws.onopen = () => {
-      console.log('WebSocket connected:', url);
       setIsConnected(true);
-      onOpen();
+      onOpen?.();
     };
 
     ws.onmessage = (event) => {
@@ -47,61 +47,56 @@ export function useWebSocket(
     };
 
     ws.onclose = (event) => {
-      console.log('WebSocket closed:', event.code, event.reason);
       setIsConnected(false);
-      onClose();
+      onClose?.();
 
-      // Auto-reconnect logic
-      setTimeout(() => connect(), reconnectionDelay);
+      if (event.code !== 1000) {
+        reconnectTimeoutRef.current = setTimeout(() => connect(), reconnectionDelay || 3000);
+      }
     };
 
     ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
-      onError(error);
+      onError?.(error);
     };
+  }, [url]);
 
-    setSocket(ws);
-    return ws;
-  }, [url, onOpen, onMessage, onClose, onError, reconnectionDelay]);
-
-  // Connect on mount and clean up on unmount
   useEffect(() => {
     connect();
     return () => {
-      if (socket) {
-        socket.close();
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+      if (socketRef.current) {
+        socketRef.current.close(1000, 'Component unmounting');
       }
     };
-  }, [connect, socket]);
+  }, [connect]);
 
   const sendMessage = useCallback((message: string | ArrayBuffer | Blob) => {
-    if (socket && socket.readyState === WebSocket.OPEN) {
-      socket.send(message);
+    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      socketRef.current.send(message);
     } else {
-      console.warn('WebSocket not connected, cannot send message');
+      console.warn('WebSocket not connected');
     }
-  }, [socket]);
+  }, []);
 
-  const closeWebSocket = useCallback((code?: number, reason?: string) => {
-    if (socket) {
-      socket.close(code, reason);
-      setSocket(null);
+  const closeWebSocket = useCallback(() => {
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
     }
-  }, [socket]);
-
-  // Reconnect helper (useful if you want manual control over reconnects)
-  const reconnect = useCallback(() => {
-    if (!socket || socket.readyState !== WebSocket.CLOSED) {
-      connect();
+    if (socketRef.current) {
+      socketRef.current.close(1000, 'Manual close');
+      socketRef.current = null;
+      setIsConnected(false);
     }
-  }, [socket, connect]);
+  }, []);
 
   return {
-    socket,
+    socket: socketRef.current,
     isConnected,
     send: sendMessage,
     close: closeWebSocket,
-    reconnect
+    reconnect: connect
   };
 }
 
