@@ -36,7 +36,7 @@ const TutorialListPage = () => {
         setBookmarks(new Set(bookmarkIds));
       }
     } catch {
-      // Ignore bookmark fetch errors; bookmarks are non-critical
+      console.log('Failed to fetch bookmarks');
     }
   };
 

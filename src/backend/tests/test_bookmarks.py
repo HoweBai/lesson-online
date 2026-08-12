@@ -4,26 +4,13 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import text
 from src.api.main import app
-from src.database import engine, Base, get_db
-from src.services.auth_service import AuthService, get_current_user
+from src.database import engine, Base
+from src.services.auth_service import AuthService
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 import uuid as uuid_module
 
 Base.metadata.create_all(bind=engine)
-
-
-def override_get_db():
-    db = Session(bind=engine)
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-def override_get_current_user():
-    from src.models.user import User
-    return User(id="testbookuser", username="bookuser", email="book@test.com")
 
 
 @pytest.fixture
@@ -94,9 +81,8 @@ class TestBookmarkEndpoints:
     def test_bookmark_tutorial(self, auth_client: TestClient) -> None:
         """Test bookmarking a tutorial."""
         _clean_db()
-        auth = AuthService()
         with Session(bind=engine) as db:
-            user_id = _register_user(db, "testbookuser_b", "bookb@test.com", "testpass123")
+            user_id = _register_user(db, "testbookuser", "book@test.com", "testpass123")
 
         test_tutorial_id = str(uuid_module.uuid4())
         _insert_tutorial(Session(bind=engine), test_tutorial_id, user_id)
@@ -105,6 +91,14 @@ class TestBookmarkEndpoints:
         assert response.status_code == 200
         data = response.json()
         assert data["success"] is True
+
+        db = Session(bind=engine)
+        count = db.execute(
+            text("SELECT COUNT(*) FROM user_bookmarks WHERE user_id=:uid AND tutorial_id=:tid"),
+            {"uid": user_id, "tid": test_tutorial_id}
+        ).fetchone()[0]
+        db.close()
+        assert count == 1
 
     def test_unbookmark_tutorial(self, auth_client: TestClient) -> None:
         """Test unbookmarking a tutorial."""
@@ -132,7 +126,7 @@ class TestBookmarkEndpoints:
         """Test listing user bookmarks."""
         _clean_db()
         with Session(bind=engine) as db:
-            user_id = _register_user(db, "testbookuser_l", "bookl@test.com", "testpass123")
+            user_id = _register_user(db, "testbookuser", "book@test.com", "testpass123")
 
         test_tutorial_id = str(uuid_module.uuid4())
         _insert_tutorial(Session(bind=engine), test_tutorial_id, user_id)
