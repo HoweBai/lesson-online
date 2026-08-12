@@ -33,3 +33,21 @@ export const generateId = (): string => {
 export const checkRole = (user: any, roles: string[]): boolean => {
   return roles.some(r => user?.roles?.includes(r));
 };
+
+export async function pollStatus<T>(
+  getStatus: () => Promise<T>,
+  isComplete: (result: T) => boolean,
+  options: { initialDelay?: number; maxDelay?: number; maxAttempts?: number } = {}
+): Promise<T> {
+  const { initialDelay = 1000, maxDelay = 30000, maxAttempts = 60 } = options;
+  let delay = initialDelay;
+  let attempts = 0;
+  while (attempts < maxAttempts) {
+    const result = await getStatus();
+    if (isComplete(result)) return result;
+    await new Promise(resolve => setTimeout(resolve, delay));
+    delay = Math.min(delay * 2, maxDelay);
+    attempts++;
+  }
+  throw new Error('Status polling timed out');
+}
