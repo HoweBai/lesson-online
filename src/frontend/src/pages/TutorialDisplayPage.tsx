@@ -619,7 +619,7 @@ const TutorialDisplayPage = () => {
 
       {/* Comments Section */}
       <CommentSection tutorialId={id} />
-    </div>
+    </>
   );
 };
 
