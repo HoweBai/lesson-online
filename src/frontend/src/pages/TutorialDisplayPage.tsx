@@ -39,6 +39,16 @@ const TutorialDisplayPage = () => {
   const [generating, setGenerating] = useState(false);
 
   const [refreshing, setRefreshing] = useState(false);
+  const [chapters, setChapters] = useState<Array<{ chapter_number: number; title: string; status: string; id: string }>>([]);
+  const [showChapterList, setShowChapterList] = useState(false);
+
+  const fetchChapters = useCallback(async () => {
+    if (!id) return;
+    const result = await api.getTutorialChapters(id);
+    if (result.success && result.data?.data) {
+      setChapters(result.data.data);
+    }
+  }, [id]);
 
   const fetchChapter = useCallback(async () => {
     setLoading(true);
@@ -61,7 +71,8 @@ const TutorialDisplayPage = () => {
 
   useEffect(() => {
     fetchChapter();
-  }, [fetchChapter]);
+    fetchChapters();
+  }, [fetchChapter, fetchChapters]);
 
   const handleRetry = useCallback(() => {
     fetchChapter();
@@ -336,7 +347,58 @@ const TutorialDisplayPage = () => {
     : 0;
 
   return (
-    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+    <>
+      {/* Chapter Navigation */}
+      <div className="fixed left-0 top-16 bottom-0 z-30 transition-all duration-300">
+        <button
+          onClick={() => setShowChapterList(!showChapterList)}
+          className="fixed left-0 top-20 z-40 w-10 h-10 bg-white rounded-r-xl shadow-lg flex items-center justify-center text-gray-600 hover:text-primary-600 transition-all"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h10M4 18h7" />
+          </svg>
+        </button>
+        <div className={`bg-white shadow-xl transition-all duration-300 ${showChapterList ? 'w-72' : 'w-0'} overflow-hidden`}>
+          <div className="p-4">
+            <h3 className="font-bold text-gray-900 mb-3">Chapters</h3>
+            <div className="space-y-1">
+              {chapters.map((ch) => (
+                <button
+                  key={ch.id}
+                  onClick={async () => {
+                    const result = await api.getChapterContent(id!, ch.chapter_number);
+                    if (result.success) {
+                      setChapter(result.data);
+                      setShowChapterList(false);
+                    }
+                  }}
+                  className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all ${
+                    chapter?.chapter_number === ch.chapter_number
+                      ? 'bg-primary-100 text-primary-700 font-semibold'
+                      : ch.status === 'ready'
+                      ? 'text-gray-700 hover:bg-gray-50'
+                      : 'text-gray-400 cursor-not-allowed'
+                  }`}
+                  disabled={ch.status !== 'ready'}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold">
+                      {ch.chapter_number}
+                    </span>
+                    <span className="truncate">{ch.title}</span>
+                    {ch.status === 'ready' && <span className="text-green-500 text-xs ml-auto">✓</span>}
+                  </div>
+                </button>
+              ))}
+              {chapters.length === 0 && (
+                <p className="text-sm text-gray-500 text-center py-4">No chapters yet</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className={`min-h-screen py-8 px-4 sm:px-6 lg:px-8 transition-all duration-300 ${showChapterList ? 'ml-72' : 'ml-0'}`}>
       <div className="max-w-4xl mx-auto">
         {/* Top toolbar */}
         <div className="bg-white rounded-2xl shadow-soft p-4 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
