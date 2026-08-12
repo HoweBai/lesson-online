@@ -1,7 +1,7 @@
 """Bookmark API endpoints for tutorial favorites."""
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 from ..database import get_db
 from ..models.user import User
@@ -24,9 +24,15 @@ async def bookmark_tutorial(
         raise HTTPException(status_code=404, detail="Tutorial not found")
 
     bookmark = Bookmark.create(db=db, user_id=str(current_user.id), tutorial_id=tutorial_id)
+    if bookmark is None:
+        return {
+            "success": True,
+            "message": "Already bookmarked",
+            "bookmark_id": None
+        }
     return {
         "success": True,
-        "message": "Tutorial bookmarked" if bookmark.id else "Already bookmarked",
+        "message": "Tutorial bookmarked",
         "bookmark_id": bookmark.id
     }
 

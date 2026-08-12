@@ -137,12 +137,20 @@ class ApiClient {
     return this.request<any>('POST', `/api/v1/tutorials/${tutorialId}/generate-next`);
   }
 
+  async getTutorialChapters(tutorialId: string) {
+    return this.request<any>('GET', `/api/v1/tutorials/${tutorialId}/chapters`);
+  }
+
   async getChapterStatus(tutorialId: string, chapterNumber: number) {
     return this.request<any>('GET', `/api/v1/tutorials/${tutorialId}/chapters/${chapterNumber}/status`);
   }
 
   async getChapterContent(tutorialId: string, chapterNumber: number) {
     return this.request<any>('GET', `/api/v1/tutorials/${tutorialId}/chapters/${chapterNumber}`);
+  }
+
+  async getTutorialChapters(tutorialId: string) {
+    return this.request<any>('GET', `/api/v1/tutorials/${tutorialId}/chapters`);
   }
 
   // Catalog endpoints
@@ -161,8 +169,27 @@ class ApiClient {
     return this.request<any>('POST', `/api/v1/catalog/${id}/like`);
   }
 
+  async bookmarkTutorial(id: string) {
+    return this.request<any>('POST', `/api/v1/bookmarks/${id}/bookmark`);
+  }
+
+  async unbookmarkTutorial(id: string) {
+    return this.request<any>('DELETE', `/api/v1/bookmarks/${id}/bookmark`);
+  }
+
   async reportTutorial(id: string, reason: string) {
     return this.request<any>('POST', `/api/v1/catalog/${id}/report`, { reason });
+  }
+
+  async getComments(tutorialId: string) {
+    return this.request<any>('GET', `/api/v1/tutorials/${tutorialId}/comments`);
+  }
+
+  async createComment(tutorialId: string, content: string, parentId?: string) {
+    return this.request<any>('POST', `/api/v1/tutorials/${tutorialId}/comments`, {
+      content,
+      parent_id: parentId
+    });
   }
 
   async getPopularTutorials() {

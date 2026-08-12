@@ -18,10 +18,27 @@ const TutorialListPage = () => {
   const [sortBy, setSortBy] = useState('publish_time');
   const [sortOrder, setSortOrder] = useState('desc');
   const [activeTab, setActiveTab] = useState<'public' | 'mine'>('public');
+  const [bookmarks, setBookmarks] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    fetchBookmarks();
+  }, []);
 
   useEffect(() => {
     fetchTutorials();
   }, [activeTab, searchTerm, sortBy, sortOrder]);
+
+  const fetchBookmarks = async () => {
+    try {
+      const result = await api.request<any>('GET', '/api/v1/bookmarks/bookmarks');
+      if (result.success && result.data?.data) {
+        const bookmarkIds = result.data.data.map((b: any) => b.tutorial_id);
+        setBookmarks(new Set(bookmarkIds));
+      }
+    } catch {
+      console.log('Failed to fetch bookmarks');
+    }
+  };
 
   const fetchTutorials = async () => {
     setLoading(true);
@@ -46,6 +63,22 @@ const TutorialListPage = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     fetchTutorials();
+  };
+
+  const handleBookmark = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const isBookmarked = bookmarks.has(id);
+    const result = isBookmarked
+      ? await api.unbookmarkTutorial(id)
+      : await api.bookmarkTutorial(id);
+    if (result.success) {
+      setBookmarks(prev => {
+        const next = new Set(prev);
+        if (isBookmarked) next.delete(id);
+        else next.add(id);
+        return next;
+      });
+    }
   };
 
   const handleLike = async (id: string, e: React.MouseEvent) => {
@@ -180,20 +213,20 @@ const TutorialListPage = () => {
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
               {activeTab === 'public' ? 'No public tutorials yet' : 'You haven\'t created any tutorials'}
             </h3>
-            <p className="text-gray-500 mb-6">
-              {activeTab === 'public' ? 'Be the first to share your knowledge!' : 'Create your first AI-powered tutorial'}
+            <p className="text-gray-500 mb-6 max-w-md mx-auto">
+              {activeTab === 'public'
+                ? 'Share your knowledge with the community! Create your first AI-powered tutorial.'
+                : 'Create your first AI-powered tutorial with our guided wizard.'}
             </p>
-            {activeTab === 'mine' && (
-              <button
-                onClick={() => navigate('/wizard')}
-                className="btn-primary"
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                Create Your First Tutorial
-              </button>
-            )}
+            <button
+              onClick={() => navigate('/wizard')}
+              className="btn-primary inline-flex items-center gap-2 px-6 py-3"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              {activeTab === 'public' ? 'Create & Publish Tutorial' : 'Create Your First Tutorial'}
+            </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -203,6 +236,8 @@ const TutorialListPage = () => {
                   tutorial={tutorial}
                   onClick={(id) => navigate(`/tutorial/${id}`)}
                   onLike={(e) => handleLike(tutorial.id, e)}
+                  isBookmarked={bookmarks.has(tutorial.id)}
+                  onBookmark={(e) => handleBookmark(tutorial.id, e)}
                 />
               </div>
             ))}
@@ -214,7 +249,7 @@ const TutorialListPage = () => {
           <StatCard label="Total Tutorials" value={tutorials.length} icon="📚" />
           <StatCard label="Public Tutorials" value={tutorials.filter(t => t.is_public).length} icon="🌍" />
           <StatCard label="Total Views" value={tutorials.reduce((sum, t) => sum + (t.views || 0), 0)} icon="👁️" />
-          <StatCard label="Total Likes" value={tutorials.reduce((sum, t) => sum + (t.likes || 0), 0)} icon="❤️" />
+          <StatCard label="Bookmarked" value={bookmarks.size} icon="🔖" />
         </div>
       </div>
     </div>

@@ -30,13 +30,13 @@ class Bookmark(Base):
         }
 
     @staticmethod
-    def create(db: Session, user_id: str, tutorial_id: str) -> 'Bookmark':
+    def create(db: Session, user_id: str, tutorial_id: str) -> Optional['Bookmark']:
         """Create a bookmark, return None if already exists."""
         existing = db.query(Bookmark).filter_by(
             user_id=user_id, tutorial_id=tutorial_id
         ).first()
         if existing:
-            return existing
+            return None
         bookmark = Bookmark(user_id=user_id, tutorial_id=tutorial_id)
         db.add(bookmark)
         db.commit()

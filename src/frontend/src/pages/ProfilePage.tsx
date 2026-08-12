@@ -17,6 +17,7 @@ const ProfilePage = () => {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
+  const [knowledgeMap, setKnowledgeMap] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     programming_level: 1,
     math_background: '',
@@ -43,6 +44,11 @@ const ProfilePage = () => {
       if (profileRes.success) setProfile(profileRes.data?.profile);
       if (progressRes.success) setProgress(progressRes.data);
       if (statsRes.success) setStats(statsRes.data);
+
+      // Extract knowledge map from profile response
+      if (profileRes.success && profileRes.data?.knowledge_mapping?.mastery_map) {
+        setKnowledgeMap(profileRes.data.knowledge_mapping.mastery_map);
+      }
 
       if (profileRes.data?.profile) {
         setFormData({
@@ -203,6 +209,32 @@ const ProfilePage = () => {
               <p className="text-gray-500 text-center py-8">No stats available</p>
             )}
           </div>
+
+          {/* Knowledge Map Card */}
+          {Object.keys(knowledgeMap).length > 0 && (
+            <div className="card p-6 animate-slide-up" style={{ animationDelay: '0.15s' }}>
+              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <span>🧠</span> Knowledge Map
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(knowledgeMap).map(([topic, level]) => (
+                  <span
+                    key={topic}
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium ${
+                      level === 'advanced' ? 'bg-green-100 text-green-700' :
+                      level === 'intermediate' ? 'bg-yellow-100 text-yellow-700' :
+                      'bg-gray-100 text-gray-600'
+                    }`}
+                  >
+                    {topic.replace(/_/g, ' ')} · {level}
+                  </span>
+                ))}
+              </div>
+              <p className="text-xs text-gray-400 mt-3">
+                Auto-inferred from your learning profile
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Profile Edit Section */}
