@@ -61,29 +61,34 @@ const TutorialDisplayPage = () => {
 
   const [refreshing, setRefreshing] = useState(false);
 
-  const handleRetry = useCallback(() => {
+  const fetchChapter = useCallback(async () => {
+    setLoading(true);
     setError(null);
-    const fetchChapter = async () => {
-      setLoading(true);
-      try {
-        const result = await api.getChapterContent(id!, 1);
-        if (result.success) {
-          setChapter(result.data);
-        } else {
-          throw new Error(result.error || 'Failed to load chapter');
-        }
-      } catch (err: any) {
-        console.error('Error loading chapter:', err);
-        setError(err?.message || 'Failed to load tutorial chapter. Please try again.');
-      } finally {
-        setLoading(false);
+    try {
+      const result = await api.getChapterContent(id!, 1);
+      if (result.success) {
+        setChapter(result.data);
+      } else {
+        throw new Error(result.error || 'Failed to load chapter');
       }
-    };
+    } catch (err: any) {
+      console.error('Error loading chapter:', err);
+      setError(err?.message || 'Failed to load tutorial chapter. Please try again.');
+      toast.error(err?.message || 'Failed to load tutorial chapter');
+    } finally {
+      setLoading(false);
+    }
+  }, [id, toast]);
+
+  useEffect(() => {
     fetchChapter();
-  }, [id]);
+  }, [fetchChapter]);
+
+  const handleRetry = useCallback(() => {
+    fetchChapter();
+  }, [fetchChapter]);
 
   const handleChapterGenerated = useCallback(async () => {
-    // Refresh the chapter data after generation
     if (id) {
       setRefreshing(true);
       try {
@@ -377,7 +382,7 @@ const TutorialDisplayPage = () => {
             </button>
             <button
               onClick={handleNextChapter}
-              disabled={generating || !chapter?.chapter_number}
+              disabled={generating || refreshing || !chapter?.chapter_number}
               className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-xl hover:from-primary-700 hover:to-accent-700 transition-all font-medium shadow-soft hover:shadow-hover disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {generating ? (

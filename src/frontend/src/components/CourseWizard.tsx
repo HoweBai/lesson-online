@@ -3,6 +3,7 @@
  */
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useToast } from '../hooks/useToast';
 import { api } from '../api/client';
 import ProfileFormStep from './WizardSteps/ProfileFormStep';
@@ -25,6 +26,7 @@ interface WizardStep {
 
 export const CourseWizard = ({ onClose }: { onClose?: () => void }) => {
   const toast = useToast();
+  const navigate = useNavigate();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [error, setError] = useState('');
@@ -109,7 +111,7 @@ export const CourseWizard = ({ onClose }: { onClose?: () => void }) => {
 
   const handleNavigate = () => {
     onClose?.();
-    window.location.href = `/tutorial/${generatedTutorialId}`;
+    navigate(`/tutorial/${generatedTutorialId}`);
   };
 
   const handleRetry = () => {
