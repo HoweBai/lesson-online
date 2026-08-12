@@ -97,8 +97,20 @@ export const CourseWizard = ({ onClose }: { onClose?: () => void }) => {
         throw new Error(result.error || 'Failed to generate outline');
       }
       setGenerationProgress(100);
-      setGenerationMessage('Outline generated successfully!');
-      setGeneratedTutorialId(result.data?.task_id);
+      setGenerationMessage('Generating outline... Confirming tutorial');
+
+      // Confirm outline to create the tutorial
+      const confirmResult = await api.confirmOutline(result.data?.task_id, {
+        title: formData.course_title || undefined,
+        description: formData.description || undefined,
+        selected_chapters: formData.selected_sections || []
+      });
+      if (!confirmResult.success) {
+        throw new Error(confirmResult.error || 'Failed to confirm outline');
+      }
+
+      const tutorialId = confirmResult.data?.tutorial_id;
+      setGeneratedTutorialId(tutorialId);
       setGenerationStatus('completed');
       toast.success('Tutorial generated successfully!');
     } catch (err: any) {
