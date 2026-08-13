@@ -252,6 +252,23 @@ class ApiClient {
     return this.request<any>('GET', `/api/v1/tutorials/share/${shareCode.toUpperCase()}`);
   }
 
+  // OAuth endpoints
+  async oauthGoogleInit() {
+    return this.request<any>('GET', '/api/v1/oauth/google/init');
+  }
+
+  async oauthGithubInit() {
+    return this.request<any>('GET', '/api/v1/oauth/github/init');
+  }
+
+  async oauthMe() {
+    return this.request<any>('GET', '/api/v1/oauth/me');
+  }
+
+  async oauthRevoke(provider: string) {
+    return this.request<any>('DELETE', `/api/v1/oauth/${provider}`);
+  }
+
   // Admin endpoints
   async adminLogin(email: string, password: string) {
     return this.request<any>('POST', '/api/v1/admin/login', { email, password });

@@ -8,6 +8,7 @@ import ProfilePage from './pages/ProfilePage';
 import ClaudeConfigPage from './pages/ClaudeConfigPage';
 import AdminLoginPage from './pages/AdminLoginPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
+import AuthCallbackPage from './pages/AuthCallbackPage';
 import AdminUsersPage from './pages/AdminUsersPage';
 import AdminCatalogPage from './pages/AdminCatalogPage';
 import AdminGuard from './components/AdminGuard';
@@ -111,6 +112,7 @@ const App = () => {
                 <Route path="/register" element={<AuthPage mode="register" />} />
                 <Route path="/forgot-password" element={<AuthPage mode="forgot-password" />} />
                 <Route path="/reset-password/:token" element={<ResetPasswordRoute />} />
+                <Route path="/auth/callback" element={<AuthCallbackPage />} />
                 <Route path="*" element={<Navigate to="/login" replace />} />
               </>
             ) : (
