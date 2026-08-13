@@ -8,7 +8,7 @@ from datetime import datetime
 import logging
 import traceback
 
-from ..database import engine, Base, get_db
+from ..database import engine, Base, get_db, migrate_db
 from ..services.auth_service import AuthService, get_current_user
 from ..models.user import User
 from ..api.auth import auth_router
@@ -121,6 +121,7 @@ async def startup_event():
     try:
         Base.metadata.create_all(bind=engine)
         logger.info("Database tables created/initialized successfully")
+        migrate_db()
     except Exception as e:
         logger.error(f"Failed to initialize database: {e}")
         raise

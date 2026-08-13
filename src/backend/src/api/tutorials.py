@@ -302,6 +302,7 @@ async def confirm_outline(
         current_chapter=1,
         created_at=datetime.utcnow()
     )
+    tutorial.share_code = Tutorial.generate_share_code()
     db.add(tutorial)
     db.commit()
     db.refresh(tutorial)
@@ -642,3 +643,33 @@ async def delete_tutorial(
     db.query(Chapter).filter_by(tutorial_id=tutorial_id).delete()
     db.delete(tutorial)
     db.commit()
+
+
+@tutorials_router.get("/share/{share_code}")
+async def get_tutorial_by_share_code(
+    share_code: str,
+    db: Session = Depends(get_db)
+) -> Dict[str, Any]:
+    """Get tutorial by share code for public viewing."""
+    tutorial = db.query(Tutorial).filter(
+        Tutorial.share_code == share_code.upper()
+    ).first()
+
+    if not tutorial:
+        raise HTTPException(status_code=404, detail="Tutorial not found")
+
+    if not tutorial.is_public:
+        raise HTTPException(status_code=403, detail="Tutorial is not public")
+
+    return {
+        "success": True,
+        "data": {
+            "id": tutorial.id,
+            "title": tutorial.title,
+            "description": tutorial.description,
+            "owner_id": tutorial.owner_id,
+            "status": tutorial.status,
+            "total_chapters": tutorial.total_chapters,
+            "created_at": tutorial.created_at.isoformat() if tutorial.created_at else None,
+        }
+    }

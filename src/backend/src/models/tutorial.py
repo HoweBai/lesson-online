@@ -1,6 +1,8 @@
 """Tutorial model for the learning platform."""
 
 import uuid
+import random
+import string
 from datetime import datetime
 from sqlalchemy import Column, String, Text, Boolean, Integer, DateTime, JSON, Enum as SQLEnum, ForeignKey
 from sqlalchemy.orm import relationship, Session
@@ -23,6 +25,7 @@ class Tutorial(Base):
     current_chapter = Column(Integer, nullable=True, default=1)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    share_code = Column(String(20), unique=True, nullable=True)
 
     chapters = relationship("Chapter", back_populates="tutorial", cascade="all, delete-orphan")
 
@@ -38,6 +41,7 @@ class Tutorial(Base):
             "current_chapter": self.current_chapter,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
+            "share_code": self.share_code,
             "outline": self.outline if include_outline else None
         }
 
@@ -50,3 +54,9 @@ class Tutorial(Base):
     def get_by_owner(db: Session, owner_id: str) -> list:
         """Get all tutorials by owner."""
         return db.query(Tutorial).filter(Tutorial.owner_id == owner_id).all()
+
+    @staticmethod
+    def generate_share_code() -> str:
+        """Generate an 8-character alphanumeric share code."""
+        chars = string.ascii_uppercase + string.digits
+        return ''.join(random.choice(chars) for _ in range(8))
