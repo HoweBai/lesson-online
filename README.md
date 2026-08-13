@@ -113,13 +113,17 @@ pytest tests/test_auth.py -v
 - [x] User registration/login (MVP)
 - [x] Profile management (MVP)
 - [x] Claude API config storage (encrypted) (MVP)
+- [x] P3 — Experience Enhancements (2026-08-13)
+  - OAuth third-party login (Google, GitHub)
+  - PDF tutorial export
+  - Admin link visible only to admin users
 - [ ] Knowledge inference from profile (MVP - partially done)
 - [ ] Course outline generation via LLM (MVP)
 - [ ] Chapter-by-chapter generation with prerequisite checks (MVP)
 - [ ] Tutorial display with Markdown/Formula rendering (in progress)
 - [ ] Public course catalog (search, sort, like, report)
-- [ ] Content export (Markdown/PDF)
-- [ ] OAuth2 login (Google/GitHub)
+- [x] Content export (Markdown/PDF)
+- [x] OAuth2 login (Google/GitHub)
 - [ ] Administrator dashboard
 - [ ] Mobile responsive design
 

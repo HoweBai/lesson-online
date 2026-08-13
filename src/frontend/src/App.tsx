@@ -26,7 +26,13 @@ const App = () => {
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
     if (token) {
-      setUser({ token });
+      api.getMe().then((result) => {
+        if (result.success && result.data?.user) {
+          setUser({ token, ...result.data.user });
+        } else {
+          setUser({ token });
+        }
+      }).catch(() => setUser({ token }));
     }
     setLoading(false);
   }, []);
@@ -79,7 +85,7 @@ const App = () => {
                   <NavLink href="/" icon="📚" label="Tutorials" />
                   <NavLink href="/wizard" icon="✨" label="Create" />
                   <NavLink href="/profile" icon="👤" label="Profile" />
-                  <NavLink href="/admin" icon="🛡️" label="Admin" />
+                  {user?.is_admin && <NavLink href="/admin" icon="🛡️" label="Admin" />}
                   <button onClick={handleLogout} className="text-gray-600 hover:text-red-600">Logout</button>
                   <ThemeToggle />
                 </div>
