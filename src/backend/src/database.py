@@ -88,4 +88,10 @@ def migrate_db():
             print("Created chat_histories table")
         except sqlite3.OperationalError:
             pass  # Table already exists
+        try:
+            cursor.execute("ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT FALSE")
+            conn.commit()
+            print("Added is_admin column to users")
+        except sqlite3.OperationalError:
+            pass  # Column already exists
         conn.close()
