@@ -2,7 +2,7 @@
 
 import uuid
 from datetime import datetime
-from sqlalchemy import Column, String, DateTime, UniqueConstraint, Boolean
+from sqlalchemy import Column, String, DateTime, UniqueConstraint, Boolean, Text
 from sqlalchemy.orm import Session
 from ..database import Base
 
@@ -16,6 +16,7 @@ class User(Base):
     password_hash = Column(String(255), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     is_admin = Column(Boolean, default=False)
+    avatar_url = Column(Text, nullable=True)
 
     def to_dict(self):
         return {
@@ -24,6 +25,7 @@ class User(Base):
             "email": self.email,
             "created_at": self.created_at.isoformat(),
             "is_admin": self.is_admin,
+            "avatar_url": self.avatar_url,
         }
 
     @staticmethod

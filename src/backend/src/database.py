@@ -51,6 +51,7 @@ def init_db():
     from src.models.bookmark import Bookmark
     from src.models.comment import Comment
     from src.models.chat_history import ChatHistory
+    from src.models.oauth_token import OAuthToken
     Base.metadata.create_all(bind=engine)
 
 
@@ -94,4 +95,20 @@ def migrate_db():
             print("Added is_admin column to users")
         except sqlite3.OperationalError:
             pass  # Column already exists
+        try:
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS oauth_tokens (
+                    id VARCHAR(36) PRIMARY KEY,
+                    user_id VARCHAR(36) NOT NULL,
+                    provider VARCHAR(20) NOT NULL,
+                    encrypted_token VARCHAR(512) NOT NULL,
+                    expires_at DATETIME NOT NULL,
+                    created_at DATETIME,
+                    state VARCHAR(64) UNIQUE
+                )
+            """)
+            conn.commit()
+            print("Created oauth_tokens table")
+        except sqlite3.OperationalError:
+            pass  # Table already exists
         conn.close()

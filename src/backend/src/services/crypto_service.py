@@ -33,3 +33,13 @@ class SecureCryptoService:
         ciphertext_with_tag = ciphertext + tag
         decrypted = aesgcm.decrypt(nonce, ciphertext_with_tag, None)
         return decrypted.decode()
+
+    def encrypt(self, plaintext: str) -> str:
+        """Convenience: encrypt and return as base64-encoded JSON dict for DB storage."""
+        d = self.encrypt_api_key(plaintext)
+        return base64.b64encode(json.dumps(d).encode()).decode()
+
+    def decrypt(self, encoded: str) -> str:
+        """Convenience: decode and decrypt value stored via encrypt()."""
+        d = json.loads(base64.b64decode(encoded).decode())
+        return self.decrypt_api_key(d)

@@ -9,6 +9,10 @@ from .chapter import Chapter
 from .public_catalog import PublicCatalog
 from .task_log import TaskLog
 from .audit_log import AuditLog
+from .bookmark import Bookmark
+from .comment import Comment
+from .chat_history import ChatHistory
+from .oauth_token import OAuthToken
 
 __all__ = [
     'User',
@@ -20,4 +24,8 @@ __all__ = [
     'PublicCatalog',
     'TaskLog',
     'AuditLog',
+    'Bookmark',
+    'Comment',
+    'ChatHistory',
+    'OAuthToken',
 ]
