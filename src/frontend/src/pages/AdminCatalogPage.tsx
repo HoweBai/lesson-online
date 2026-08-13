@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { api } from '../api/client';
 import { useToast } from '../hooks/useToast';
-import { useTheme } from '../contexts/ThemeContext';
 
 interface PendingTutorial {
   id: string;
@@ -18,9 +17,7 @@ interface PendingTutorial {
 }
 
 const AdminCatalogPage = () => {
-  const navigate = useNavigate();
   const toast = useToast();
-  const { theme, toggleTheme } = useTheme();
   const [tutorials, setTutorials] = useState<PendingTutorial[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);

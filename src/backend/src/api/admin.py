@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, Optional
 import logging
 from datetime import datetime, timedelta
 
@@ -12,7 +12,6 @@ from ..services.admin_service import admin_service, AdminService
 from ..models.user import User
 from ..models.tutorial import Tutorial
 from ..models.public_catalog import PublicCatalog
-from ..models.task_log import TaskLog
 
 logger = logging.getLogger(__name__)
 
@@ -153,7 +152,7 @@ async def review_tutorial(
     db: Session = Depends(get_db),
     current_user: User = Depends(admin_service.require_admin)
 ) -> Dict[str, Any]:
-    """Approve or reject a tutorial. body: {action: 'approve'|'reject', reason: str}."""
+    """Approve or reject a tutorial. body: {action: 'approve'|'reject'}."""
     tutorial = db.query(Tutorial).filter(Tutorial.id == tutorial_id).first()
     if not tutorial:
         raise HTTPException(status_code=404, detail="Tutorial not found")
@@ -181,7 +180,6 @@ async def get_stats_overview(
     total_tutorials = db.query(Tutorial).count()
     published_tutorials = db.query(Tutorial).filter(Tutorial.status == "published").count()
     pending_tutorials = db.query(Tutorial).filter(Tutorial.status == "reviewing").count()
-    total_chapters = db.query(TaskLog).count()  # proxy for activity
 
     # New users in last 7 days
     week_ago = datetime.utcnow() - timedelta(days=7)

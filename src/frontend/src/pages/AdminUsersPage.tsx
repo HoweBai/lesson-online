@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { api } from '../api/client';
 import { useToast } from '../hooks/useToast';
-import { useTheme } from '../contexts/ThemeContext';
 import { User } from '../types';
 
 const AdminUsersPage = () => {
-  const navigate = useNavigate();
   const toast = useToast();
-  const { theme, toggleTheme } = useTheme();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');

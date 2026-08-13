@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { api } from '../api/client';
 import { useToast } from '../hooks/useToast';
-import { useTheme } from '../contexts/ThemeContext';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
 const AdminDashboardPage = () => {
-  const navigate = useNavigate();
   const toast = useToast();
-  const { theme, toggleTheme } = useTheme();
   const [stats, setStats] = useState<any>(null);
   const [userGrowth, setUserGrowth] = useState<any[]>([]);
   const [tutorialStats, setTutorialStats] = useState<any>(null);
