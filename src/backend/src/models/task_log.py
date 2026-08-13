@@ -14,8 +14,8 @@ class TaskLog(Base):
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     user_id = Column(String(36), ForeignKey('users.id'), nullable=False)
-    task_type = Column(SQLEnum("generate_outline", "generate_chapter", "save_config", "publish_tutorial", "delete_tutorial"), nullable=False)
-    status = Column(SQLEnum("pending", "running", "success", "failed", "cancelled"), default="pending")
+    task_type = Column(SQLEnum("generate_outline", "generate_chapter", "save_config", "publish_tutorial", "delete_tutorial", name='task_type_enum'), nullable=False)
+    status = Column(SQLEnum("pending", "running", "success", "failed", "cancelled", name='task_status_enum'), default="pending")
     progress = Column(Integer, default=0)
     result_url = Column(String(1024), nullable=True)
     error_message = Column(Text, nullable=True)

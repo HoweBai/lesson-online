@@ -19,7 +19,7 @@ class Tutorial(Base):
     title = Column(String(200), nullable=False)
     description = Column(Text, nullable=True)
     is_public = Column(Boolean, default=False)
-    status = Column(SQLEnum('draft', 'reviewing', 'published', 'retired'), default='draft')
+    status = Column(SQLEnum('draft', 'reviewing', 'published', 'retired', name='tutorial_status'), default='draft')
     outline = Column(JSON, nullable=True)
     total_chapters = Column(Integer, nullable=True)
     current_chapter = Column(Integer, nullable=True, default=1)

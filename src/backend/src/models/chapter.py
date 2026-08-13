@@ -17,7 +17,7 @@ class Chapter(Base):
     chapter_number = Column(Integer, nullable=False)
     title = Column(String(200), nullable=False)
     content = Column(JSON, nullable=True)
-    status = Column(SQLEnum('draft', 'ready', 'in_progress', 'completed', 'failed'), default='draft')
+    status = Column(SQLEnum('draft', 'ready', 'in_progress', 'completed', 'failed', name='chapter_status'), default='draft')
     prerequisite_check_passed = Column(Boolean, default=False)
     generated_at = Column(DateTime, nullable=True)
     completed_at = Column(DateTime, nullable=True)
