@@ -8,6 +8,7 @@ import ProfilePage from './pages/ProfilePage';
 import ClaudeConfigPage from './pages/ClaudeConfigPage';
 import CourseWizard from './components/CourseWizard';
 import { GlobalErrorHandler } from './components/GlobalErrorHandler';
+import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { api } from './api/client';
 import './App.css';
 
@@ -51,11 +52,12 @@ const App = () => {
   }
 
   return (
+    <ThemeProvider>
     <GlobalErrorHandler>
       <BrowserRouter>
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         {user && (
-          <header className="sticky top-0 z-40 glass border-b border-white/30 shadow-sm">
+          <header className="sticky top-0 z-40 glass border-b border-white/30 dark:border-gray-700 shadow-sm">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center h-16">
                 <div className="flex items-center space-x-3">
@@ -72,6 +74,7 @@ const App = () => {
                   <NavLink href="/wizard" icon="✨" label="Create" />
                   <NavLink href="/profile" icon="👤" label="Profile" />
                   <button onClick={handleLogout} className="text-gray-600 hover:text-red-600">Logout</button>
+                  <ThemeToggle />
                 </div>
               </div>
             </div>
@@ -103,15 +106,29 @@ const App = () => {
         </div>
       </BrowserRouter>
     </GlobalErrorHandler>
+    </ThemeProvider>
   );
 };
 
 const NavLink = ({ href, icon, label }: { href: string; icon: string; label: string }) => {
   const navigate = useNavigate();
   return (
-    <button onClick={() => navigate(href)} className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all">
+    <button onClick={() => navigate(href)} className="flex items-center space-x-2 px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-700 rounded-xl transition-all">
       <span className="text-lg">{icon}</span>
       <span className="font-medium">{label}</span>
+    </button>
+  );
+};
+
+const ThemeToggle = () => {
+  const { theme, toggleTheme } = useTheme();
+  return (
+    <button
+      onClick={toggleTheme}
+      className="w-9 h-9 rounded-xl flex items-center justify-center text-lg transition-all hover:bg-gray-100 dark:hover:bg-gray-700"
+      title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+    >
+      {theme === 'dark' ? '☀️' : '🌙'}
     </button>
   );
 };
