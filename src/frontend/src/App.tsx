@@ -6,6 +6,11 @@ import TutorialListPage from './pages/TutorialListPage';
 import TutorialDisplayPage from './pages/TutorialDisplayPage';
 import ProfilePage from './pages/ProfilePage';
 import ClaudeConfigPage from './pages/ClaudeConfigPage';
+import AdminLoginPage from './pages/AdminLoginPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
+import AdminUsersPage from './pages/AdminUsersPage';
+import AdminCatalogPage from './pages/AdminCatalogPage';
+import AdminGuard from './components/AdminGuard';
 import CourseWizard from './components/CourseWizard';
 import { GlobalErrorHandler } from './components/GlobalErrorHandler';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
@@ -73,6 +78,7 @@ const App = () => {
                   <NavLink href="/" icon="📚" label="Tutorials" />
                   <NavLink href="/wizard" icon="✨" label="Create" />
                   <NavLink href="/profile" icon="👤" label="Profile" />
+                  <NavLink href="/admin" icon="🛡️" label="Admin" />
                   <button onClick={handleLogout} className="text-gray-600 hover:text-red-600">Logout</button>
                   <ThemeToggle />
                 </div>
@@ -82,6 +88,23 @@ const App = () => {
         )}
         <main className="flex-1">
           <Routes>
+            {/* Admin routes — always accessible */}
+            <Route path="/admin/login" element={<AdminLoginPage />} />
+            <Route path="/admin" element={
+              <AdminGuard>
+                <AdminDashboardPage />
+              </AdminGuard>
+            } />
+            <Route path="/admin/users" element={
+              <AdminGuard>
+                <AdminUsersPage />
+              </AdminGuard>
+            } />
+            <Route path="/admin/catalog" element={
+              <AdminGuard>
+                <AdminCatalogPage />
+              </AdminGuard>
+            } />
             {!user ? (
               <>
                 <Route path="/login" element={<AuthPage mode="login" />} />
