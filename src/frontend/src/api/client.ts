@@ -247,6 +247,10 @@ class ApiClient {
   async exportOutline(tutorialId: string) {
     return this.request<any>('GET', `/api/v1/tutorials/${tutorialId}/export/outline`);
   }
+
+  async getTutorialByShareCode(shareCode: string) {
+    return this.request<any>('GET', `/api/v1/tutorials/share/${shareCode.toUpperCase()}`);
+  }
 }
 
 export const api = new ApiClient();

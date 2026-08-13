@@ -9,6 +9,7 @@ import remarkGfm from 'remark-gfm';
 import CodeBlock from '../components/CodeBlock';
 import ClaudeChatSidebar from '../components/ClaudeChatSidebar';
 import CommentSection from '../components/CommentSection';
+import ShareModal from '../components/ShareModal';
 import { api } from '../api/client';
 import { useToast } from '../hooks/useToast';
 
@@ -43,6 +44,7 @@ const TutorialDisplayPage = () => {
   const [showChapterList, setShowChapterList] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [bookmarkLoading, setBookmarkLoading] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const fetchChapters = useCallback(async () => {
     if (!id) return;
@@ -225,15 +227,9 @@ const TutorialDisplayPage = () => {
     }
   };
 
-  const handleShare = async () => {
+  const handleShare = () => {
     if (!id) return;
-    const url = `${window.location.origin}/tutorial/${id}`;
-    try {
-      await navigator.clipboard.writeText(url);
-      toast.success('Link copied to clipboard!');
-    } catch {
-      toast.error('Failed to copy link');
-    }
+    setShowShareModal(true);
   };
 
   const handleNextChapter = async () => {
@@ -680,6 +676,15 @@ const TutorialDisplayPage = () => {
 
       {/* Comments Section */}
       <CommentSection tutorialId={id} />
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        tutorialId={id!}
+        tutorialTitle={chapter?.title || ''}
+        tutorialDescription={''}
+      />
     </>
   );
 };

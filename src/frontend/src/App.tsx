@@ -8,6 +8,7 @@ import ProfilePage from './pages/ProfilePage';
 import ClaudeConfigPage from './pages/ClaudeConfigPage';
 import CourseWizard from './components/CourseWizard';
 import { GlobalErrorHandler } from './components/GlobalErrorHandler';
+import { api } from './api/client';
 import './App.css';
 
 const App = () => {
@@ -90,6 +91,7 @@ const App = () => {
               <>
                 <Route path="/wizard" element={<CourseWizard onClose={() => setShowWizard(false)} />} />
                 <Route path="/" element={<TutorialListPage />} />
+                <Route path="/tutorial/share/:shareCode" element={<ShareRedirect />} />
                 <Route path="/tutorial/:id" element={<TutorialDisplayPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/claude-config" element={<ClaudeConfigPage />} />
@@ -111,6 +113,43 @@ const NavLink = ({ href, icon, label }: { href: string; icon: string; label: str
       <span className="text-lg">{icon}</span>
       <span className="font-medium">{label}</span>
     </button>
+  );
+};
+
+const ShareRedirect = () => {
+  const { shareCode } = useParams<{ shareCode: string }>();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!shareCode) {
+      navigate('/');
+      return;
+    }
+    const redirect = async () => {
+      try {
+        const result = await api.getTutorialByShareCode(shareCode);
+        if (result.success && result.data?.data?.id) {
+          navigate(`/tutorial/${result.data.data.id}`);
+        } else {
+          navigate('/');
+        }
+      } catch {
+        navigate('/');
+      }
+    };
+    redirect();
+  }, [shareCode, navigate]);
+
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <div className="relative w-16 h-16 mx-auto mb-4">
+          <div className="absolute inset-0 border-4 border-primary-200 rounded-full"></div>
+          <div className="absolute inset-0 border-4 border-primary-600 rounded-full border-t-transparent animate-spin"></div>
+        </div>
+        <p className="text-gray-600 font-medium">Loading tutorial...</p>
+      </div>
+    </div>
   );
 };
 
