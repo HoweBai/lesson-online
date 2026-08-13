@@ -209,6 +209,23 @@ const TutorialDisplayPage = () => {
     }
   };
 
+  const handleExportPDF = async () => {
+    try {
+      const blob = await api.exportPDF(id!);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${chapter?.title || 'tutorial'}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast.success('PDF exported successfully!');
+    } catch (e: any) {
+      toast.error('Failed to export PDF: ' + e.message);
+    }
+  };
+
   const handleBookmark = async () => {
     if (!id || bookmarkLoading) return;
     setBookmarkLoading(true);
@@ -530,6 +547,16 @@ const TutorialDisplayPage = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
               </svg>
               Outline
+            </button>
+            <button
+              onClick={handleExportPDF}
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all font-medium shadow-soft"
+              title="Export as PDF"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16l-4-4m0 0l4-4m-4 4h18" />
+              </svg>
+              PDF
             </button>
           </div>
             <button

@@ -248,6 +248,17 @@ class ApiClient {
     return this.request<any>('GET', `/api/v1/tutorials/${tutorialId}/export/outline`);
   }
 
+  async exportPDF(tutorialId: string) {
+    const response = await fetch(`${API_BASE}/api/v1/tutorials/${tutorialId}/export/pdf`, {
+      headers: this.getHeaders()
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.detail || 'PDF export failed');
+    }
+    return response.blob();
+  }
+
   async getTutorialByShareCode(shareCode: string) {
     return this.request<any>('GET', `/api/v1/tutorials/share/${shareCode.toUpperCase()}`);
   }
