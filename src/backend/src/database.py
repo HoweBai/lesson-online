@@ -111,4 +111,10 @@ def migrate_db():
             print("Created oauth_tokens table")
         except sqlite3.OperationalError:
             pass  # Table already exists
+        try:
+            cursor.execute("ALTER TABLE users ADD COLUMN avatar_url TEXT")
+            conn.commit()
+            print("Added avatar_url column to users")
+        except sqlite3.OperationalError:
+            pass  # Column already exists
         conn.close()

@@ -1,7 +1,7 @@
 """OAuth token storage model for persistent access tokens."""
 
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from sqlalchemy import Column, String, DateTime
 from ..database import Base
 
@@ -27,7 +27,7 @@ class OAuthToken(Base):
             user_id=user_id,
             provider=provider,
             state=state,
-            expires_at=datetime.now(timezone.utc) + __import__('datetime').timedelta(minutes=10),
+            expires_at=datetime.now(timezone.utc) + timedelta(minutes=10),
         )
         db.add(record)
         db.commit()

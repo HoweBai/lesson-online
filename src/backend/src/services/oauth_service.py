@@ -3,13 +3,12 @@
 import logging
 import os
 import secrets
-import uuid
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional
 
 import httpx
 from sqlalchemy.orm import Session
 
-from ..database import get_db
 from ..models.oauth_token import OAuthToken
 from ..models.user import User
 from ..services.auth_service import AuthService
@@ -71,7 +70,6 @@ class OAuthService:
             'state': state,
             'prompt': 'consent',
         }
-        from urllib.parse import quote
         return f"{p['authorize_url']}?{urlencode(params)}"
 
     def google_callback(self, code: str, state: str, db: Session) -> Dict[str, Any]:
@@ -92,7 +90,7 @@ class OAuthService:
         stored_state = db.query(OAuthToken).filter(
             OAuthToken.state == state,
             OAuthToken.provider == provider,
-            OAuthToken.expires_at > __import__('datetime').datetime.now(__import__('datetime').timezone.utc)
+            OAuthToken.expires_at > datetime.now(timezone.utc)
         ).first()
         if not stored_state:
             raise ValueError("Invalid or expired state token")
@@ -169,13 +167,13 @@ class OAuthService:
         ).first()
         if existing_token:
             existing_token.encrypted_token = encrypted_token
-            existing_token.expires_at = __import__('datetime').datetime.now(__import__('datetime').timezone.utc) + __import__('datetime').timedelta(seconds=expires_in)
+            existing_token.expires_at = datetime.now(timezone.utc) + timedelta(seconds=expires_in)
         else:
             oauth_token = OAuthToken(
                 user_id=user.id,
                 provider=provider,
                 encrypted_token=encrypted_token,
-                expires_at=__import__('datetime').datetime.now(__import__('datetime').timezone.utc) + __import__('datetime').timedelta(seconds=expires_in),
+                expires_at=datetime.now(timezone.utc) + timedelta(seconds=expires_in),
             )
             db.add(oauth_token)
         db.commit()
@@ -204,11 +202,11 @@ class OAuthService:
                     return {'primary': e['email']}
             if emails:
                 return {'primary': emails[0]['email']}
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning("Failed to fetch GitHub emails: %s", e)
         return {}
 
-    def store_access_token(self, db: Session, user_id: str, provider: str, encrypted_token: str) -> None:
+    def store_access_token(self, db: Session, user_id: str, provider: str, encrypted_token: str, expires_in: int = 3600) -> None:
         """Persist encrypted access token."""
         record = db.query(OAuthToken).filter(
             OAuthToken.user_id == user_id,
@@ -221,7 +219,7 @@ class OAuthService:
                 user_id=user_id,
                 provider=provider,
                 encrypted_token=encrypted_token,
-                expires_at=__import__('datetime').datetime.now(__import__('datetime').timezone.utc) + __import__('datetime').timedelta(hours=1),
+                expires_at=datetime.now(timezone.utc) + timedelta(hours=expires_in / 3600),
             )
             db.add(record)
         db.commit()
@@ -231,7 +229,7 @@ class OAuthService:
         record = db.query(OAuthToken).filter(
             OAuthToken.user_id == user_id,
             OAuthToken.provider == provider,
-            OAuthToken.expires_at > __import__('datetime').datetime.now(__import__('datetime').timezone.utc)
+            OAuthToken.expires_at > datetime.now(timezone.utc)
         ).first()
         if not record:
             return None
@@ -252,7 +250,6 @@ class OAuthService:
 
 def get_oauth_service() -> OAuthService:
     """Create and return the global OAuth service instance."""
-    from ..database import get_db as _get_db
     from ..services.crypto_service import SecureCryptoService
     import os
     master_key_hex = os.getenv("CRYPTO_KEY_HEX", "0" * 64)
