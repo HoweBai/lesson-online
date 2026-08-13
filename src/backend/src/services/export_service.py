@@ -184,8 +184,20 @@ class ExportService:
         """Convert markdown to HTML for PDF rendering."""
         html = markdown
 
+        # Extract and protect code blocks before HTML escaping
+        code_blocks: list[str] = []
+        def _protect_code(m: re.Match) -> str:
+            idx = len(code_blocks)
+            code_blocks.append(m.group(2))
+            return f"%%CODEBLOCK_{idx}%%"
+        html = re.sub(r'```(\w+)?\n(.+?)```', _protect_code, html, flags=re.DOTALL)
+
         # Escape HTML
         html = html.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+
+        # Restore code blocks
+        for idx, code in enumerate(code_blocks):
+            html = html.replace(f"%%CODEBLOCK_{idx}%%", f"<pre><code>{code}</code></pre>")
 
         # Headings
         html = re.sub(r'^# (.+)$', r'<h1>\1</h1>', html, flags=re.MULTILINE)
@@ -196,8 +208,7 @@ class ExportService:
         html = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', html)
         html = re.sub(r'\*(.+?)\*', r'<em>\1</em>', html)
 
-        # Code blocks
-        html = re.sub(r'```(\w+)?\n(.+?)```', r'<pre><code>\2</code></pre>', html, flags=re.DOTALL)
+        # Inline code
         html = re.sub(r'`(.+?)`', r'<code>\1</code>', html)
 
         # Horizontal rule

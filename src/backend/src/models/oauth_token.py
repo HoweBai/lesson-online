@@ -14,7 +14,7 @@ class OAuthToken(Base):
     user_id = Column(String(36), nullable=False, index=True)
     provider = Column(String(20), nullable=False)  # 'google' or 'github'
     encrypted_token = Column(String(512), nullable=True)
-    expires_at = Column(DateTime, nullable=False, default=datetime.now(timezone.utc))
+    expires_at = Column(DateTime, nullable=False, default=lambda: datetime.now(timezone.utc))
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
     state = Column(String(64), unique=True, nullable=True)  # for OAuth state validation
 
