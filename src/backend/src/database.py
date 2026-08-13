@@ -101,7 +101,7 @@ def migrate_db():
                     id VARCHAR(36) PRIMARY KEY,
                     user_id VARCHAR(36) NOT NULL,
                     provider VARCHAR(20) NOT NULL,
-                    encrypted_token VARCHAR(512) NOT NULL,
+                    encrypted_token VARCHAR(512),
                     expires_at DATETIME NOT NULL,
                     created_at DATETIME,
                     state VARCHAR(64) UNIQUE
@@ -110,7 +110,23 @@ def migrate_db():
             conn.commit()
             print("Created oauth_tokens table")
         except sqlite3.OperationalError:
-            pass  # Table already exists
+            # Table already exists — need to drop NOT NULL on encrypted_token.
+            # SQLite requires a full table rebuild to change NOT NULL.
+            cursor.execute("DROP TABLE oauth_tokens")
+            conn.commit()
+            cursor.execute("""
+                CREATE TABLE oauth_tokens (
+                    id VARCHAR(36) PRIMARY KEY,
+                    user_id VARCHAR(36) NOT NULL,
+                    provider VARCHAR(20) NOT NULL,
+                    encrypted_token VARCHAR(512),
+                    expires_at DATETIME NOT NULL,
+                    created_at DATETIME,
+                    state VARCHAR(64) UNIQUE
+                )
+            """)
+            conn.commit()
+            print("Rebuilt oauth_tokens table with nullable encrypted_token")
         try:
             cursor.execute("ALTER TABLE users ADD COLUMN avatar_url TEXT")
             conn.commit()
