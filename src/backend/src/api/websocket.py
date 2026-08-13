@@ -11,10 +11,11 @@ from datetime import datetime
 from typing import Dict, Any, Optional, List
 from collections import defaultdict
 
-from ..database import get_db, Session
+from ..database import get_db, Session, SessionLocal
 from ..services.auth_service import get_current_user
 from ..models.user import User
 from ..models.chapter import Chapter
+from ..models.chat_history import ChatHistory
 from ..services.llm_adapter import ClaudeAdapter, OpenAIAAdapter
 from ..services.claude_config_service import ClaudeConfigService
 from ..services.crypto_service import SecureCryptoService
@@ -123,14 +124,27 @@ async def claude_chat(websocket: WebSocket, tutorial_id: str, channel_id: str):
         "timestamp": datetime.utcnow().isoformat()
     })
 
-    # Send chat history if exists
-    history = chat_history.get(tutorial_id, {}).get(channel_id, [])
-    if history:
-        await session.send({
-            "type": "history",
-            "messages": history[-50:],  # Last 50 messages
-            "timestamp": datetime.utcnow().isoformat()
-        })
+    # Send chat history from database
+    db = SessionLocal()
+    try:
+        stored_history = ChatHistory.get_history(db, tutorial_id, channel_id, 50)
+        if stored_history:
+            stored_messages = [
+                {
+                    "id": str(h.id),
+                    "sender": h.sender,
+                    "content": h.content,
+                    "timestamp": h.created_at.isoformat() if h.created_at else datetime.utcnow().isoformat()
+                }
+                for h in stored_history
+            ]
+            await session.send({
+                "type": "history",
+                "messages": stored_messages,
+                "timestamp": datetime.utcnow().isoformat()
+            })
+    finally:
+        db.close()
 
     logger.info(f"WebSocket connected: tutorial={tutorial_id}, channel={channel_id}, session={session.session_id}")
 
@@ -171,6 +185,20 @@ async def claude_chat(websocket: WebSocket, tutorial_id: str, channel_id: str):
                 }
                 chat_history[tutorial_id][channel_id].append(user_msg)
 
+                # Store user message to database
+                if user_id:
+                    db = SessionLocal()
+                    try:
+                        ChatHistory.create(
+                            db=db,
+                            tutorial_id=tutorial_id,
+                            channel_id=channel_id,
+                            sender='user',
+                            content=user_content
+                        )
+                    finally:
+                        db.close()
+
                 # Send acknowledgment
                 await session.send({
                     "type": "message_received",
@@ -199,6 +227,20 @@ async def claude_chat(websocket: WebSocket, tutorial_id: str, channel_id: str):
                         "timestamp": datetime.utcnow().isoformat()
                     }
                     chat_history[tutorial_id][channel_id].append(ai_msg)
+
+                    # Store AI response to database
+                    if user_id:
+                        db = SessionLocal()
+                        try:
+                            ChatHistory.create(
+                                db=db,
+                                tutorial_id=tutorial_id,
+                                channel_id=channel_id,
+                                sender='ai',
+                                content=response
+                            )
+                        finally:
+                            db.close()
 
                     await session.send({
                         "type": "ai_response",
