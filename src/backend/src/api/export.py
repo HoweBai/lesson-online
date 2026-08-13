@@ -85,3 +85,32 @@ async def export_outline(
         "title": tutorial.title,
         "outline": outline
     })
+
+
+@router.get("/{tutorial_id}/export/pdf")
+async def export_pdf(
+    tutorial_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+) -> Response:
+    """Export tutorial content as PDF."""
+    tutorial = db.query(Tutorial).filter(
+        Tutorial.id == tutorial_id,
+        (Tutorial.owner_id == current_user.id) | (Tutorial.is_public == True)
+    ).first()
+    if not tutorial:
+        raise HTTPException(status_code=404, detail="Tutorial not found")
+
+    try:
+        export_service = create_export_service(db)
+        result = export_service.export_to_pdf(tutorial_id)
+        return Response(
+            content=result["pdf_bytes"],
+            media_type="application/pdf",
+            headers={"Content-Disposition": f"attachment; filename={tutorial.title.replace(' ', '_')}.pdf"}
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=501, detail=str(e))
+    except Exception as e:
+        logger.error(f"Export to PDF failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
