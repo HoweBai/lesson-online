@@ -251,6 +251,53 @@ class ApiClient {
   async getTutorialByShareCode(shareCode: string) {
     return this.request<any>('GET', `/api/v1/tutorials/share/${shareCode.toUpperCase()}`);
   }
+
+  // Admin endpoints
+  async adminLogin(email: string, password: string) {
+    return this.request<any>('POST', '/api/v1/admin/login', { email, password });
+  }
+
+  async adminMe() {
+    return this.request<any>('GET', '/api/v1/admin/me');
+  }
+
+  async adminListUsers(page = 1, limit = 20, search?: string) {
+    let url = `/api/v1/admin/users?page=${page}&limit=${limit}`;
+    if (search) url += `&search=${encodeURIComponent(search)}`;
+    return this.request<any>('GET', url);
+  }
+
+  async adminGetUser(userId: string) {
+    return this.request<any>('GET', `/api/v1/admin/users/${userId}`);
+  }
+
+  async adminUpdateUserStatus(userId: string, data: { is_admin: boolean }) {
+    return this.request<any>('PUT', `/api/v1/admin/users/${userId}/status`, data);
+  }
+
+  async adminDeleteUser(userId: string) {
+    return this.request<any>('DELETE', `/api/v1/admin/users/${userId}`);
+  }
+
+  async adminListPendingTutorials(page = 1, limit = 20) {
+    return this.request<any>('GET', `/api/v1/admin/catalog/pending?page=${page}&limit=${limit}`);
+  }
+
+  async adminReviewTutorial(tutorialId: string, action: string, reason?: string) {
+    return this.request<any>('PUT', `/api/v1/admin/catalog/${tutorialId}/review`, { action, reason });
+  }
+
+  async adminGetStatsOverview() {
+    return this.request<any>('GET', '/api/v1/admin/stats/overview');
+  }
+
+  async adminGetUserStats(period = '30d') {
+    return this.request<any>('GET', `/api/v1/admin/stats/users?period=${period}`);
+  }
+
+  async adminGetTutorialStats(period = '30d') {
+    return this.request<any>('GET', `/api/v1/admin/stats/tutorials?period=${period}`);
+  }
 }
 
 export const api = new ApiClient();
