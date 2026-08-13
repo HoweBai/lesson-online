@@ -65,7 +65,7 @@ def test_bookmark_tutorial(bookmark_client):
     tutorial_id = "test-bm-tutorial"
     _insert_tutorial(Session(bind=engine), tutorial_id)
 
-    resp = bookmark_client.post(f"/api/v1/bookmarks/{tutorial_id}")
+    resp = bookmark_client.post(f"/api/v1/bookmarks/{tutorial_id}/bookmark")
     assert resp.status_code == 200
     assert resp.json()["success"] is True
 
@@ -81,8 +81,8 @@ def test_duplicate_bookmark(bookmark_client):
     tutorial_id = "test-dup-tutorial"
     _insert_tutorial(Session(bind=engine), tutorial_id)
 
-    resp1 = bookmark_client.post(f"/api/v1/bookmarks/{tutorial_id}")
-    resp2 = bookmark_client.post(f"/api/v1/bookmarks/{tutorial_id}")
+    resp1 = bookmark_client.post(f"/api/v1/bookmarks/{tutorial_id}/bookmark")
+    resp2 = bookmark_client.post(f"/api/v1/bookmarks/{tutorial_id}/bookmark")
     assert resp1.status_code == 200
     assert resp2.status_code == 200
     assert resp2.json()["message"] == "Already bookmarked"
@@ -93,8 +93,8 @@ def test_unbookmark_tutorial(bookmark_client):
     tutorial_id = "test-ub-tutorial"
     _insert_tutorial(Session(bind=engine), tutorial_id)
 
-    bookmark_client.post(f"/api/v1/bookmarks/{tutorial_id}")
-    resp = bookmark_client.delete(f"/api/v1/bookmarks/{tutorial_id}")
+    bookmark_client.post(f"/api/v1/bookmarks/{tutorial_id}/bookmark")
+    resp = bookmark_client.delete(f"/api/v1/bookmarks/{tutorial_id}/bookmark")
     assert resp.status_code == 200
     assert resp.json()["success"] is True
 
@@ -106,7 +106,7 @@ def test_unbookmark_tutorial(bookmark_client):
 
 
 def test_bookmark_not_found(bookmark_client):
-    resp = bookmark_client.post("/api/v1/bookmarks/nonexistent")
+    resp = bookmark_client.post("/api/v1/bookmarks/nonexistent/bookmark")
     assert resp.status_code == 404
 
 
@@ -114,9 +114,9 @@ def test_list_bookmarks(bookmark_client):
     _clean_db()
     tutorial_id = "test-lb-tutorial"
     _insert_tutorial(Session(bind=engine), tutorial_id)
-    bookmark_client.post(f"/api/v1/bookmarks/{tutorial_id}")
+    bookmark_client.post(f"/api/v1/bookmarks/{tutorial_id}/bookmark")
 
-    resp = bookmark_client.get("/api/v1/bookmarks")
+    resp = bookmark_client.get("/api/v1/bookmarks/bookmarks")
     assert resp.status_code == 200
     data = resp.json()
     assert "data" in data
@@ -125,7 +125,8 @@ def test_list_bookmarks(bookmark_client):
 
 
 def test_list_bookmarks_empty(bookmark_client):
-    resp = bookmark_client.get("/api/v1/bookmarks")
+    _clean_db()
+    resp = bookmark_client.get("/api/v1/bookmarks/bookmarks")
     assert resp.status_code == 200
     data = resp.json()
     assert data["data"] == []
