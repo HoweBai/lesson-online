@@ -13,6 +13,7 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/ssl:/etc/nginx/ssl:ro
       - ./logs/nginx:/var/log/nginx
+      - ./src/frontend/build:/opt/ollp/frontend:ro
     depends_on:
       - backend
       - frontend
@@ -62,6 +63,7 @@ services:
       - ALLOWED_HOSTS=${ALLOWED_HOSTS}
       - CORS_ORIGINS=${CORS_ORIGINS}
       - LOG_LEVEL=${LOG_LEVEL}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - app_logs:/app/logs
       - tutorial_uploads:/app/uploads

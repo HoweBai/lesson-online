@@ -1,6 +1,7 @@
 """Bookmark model for tutorial favorites."""
 import uuid
 from datetime import datetime
+from typing import Optional
 from sqlalchemy import Column, String, DateTime, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship, Session
 from ..database import Base

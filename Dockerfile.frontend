@@ -11,7 +11,7 @@ RUN apk add --no-cache python3 make g++
 COPY src/frontend/package*.json ./
 
 # 安装依赖
-RUN npm ci --only=production && npm cache clean --force
+RUN npm install --omit=dev --no-audit --no-fund && npm cache clean --force
 
 # 复制应用代码
 COPY src/frontend/ ./

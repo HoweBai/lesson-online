@@ -35,9 +35,9 @@ celery_app.conf.update(
 )
 
 # Import tasks
-from ..tasks.outline_tasks import generate_outline_task  # noqa: E402
-from ..tasks.chapter_tasks import generate_chapter_task  # noqa: E402
-from ..tasks.export_tasks import export_file_task         # noqa: E402
+from src.tasks.outline_tasks import generate_outline_task  # noqa: E402
+from src.tasks.chapter_tasks import generate_chapter_task  # noqa: E402
+from src.tasks.export_tasks import export_file_task         # noqa: E402
 
 if __name__ == '__main__':
     logger.info("Starting Celery worker...")

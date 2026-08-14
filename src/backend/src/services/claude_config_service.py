@@ -2,7 +2,7 @@
 
 import uuid
 from datetime import datetime
-from typing import Optional, Dict, Any
+from typing import List, Optional, Dict, Any
 from sqlalchemy.orm import Session
 
 from ..models.claude_config import ClaudeConfig
