@@ -88,7 +88,7 @@ const AdminUsersPage = () => {
         </div>
 
         {/* Users Table */}
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-soft border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-soft border border-gray-100 dark:border-gray-700 overflow-hidden hidden md:block">
           {loading ? (
             <div className="p-12 text-center">
               <div className="w-10 h-10 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto"></div>
@@ -97,7 +97,7 @@ const AdminUsersPage = () => {
             <div className="p-12 text-center text-gray-400">No users found</div>
           ) : (
             <>
-              <table className="w-full">
+              <table className="w-full hidden md:table">
                 <thead>
                   <tr className="border-b border-gray-100 dark:border-gray-700">
                     <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">User</th>
@@ -151,6 +151,51 @@ const AdminUsersPage = () => {
                   ))}
                 </tbody>
               </table>
+
+              {/* Mobile card view */}
+              <div className="md:hidden space-y-3">
+                {users.map((user) => (
+                  <div key={user.id} className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-soft border border-gray-100 dark:border-gray-700">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center text-white text-sm font-bold">
+                        {user.username[0].toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-gray-900 dark:text-white truncate">{user.username}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</div>
+                      </div>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        user.is_admin
+                          ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                          : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
+                      }`}>
+                        {user.is_admin ? 'Admin' : 'User'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
+                      <span className="text-xs text-gray-400 dark:text-gray-500">
+                        Joined {new Date(user.created_at).toLocaleDateString()}
+                      </span>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleToggleAdmin(user)}
+                          className="w-8 h-8 flex items-center justify-center rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 dark:bg-primary-900/20 dark:text-primary-400 dark:hover:bg-primary-900/30 text-sm"
+                          title={user.is_admin ? 'Remove Admin' : 'Make Admin'}
+                        >
+                          {user.is_admin ? '🔓' : '🔒'}
+                        </button>
+                        <button
+                          onClick={() => handleDeleteUser(user)}
+                          className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30 text-sm"
+                          title="Delete user"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
 
               {/* Pagination */}
               {totalPages > 1 && (
