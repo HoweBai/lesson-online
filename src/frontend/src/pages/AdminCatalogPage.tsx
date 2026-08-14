@@ -97,38 +97,55 @@ const AdminCatalogPage = () => {
           <>
             <div className="space-y-4">
               {tutorials.map((tutorial) => (
-                <div key={tutorial.id} className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-soft border border-gray-100 dark:border-gray-700">
+                <div key={tutorial.id} className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 shadow-soft border border-gray-100 dark:border-gray-700">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <h3 className="text-lg font-bold text-gray-900 dark:text-white">{tutorial.title}</h3>
+                      <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">{tutorial.title}</h3>
                       <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
                         {tutorial.description || 'No description'}
                       </p>
-                      <div className="flex items-center gap-4 mt-3 text-xs text-gray-400 dark:text-gray-500">
-                        <span>👤 Owner: {tutorial.owner_id.slice(0, 8)}...</span>
-                        <span>📖 {tutorial.total_chapters || 0} chapters</span>
-                        <span>👁️ {tutorial.view_count || 0} views</span>
-                        <span>❤️ {tutorial.like_count || 0} likes</span>
+                      <div className="flex flex-wrap items-center gap-2 mt-3 text-xs text-gray-400 dark:text-gray-500">
+                        <span className="hidden sm:inline">👤 Owner: {tutorial.owner_id.slice(0, 8)}...</span>
+                        <span className="sm:hidden">👤 {tutorial.owner_id.slice(0, 6)}...</span>
+                        <span>📖 {tutorial.total_chapters || 0}ch</span>
+                        <span>👁️ {tutorial.view_count || 0}</span>
+                        <span>❤️ {tutorial.like_count || 0}</span>
                         {tutorial.reported_count && tutorial.reported_count > 0 && (
-                          <span className="text-red-500">⚠️ {tutorial.reported_count} reports</span>
+                          <span className="text-red-500">⚠️{tutorial.reported_count}</span>
                         )}
-                        <span>📅 {new Date(tutorial.created_at).toLocaleDateString()}</span>
+                        <span className="ml-auto">📅 {new Date(tutorial.created_at).toLocaleDateString()}</span>
                       </div>
                     </div>
-                    <div className="flex gap-2 ml-4">
+                    <div className="flex gap-2 ml-4 shrink-0">
                       <button
                         onClick={() => handleReview(tutorial.id, 'approve')}
                         disabled={reviewingId === tutorial.id}
-                        className="px-4 py-2 bg-green-500 text-white rounded-xl hover:bg-green-600 text-sm font-medium disabled:opacity-50"
+                        className="hidden sm:flex px-4 py-2 bg-green-500 text-white rounded-xl hover:bg-green-600 text-sm font-medium disabled:opacity-50"
                       >
                         {reviewingId === tutorial.id ? '...' : '✓ Approve'}
                       </button>
                       <button
+                        onClick={() => handleReview(tutorial.id, 'approve')}
+                        disabled={reviewingId === tutorial.id}
+                        className="sm:hidden w-9 h-9 flex items-center justify-center rounded-lg bg-green-500 text-white text-sm disabled:opacity-50"
+                        title="Approve"
+                      >
+                        ✓
+                      </button>
+                      <button
                         onClick={() => handleReview(tutorial.id, 'reject')}
                         disabled={reviewingId === tutorial.id}
-                        className="px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 text-sm font-medium disabled:opacity-50"
+                        className="hidden sm:flex px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 text-sm font-medium disabled:opacity-50"
                       >
                         {reviewingId === tutorial.id ? '...' : '✗ Reject'}
+                      </button>
+                      <button
+                        onClick={() => handleReview(tutorial.id, 'reject')}
+                        disabled={reviewingId === tutorial.id}
+                        className="sm:hidden w-9 h-9 flex items-center justify-center rounded-lg bg-red-500 text-white text-sm disabled:opacity-50"
+                        title="Reject"
+                      >
+                        ✗
                       </button>
                     </div>
                   </div>
