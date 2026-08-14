@@ -444,7 +444,7 @@ cd src/frontend && npm run build
 | P0 安全修复 (启动校验, WS 认证, 房间权限) | ✅ 完成 | 2026-08-14 |
 | P1 异步任务 + 对象存储 (Celery + MinIO) | ✅ 完成 | 2026-08-14 |
 | P2 部署修复 + 响应式适配 (WeasyPrint deps, 移动端布局) | ✅ 完成 | 2026-08-14 |
-| P3 PWA 离线支持 | ⏳ 计划 | — |
+| P3 PWA 离线支持 (manifest + Service Worker) | ✅ 完成 | 2026-08-14 |
 
 ---
 
