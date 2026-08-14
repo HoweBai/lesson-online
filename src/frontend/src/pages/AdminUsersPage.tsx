@@ -208,6 +208,7 @@ const AdminUsersPage = () => {
                     onClick={() => handleToggleAdmin(user)}
                     className="w-8 h-8 flex items-center justify-center rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 dark:bg-primary-900/20 dark:text-primary-400 dark:hover:bg-primary-900/30 text-sm"
                     title={user.is_admin ? 'Remove Admin' : 'Make Admin'}
+                    aria-label={user.is_admin ? 'Remove admin' : 'Make admin'}
                   >
                     {user.is_admin ? '🔓' : '🔒'}
                   </button>
@@ -215,6 +216,7 @@ const AdminUsersPage = () => {
                     onClick={() => handleDeleteUser(user)}
                     className="w-8 h-8 flex items-center justify-center rounded-lg bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30 text-sm"
                     title="Delete user"
+                    aria-label="Delete user"
                   >
                     🗑️
                   </button>
