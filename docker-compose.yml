@@ -62,34 +62,6 @@ services:
       retries: 3
       start_period: 40s
 
-  # ==================== Celery Worker ====================
-  celery-worker:
-    build:
-      context: .
-      dockerfile: Dockerfile.worker
-    container_name: ollp-worker
-    restart: always
-    command: celery -A src.tasks.generation_tasks worker --loglevel=info --concurrency=4 -E
-    environment:
-      - DATABASE_URL=postgresql://ollp_user:${POSTGRES_PASSWORD}@db:5432/ollp_db
-      - REDIS_URL=redis://redis:6379/0
-      - SECRET_KEY=${SECRET_KEY}
-      - CRYPTO_KEY_HEX=${CRYPTO_KEY_HEX}
-      - MINIO_ENDPOINT=http://minio:9000
-      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
-      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
-      - LOG_LEVEL=${LOG_LEVEL}
-    volumes:
-      - app_logs:/app/logs
-      - tutorial_uploads:/app/uploads
-      - ./src/backend:/app/src/backend:ro
-    depends_on:
-      - db
-      - redis
-      - minio
-    networks:
-      - platform-net
-
   # ==================== 前端应用 ====================
   frontend:
     build:
