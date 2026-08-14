@@ -7,15 +7,17 @@ import uuid
 import json
 import asyncio
 import logging
+import os
 from datetime import datetime
 from typing import Dict, Any, Optional, List
 from collections import defaultdict
 
 from ..database import get_db, Session, SessionLocal
-from ..services.auth_service import get_current_user
+from ..services.auth_service import get_current_user, SECRET_KEY, ALGORITHM
 from ..models.user import User
 from ..models.chapter import Chapter
 from ..models.chat_history import ChatHistory
+from ..models.tutorial import Tutorial
 from ..services.llm_adapter import ClaudeAdapter, OpenAIAAdapter
 from ..services.claude_config_service import ClaudeConfigService
 from ..services.crypto_service import SecureCryptoService
@@ -79,26 +81,74 @@ class ChatSession:
             return None
 
 
+def extract_token_from_headers(headers: dict) -> Optional[str]:
+    """Extract JWT token from WebSocket subprotocol or Authorization header."""
+    # Try subprotocol header (sent via new WebSocket(url, ['token', authToken]))
+    token = headers.get("token")
+    if token:
+        return token.strip()
+
+    # Try Authorization header
+    auth = headers.get("authorization", "")
+    if auth.startswith("Bearer "):
+        return auth[7:].strip()
+
+    return None
+
+
+def check_room_access(db: Session, tutorial_id: str, user_id: Optional[str]) -> bool:
+    """Check if user has access to the tutorial's chat room.
+
+    Permission rules:
+    - Owner can always access their tutorial
+    - Any logged-in user can access published public tutorials
+    - Unauthenticated users can only access published public tutorials
+    """
+    tutorial = db.query(Tutorial).filter(Tutorial.id == tutorial_id).first()
+    if not tutorial:
+        return False
+
+    # Owner always has access
+    if user_id and tutorial.owner_id == user_id:
+        return True
+
+    # Unauthenticated users can access published public tutorials
+    if not user_id:
+        return tutorial.is_public and tutorial.status == "published"
+
+    # Authenticated users can access published public tutorials
+    return tutorial.is_public and tutorial.status == "published"
+
+
 @router.websocket("/claude/{tutorial_id}/{channel_id}")
 async def claude_chat(websocket: WebSocket, tutorial_id: str, channel_id: str):
     """WebSocket endpoint for Claude AI chat interaction."""
-    # Accept connection without immediate auth (auth via query param)
     await websocket.accept()
 
-    # Extract token from query params
-    query_params = websocket.query_params
-    token = query_params.get("token", "")
+    # Extract token from headers (subprotocol or Authorization)
+    token = extract_token_from_headers(dict(websocket.headers))
 
     # Authenticate if token provided
     user_id = None
     if token:
         try:
-            from ..services.auth_service import SECRET_KEY, ALGORITHM
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             user_id = payload.get("sub")
         except JWTError:
             await websocket.close(code=status.WS_1008_POLICY_VIOLATION, reason="Invalid token")
             return
+
+    # Check room access permissions
+    db = SessionLocal()
+    try:
+        if not check_room_access(db, tutorial_id, user_id):
+            await websocket.close(
+                code=status.WS_1008_POLICY_VIOLATION,
+                reason="No access to this tutorial"
+            )
+            return
+    finally:
+        db.close()
 
     # Create session
     session = ChatSession(websocket, tutorial_id, channel_id, user_id or "anonymous")
@@ -300,9 +350,10 @@ async def generate_ai_response(
         # Get user's Claude config
         config_service = None
         if user_id:
-            from ..services.crypto_service import SecureCryptoService
-            import os
-            master_key_hex = os.getenv("CRYPTO_KEY_HEX", "0" * 64)
+            master_key_hex = os.getenv("CRYPTO_KEY_HEX")
+            if not master_key_hex or len(master_key_hex) < 64 or master_key_hex == "0" * 64:
+                logger.error("CRYPTO_KEY_HEX is missing or invalid — cannot decrypt user configs")
+                return "Configuration error. Please contact support."
             master_key = bytes.fromhex(master_key_hex)[:32]
             crypto = SecureCryptoService(master_key)
             config_service = ClaudeConfigService(crypto, db)
@@ -344,7 +395,6 @@ async def generate_ai_response(
 
 async def get_tutorial_context(db: Session, tutorial_id: str) -> str:
     """Get tutorial context for AI response."""
-    from ..models.tutorial import Tutorial
     tutorial = db.query(Tutorial).filter(Tutorial.id == tutorial_id).first()
     if not tutorial:
         return "No tutorial context available."

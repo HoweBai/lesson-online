@@ -8,6 +8,7 @@ interface WebSocketOptions {
   onClose?: () => void;
   onError?: (error: Event) => void;
   reconnectionDelay?: number; // ms between reconnect attempts
+  token?: string; // JWT token passed as WebSocket subprotocol
 }
 
 interface UseWebSocketResult {
@@ -33,7 +34,10 @@ export function useWebSocket(
       socketRef.current.close();
     }
 
-    const ws = new WebSocket(url);
+    const protocols = optionsRef.current.token
+      ? ['token', optionsRef.current.token]
+      : undefined;
+    const ws = new WebSocket(url, protocols);
     socketRef.current = ws;
     const { onOpen, onMessage, onClose, onError, reconnectionDelay } = optionsRef.current;
 

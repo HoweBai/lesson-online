@@ -118,10 +118,11 @@ def root_redirect():
         }
     }
 
-# Startup event - create database tables
+# Startup event - create database tables and validate env
 @app.on_event("startup")
 async def startup_event():
-    """Create all database tables on startup."""
+    """Create all database tables on startup and validate required env vars."""
+    validate_required_env()
     try:
         Base.metadata.create_all(bind=engine)
         logger.info("Database tables created/initialized successfully")
@@ -129,6 +130,29 @@ async def startup_event():
     except Exception as e:
         logger.error(f"Failed to initialize database: {e}")
         raise
+
+
+def validate_required_env():
+    """Validate that critical environment variables are set and not default values."""
+    import os
+    checks = [
+        ("SECRET_KEY", lambda v: len(v) >= 32, "must be at least 32 characters"),
+        ("CRYPTO_KEY_HEX", lambda v: len(v) >= 64 and v != "0" * 64, "must be 64+ hex chars and not all zeros"),
+        ("POSTGRES_PASSWORD", lambda v: len(v) > 0, "must not be empty"),
+        ("MINIO_ACCESS_KEY", lambda v: len(v) > 0, "must not be empty"),
+        ("MINIO_SECRET_KEY", lambda v: len(v) > 0, "must not be empty"),
+    ]
+
+    errors = []
+    for name, validator, constraint in checks:
+        value = os.getenv(name)
+        if value is None or not validator(value):
+            errors.append(f"{name} is missing or invalid ({constraint})")
+
+    if errors:
+        for err in errors:
+            logger.error(f"Env validation failed: {err}")
+        raise RuntimeError("Required environment variables are missing or invalid. Check logs for details.")
 
 # Shutdown event - clean up resources
 @app.on_event("shutdown")

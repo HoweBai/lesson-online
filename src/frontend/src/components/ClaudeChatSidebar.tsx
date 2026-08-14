@@ -32,7 +32,7 @@ const ClaudeChatSidebar = ({ tutorialId = 'default', onChapterGenerated }: Claud
   const getToken = useCallback(() => localStorage.getItem('auth_token') || '', []);
 
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const wsUrl = `${protocol}//${window.location.host}/ws/claude/${tutorialId}/default?token=${getToken()}`;
+  const wsUrl = `${protocol}//${window.location.host}/ws/claude/${tutorialId}/default`;
 
   const handleMessage = useCallback((data: string) => {
     try {
@@ -89,6 +89,7 @@ const ClaudeChatSidebar = ({ tutorialId = 'default', onChapterGenerated }: Claud
   }, [toast, onChapterGenerated]);
 
   const { send, isConnected, close } = useWebSocket(wsUrl, {
+    token: getToken(),
     onOpen: () => {
       console.log('Claude Chat connected');
     },

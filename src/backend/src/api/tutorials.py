@@ -42,7 +42,9 @@ _claude_config_service: Optional[ClaudeConfigService] = None
 def get_crypto_service() -> SecureCryptoService:
     global _crypto_service
     if _crypto_service is None:
-        master_key_hex = os.getenv("CRYPTO_KEY_HEX", "0" * 64)
+        master_key_hex = os.getenv("CRYPTO_KEY_HEX")
+        if not master_key_hex or len(master_key_hex) < 64 or master_key_hex == "0" * 64:
+            raise RuntimeError("CRYPTO_KEY_HEX is missing or invalid. Check environment configuration.")
         master_key = bytes.fromhex(master_key_hex)[:32]
         _crypto_service = SecureCryptoService(master_key)
     return _crypto_service

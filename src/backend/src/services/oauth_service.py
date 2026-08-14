@@ -252,7 +252,10 @@ def get_oauth_service() -> OAuthService:
     """Create and return the global OAuth service instance."""
     from ..services.crypto_service import SecureCryptoService
     import os
-    master_key_hex = os.getenv("CRYPTO_KEY_HEX", "0" * 64)
+    master_key_hex = os.getenv("CRYPTO_KEY_HEX")
+    if not master_key_hex or len(master_key_hex) < 64 or master_key_hex == "0" * 64:
+        logger.error("CRYPTO_KEY_HEX is missing or invalid — OAuth cannot function without it")
+        return None
     master_key = bytes.fromhex(master_key_hex)[:32]
     crypto = SecureCryptoService(master_key)
     service = OAuthService(crypto)
