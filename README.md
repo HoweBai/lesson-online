@@ -2,8 +2,8 @@
 
 一个生产级在线学习平台，核心功能是通过 **Claude API** 为用户生成循序渐进、个性化的计算机科学知识教程。支持游客浏览公开教程，注册用户可通过收集个人信息并使用 AI 生成完整课程大纲和逐章详细讲解（含数学公式推导、代码示例和练习题）。
 
-**版本**: v1.1.0  
-**最后更新**: 2026-08-13  
+**版本**: v1.2.0  
+**最后更新**: 2026-08-14  
 **部署地址**: https://tlcw.yobeeo.com/
 
 ---
@@ -45,7 +45,7 @@
 | 逐章生成 | ✅ | 每章完成后手动触发下一章节 |
 | 前置知识检查 | ✅ | 基于用户知识图谱的智能依赖分析 |
 | 教程 CRUD | ✅ | 创建/编辑/删除/发布/取消发布 |
-| 教程导出 | ✅ | Markdown / JSON / PDF 三种格式 |
+| 教程导出 | ✅ | Markdown / JSON / PDF（WeasyPrint）异步导出，MinIO 对象存储上传 |
 | 教程分享 | ✅ | 分享码短链接 + ShareModal 社交分享 |
 
 ### 用户系统
@@ -95,6 +95,9 @@
 | 告警服务 | ✅ | 异常检测与通知 |
 | 审计日志 | ✅ | 用户操作记录 |
 | API Key 加密存储 | ✅ | AES-GCM 加密 Claude API Key |
+| Celery 异步任务队列 | ✅ | 大纲/章节生成、文件导出异步化，独立 Worker 服务 |
+| MinIO 对象存储 | ✅ | 导出文件上传对象存储，预签名下载链接 |
+| PDF 依赖补全 | ✅ | Dockerfile.backend 集成 pango/cairo 等 WeasyPrint 系统库 |
 
 ---
 
@@ -140,6 +143,9 @@ GET    /api/v1/tutorials/{id}/export/markdown  Markdown 导出
 GET    /api/v1/tutorials/{id}/export/json     JSON 导出
 GET    /api/v1/tutorials/{id}/export/outline  大纲导出
 GET    /api/v1/tutorials/{id}/export/pdf      PDF 导出
+POST   /api/v1/tutorials/{id}/export/{format} 异步导出（Celery + MinIO）
+GET    /api/v1/tutorials/{id}/export/{format}/{task_id} 查询导出进度
+DELETE /api/v1/tutorials/tasks/{task_id}      取消异步任务
 GET    /api/v1/tutorials/share/{code}         分享码跳转
 ```
 
@@ -263,15 +269,19 @@ online-learning-platform/
 │   │   │   └── database/
 │   │   │       ├── database.py      # 数据库连接 + 迁移
 │   │   │       └── migrations/      # 数据库迁移脚本
-│   │   ├── tests/                   # 测试套件 (176 passed)
+│   │   ├── tests/                   # 测试套件 (179 passed)
 │   │   │   ├── test_auth.py
 │   │   │   ├── test_oauth.py
 │   │   │   ├── test_bookmarks.py
 │   │   │   ├── test_comments.py
-│   │   │   ├── test_pdf_export.py
 │   │   │   ├── test_admin.py
 │   │   │   ├── test_password_reset.py
 │   │   │   └── ...
+│   │   ├── celery_worker.py           # Celery Worker 入口
+│   │   ├── tasks/                   # Celery 异步任务
+│   │   │   ├── outline_tasks.py   # 大纲生成任务
+│   │   │   ├── chapter_tasks.py   # 章节生成任务
+│   │   │   └── export_tasks.py    # 文件导出任务
 │   │   └── requirements.txt
 │   │
 │   └── frontend/                    # React + TypeScript 前端
@@ -407,7 +417,7 @@ python -m pytest tests/test_admin.py -v
 cd src/frontend && npm run build
 ```
 
-当前测试状态: **176 passed, 3 pre-existing failures** (隔离问题，不影响功能)
+当前测试状态: **179 passed** (全部通过)
 
 ---
 
@@ -431,10 +441,10 @@ cd src/frontend && npm run build
 | P1 社交功能 (书签, 评论, 分享) | ✅ 完成 | 2026-08-12 |
 | P2 管理后台 (管理员, 用户管理, 审核, 暗色模式) | ✅ 完成 | 2026-08-12 |
 | P3 OAuth + PDF 导出 | ✅ 完成 | 2026-08-13 |
-| Celery 异步任务队列 | 🔄 进行中 | — |
-| MinIO 对象存储集成 | 🔄 进行中 | — |
-| 移动端响应式完善 | ⏳ 计划 | — |
-| PWA 离线支持 | ⏳ 计划 | — |
+| P0 安全修复 (启动校验, WS 认证, 房间权限) | ✅ 完成 | 2026-08-14 |
+| P1 异步任务 + 对象存储 (Celery + MinIO) | ✅ 完成 | 2026-08-14 |
+| P2 部署修复 + 响应式适配 (WeasyPrint deps, 移动端布局) | ✅ 完成 | 2026-08-14 |
+| P3 PWA 离线支持 | ⏳ 计划 | — |
 
 ---
 

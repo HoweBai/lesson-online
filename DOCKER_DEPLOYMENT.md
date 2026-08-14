@@ -108,7 +108,7 @@ docker compose logs -f
 
 # 查看特定服务日志
 docker compose logs -f backend
-docker compose logs -f celery-worker
+docker compose logs -f worker
 docker compose logs -f frontend
 
 # 查看最近100行
@@ -278,10 +278,10 @@ docker compose up -d frontend
 
 ```bash
 # 检查 Worker 日志
-docker compose logs celery-worker
+docker compose logs -f worker
 
 # 重启 Worker
-docker compose restart celery-worker
+docker compose restart worker
 
 # 检查 Redis 连接
 docker compose exec redis ping
