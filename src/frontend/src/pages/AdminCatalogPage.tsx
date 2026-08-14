@@ -129,6 +129,7 @@ const AdminCatalogPage = () => {
                         disabled={reviewingId === tutorial.id}
                         className="sm:hidden w-9 h-9 flex items-center justify-center rounded-lg bg-green-500 text-white text-sm disabled:opacity-50"
                         title="Approve"
+                        aria-label="Approve"
                       >
                         ✓
                       </button>
@@ -144,6 +145,7 @@ const AdminCatalogPage = () => {
                         disabled={reviewingId === tutorial.id}
                         className="sm:hidden w-9 h-9 flex items-center justify-center rounded-lg bg-red-500 text-white text-sm disabled:opacity-50"
                         title="Reject"
+                        aria-label="Reject"
                       >
                         ✗
                       </button>
