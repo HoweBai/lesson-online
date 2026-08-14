@@ -1,11 +1,20 @@
 """Conftest for pytest fixtures."""
 
+import os
 import pytest
 from unittest.mock import MagicMock, patch
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from src.database import Base, get_db
+
+# Set required env vars for tests (P0 startup validation)
+os.environ.setdefault("SECRET_KEY", "test-secret-key-for-testing-at-least-32-chars-long")
+os.environ.setdefault("CRYPTO_KEY_HEX", "a" * 64)
+os.environ.setdefault("POSTGRES_PASSWORD", "test-db-pass")
+os.environ.setdefault("MINIO_ACCESS_KEY", "test-minio-user")
+os.environ.setdefault("MINIO_SECRET_KEY", "test-minio-secret")
+
 
 
 @pytest.fixture
@@ -104,3 +113,12 @@ def sample_tutorial(db_session, test_user):
     db_session.commit()
 
     return tutorial
+
+
+@pytest.fixture(autouse=True)
+def reset_rate_limiter():
+    """Reset slowapi rate limiter storage between test runs to avoid cross-test 429s."""
+    from src.middleware.rate_limiter import limiter
+    if hasattr(limiter, "_storage") and hasattr(limiter._storage, "reset"):
+        limiter._storage.reset()
+    yield
