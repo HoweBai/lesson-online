@@ -24,6 +24,26 @@ services:
       timeout: 10s
       retries: 3
 
+  # ==================== Celery Worker 异步任务 ====================
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: ollp-worker
+    restart: always
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - CRYPTO_KEY_HEX=${CRYPTO_KEY_HEX}
+      - LOG_LEVEL=${LOG_LEVEL}
+    volumes:
+      - app_logs:/app/logs
+      - ./src/backend:/app/src/backend:ro
+    depends_on:
+      redis:
+        condition: service_started
+    networks:
+      - platform-net
+
   # ==================== 后端 API 服务 ====================
   backend:
     build:

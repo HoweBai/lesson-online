@@ -28,6 +28,8 @@ from ..services.outline_generator import OutlineGenerator
 from ..services.chapter_generator import ChapterGenerator
 from ..services.claude_config_service import ClaudeConfigService
 from ..services.crypto_service import SecureCryptoService
+from ...tasks.outline_tasks import generate_outline_task
+from ...tasks.chapter_tasks import generate_chapter_task
 from fastapi import Query
 
 logger = logging.getLogger(__name__)
@@ -147,7 +149,7 @@ async def generate_outline(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ) -> OutlineStatusResponse:
-    """Generate a course outline synchronously for MVP."""
+    """Generate a course outline asynchronously."""
     try:
         # Validate config
         config_uuid = uuid.UUID(request.claude_config_id)
@@ -157,17 +159,13 @@ async def generate_outline(
         if not config:
             raise HTTPException(status_code=404, detail="Invalid Claude configuration")
 
-        # Get or create knowledge mapping
-        km_record = db.query(UserKnowledgeMapping).filter_by(user_id=current_user.id).first()
-        mastery_map = km_record.mastery_map if km_record and km_record.mastery_map else {}
-
         # Create task log
         task_id = str(uuid.uuid4())
         task_log = TaskLog(
             user_id=str(current_user.id),
             task_type="generate_outline",
-            status="running",
-            progress=10,
+            status="pending",
+            progress=0,
             result_url=f"/api/v1/tutorials/outlines/{task_id}",
             created_at=datetime.utcnow()
         )
@@ -175,63 +173,21 @@ async def generate_outline(
         db.commit()
         db.refresh(task_log)
 
-        # Generate outline synchronously for MVP
-        try:
-            config_service = get_claude_config_service(db)
-            profile = db.query(UserProfile).filter_by(user_id=current_user.id).first()
-            profile_dict = profile.to_dict() if profile else {}
+        # Submit async task
+        generate_outline_task.delay(
+            task_id=task_id,
+            config_id=str(config.id),
+            user_id=str(current_user.id),
+            topics=request.topics,
+        )
 
-            generator = OutlineGenerator(db, get_crypto_service(), config_service)
-            result = generator.generate(
-                config_id=config_uuid,
-                user_id=current_user.id,
-                topics=request.topics,
-                mastery_map=mastery_map
-            )
-
-            # Update task status
-            task_log.status = "success"
-            task_log.progress = 100
-            task_log.details_json = result.get("outline", {})
-            task_log.finished_at = datetime.utcnow()
-            db.commit()
-
-            # 检查大纲安全性
-            outline_data = result.get("outline", {})
-            security_scan = outline_data.get('_security_scan', {})
-
-            if security_scan.get('needs_review'):
-                task_log.details_json = {
-                    **task_log.details_json,
-                    'security_scan': security_scan,
-                    'needs_review': True
-                }
-                db.commit()
-                logger.warning(f"Outline flagged for review: {security_scan.get('reasons', [])}")
-
-            return OutlineStatusResponse(
-                task_id=task_id,
-                status=OutlineStatus.COMPLETED,
-                progress=100,
-                result_url=f"/api/v1/tutorials/outlines/{task_id}",
-                created_at=task_log.created_at,
-                completed_at=task_log.finished_at,
-                outline_data=result.get("outline")
-            )
-
-        except Exception as gen_error:
-            task_log.status = "failed"
-            task_log.error_message = str(gen_error)
-            task_log.finished_at = datetime.utcnow()
-            db.commit()
-
-            return OutlineStatusResponse(
-                task_id=task_id,
-                status=OutlineStatus.FAILED,
-                progress=0,
-                error_message=str(gen_error),
-                created_at=task_log.created_at
-            )
+        return OutlineStatusResponse(
+            task_id=task_id,
+            status=OutlineStatus.PENDING,
+            progress=0,
+            result_url=f"/api/v1/tutorials/outlines/{task_id}",
+            created_at=task_log.created_at,
+        )
 
     except HTTPException:
         raise
@@ -329,7 +285,7 @@ async def generate_next_chapter(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ) -> Dict[str, Any]:
-    """Generate the next chapter in a tutorial."""
+    """Generate the next chapter asynchronously."""
     # Verify tutorial
     tutorial = db.query(Tutorial).filter_by(id=tutorial_id, owner_id=str(current_user.id)).first()
     if not tutorial:
@@ -352,8 +308,8 @@ async def generate_next_chapter(
     task_log = TaskLog(
         user_id=str(current_user.id),
         task_type="generate_chapter",
-        status="running",
-        progress=10,
+        status="pending",
+        progress=0,
         result_url=f"/api/v1/tutorials/{tutorial_id}/chapters/{next_number}",
         details_json={"tutorial_id": tutorial_id, "chapter_number": next_number},
         created_at=datetime.utcnow()
@@ -362,74 +318,21 @@ async def generate_next_chapter(
     db.commit()
     db.refresh(task_log)
 
-    # Generate chapter
-    try:
-        config_service = get_claude_config_service(db)
-        profile = db.query(UserProfile).filter_by(user_id=str(current_user.id)).first()
-        profile_dict = profile.to_dict() if profile else {}
+    # Submit async task
+    generate_chapter_task.delay(
+        task_id=task_id,
+        config_id=str(config.id),
+        user_id=str(current_user.id),
+        tutorial_id=tutorial_id,
+        chapter_number=next_number,
+        outline_data=tutorial.outline or {},
+    )
 
-        km_record = db.query(UserKnowledgeMapping).filter_by(user_id=str(current_user.id)).first()
-        mastery_map = km_record.mastery_map if km_record and km_record.mastery_map else {}
-
-        generator = ChapterGenerator(db, get_crypto_service(), config_service)
-        result = generator.generate(
-            config_id=config.id,
-            user_id=current_user.id,
-            tutorial_id=tutorial_id,
-            chapter_number=next_number,
-            outline_data=tutorial.outline or {},
-            mastery_map=mastery_map
-        )
-
-        # Save chapter to database
-        chapter_content = result.get("chapter_content", {})
-        chapter = Chapter(
-            id=str(uuid.uuid4()),
-            tutorial_id=tutorial_id,
-            chapter_number=next_number,
-            title=chapter_content.get("chapter_title", f"Chapter {next_number}"),
-            content=chapter_content,
-            status="ready",
-            prerequisite_check_passed=result.get("prerequisite_check_passed", True),
-            generated_at=datetime.utcnow()
-        )
-        db.add(chapter)
-
-        # 获取扫描结果（已在章节内容中）
-        security_scan = chapter_content.get('_security_scan', {})
-
-        # 如果内容需要审核，标记教程状态
-        if security_scan.get('needs_review'):
-            tutorial.status = TutorialStatus.REVIEWING.value
-            logger.warning(f"Chapter {next_number} flagged for review: {security_scan.get('reasons', [])}")
-
-        # Update tutorial
-        tutorial.current_chapter = next_number + 1
-        if next_number >= (tutorial.total_chapters or 10):
-            tutorial.status = TutorialStatus.PUBLISHED.value
-
-        db.commit()
-
-        # Update task
-        task_log.status = "success"
-        task_log.progress = 100
-        task_log.finished_at = datetime.utcnow()
-        db.commit()
-
-        return {
-            "task_id": task_id,
-            "chapter_number": next_number,
-            "chapter_id": str(chapter.id),
-            "status": "completed",
-            "chapter": chapter.to_dict()
-        }
-
-    except Exception as e:
-        task_log.status = "failed"
-        task_log.error_message = str(e)
-        task_log.finished_at = datetime.utcnow()
-        db.commit()
-        raise HTTPException(status_code=500, detail=f"Chapter generation failed: {str(e)}")
+    return {
+        "task_id": task_id,
+        "chapter_number": next_number,
+        "status": "pending",
+    }
 
 
 @tutorials_router.get("/{tutorial_id}/chapters/{chapter_number}/status")
@@ -675,3 +578,31 @@ async def get_tutorial_by_share_code(
             "created_at": tutorial.created_at.isoformat() if tutorial.created_at else None,
         }
     }
+
+
+# ============ Task Management Endpoints ============
+
+@tutorials_router.delete("/tasks/{task_id}")
+async def cancel_task(
+    task_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Cancel a running task."""
+    task_log = db.query(TaskLog).filter_by(
+        id=task_id,
+        user_id=str(current_user.id)
+    ).first()
+
+    if not task_log:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    if task_log.status in ("success", "failed", "cancelled"):
+        raise HTTPException(status_code=400, detail=f"Task already {task_log.status}")
+
+    task_log.status = "cancelled"
+    task_log.finished_at = datetime.utcnow()
+    db.commit()
+
+    logger.info(f"Task {task_id} cancelled by user {current_user.id}")
+    return {"message": "Task cancelled successfully", "task_id": task_id}
