@@ -6,7 +6,7 @@ import sys
 import time
 import posixpath
 
-SERVER_HOST = "tlcw.yobeeo.com"
+SERVER_HOST = os.getenv("SERVER_HOST", "localhost")
 SERVER_USER = "root"
 SERVER_PASSWORD = "tlcw_CENTOS@#2023"
 REMOTE_PATH = "/opt/ollp"
