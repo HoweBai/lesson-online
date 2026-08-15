@@ -28,8 +28,8 @@ from ..services.outline_generator import OutlineGenerator
 from ..services.chapter_generator import ChapterGenerator
 from ..services.claude_config_service import ClaudeConfigService
 from ..services.crypto_service import SecureCryptoService
-from ...tasks.outline_tasks import generate_outline_task
-from ...tasks.chapter_tasks import generate_chapter_task
+from ..tasks.outline_tasks import generate_outline_task
+from ..tasks.chapter_tasks import generate_chapter_task
 from fastapi import Query
 
 logger = logging.getLogger(__name__)

@@ -10,7 +10,7 @@ from ..services.auth_service import get_current_user
 from ..models.user import User
 from ..models.tutorial import Tutorial
 from ..services.export_service import ExportService, create_export_service
-from ...tasks.export_tasks import export_file_task
+from ..tasks.export_tasks import export_file_task
 from fastapi.responses import PlainTextResponse, JSONResponse
 
 logger = logging.getLogger(__name__)

@@ -25,6 +25,25 @@ services:
       timeout: 10s
       retries: 3
 
+  # ==================== 前端应用 ====================
+  frontend:
+    build:
+      context: src/frontend
+      dockerfile: ../../Dockerfile.frontend
+    container_name: ollp-frontend
+    restart: always
+    environment:
+      - API_URL=http://backend:8000
+      - NODE_ENV=production
+    networks:
+      - platform-net
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
   # ==================== Celery Worker 异步任务 ====================
   worker:
     build:
@@ -83,29 +102,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-
-  # ==================== 前端应用 ====================
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile.frontend
-    container_name: ollp-frontend
-    restart: always
-    environment:
-      - API_URL=http://backend:8000
-      - NODE_ENV=production
-    volumes:
-      - ./src/frontend:/app/frontend:ro
-      - /app/frontend/node_modules
-    depends_on:
-      - backend
-    networks:
-      - platform-net
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   # ==================== 数据库 (PostgreSQL) ====================
   db:
