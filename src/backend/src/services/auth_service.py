@@ -3,7 +3,7 @@
 import uuid
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
-from passlib.context import CryptContext
+import bcrypt
 from typing import Optional, Dict
 from sqlalchemy.orm import Session
 from fastapi import Depends, HTTPException, status
@@ -14,7 +14,7 @@ from ..models.user import User
 from ..models.profile import UserProfile
 import os
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = None  # replaced by bcrypt directly
 
 # Load secret key from environment
 SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
@@ -33,10 +33,10 @@ class AuthService:
         return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
-        return pwd_context.verify(plain_password, hashed_password)
+        return bcrypt.checkpw(plain_password.encode(), hashed_password.encode())
 
     def hash_password(self, password: str) -> str:
-        return pwd_context.hash(password)
+        return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
     def register(self, db: Session, username: str, email: str, password: str) -> Dict:
         """Register a new user."""

@@ -20,8 +20,9 @@ root.render(
 );
 
 // Register service worker for PWA offline support
-serviceWorkerRegistration.register({
-  onUpdate: () => {
-    console.log('New version available, refresh to update.');
-  },
-});
+// DISABLED TEMPORARILY: SW was caching stale API responses causing login redirect loop
+// serviceWorkerRegistration.register({
+//   onUpdate: () => {
+//     console.log('New version available, refresh to update.');
+//   },
+// });
