@@ -13,6 +13,9 @@ services:
       - SECRET_KEY=${SECRET_KEY}
       - CRYPTO_KEY_HEX=${CRYPTO_KEY_HEX}
       - REDIS_URL=redis://redis:6379/0
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
       - LOG_LEVEL=info
     depends_on:
       db:
@@ -32,7 +35,7 @@ services:
       retries: 3
 
   db:
-    image: postgres:16-alpine
+    image: postgres:15-alpine
     container_name: ollp-db
     ports:
       - "5432:5432"

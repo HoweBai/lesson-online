@@ -66,4 +66,4 @@ async def get_current_user_endpoint(
     user: User = Depends(get_current_user)
 ) -> Dict:
     """Get current authenticated user information."""
-    return user.to_dict()
+    return {"user": user.to_dict()}

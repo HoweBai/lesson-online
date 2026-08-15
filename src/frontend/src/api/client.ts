@@ -1,6 +1,7 @@
 /** API client for the Online Learning Platform */
 
-const API_BASE = process.env.REACT_APP_API_URL || 'http://tlcw.yobeeo.com';
+// 使用相对路径，让 nginx 统一反向代理后端 API，适配任意部署环境
+const API_BASE = '';
 
 interface ApiResponse<T> {
   success: boolean;
