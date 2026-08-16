@@ -22,46 +22,28 @@ const App = () => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showWizard, setShowWizard] = useState(false);
-  const [debugInfo, setDebugInfo] = useState<string>('');
 
   useEffect(() => {
-    const debug = [] as string[];
     const token = localStorage.getItem('auth_token');
-    debug.push(`Token: ${token ? 'EXISTS' : 'NONE'}`);
 
     if (!token) {
-      debug.push('No token, showing login');
       setUser(null);
       setLoading(false);
-      setDebugInfo(debug.join('\n'));
       return;
     }
 
-    debug.push('Token found, calling getMe...');
-    console.log('[App] Token from localStorage:', token);
-    console.log('[App] Calling api.getMe()...');
     api.getMe().then((result) => {
-      console.log('[App] getMe result:', result);
-      debug.push(`getMe: ${result.success ? 'SUCCESS' : 'FAILED'}`);
       if (result.success && result.data?.user) {
-        debug.push(`User: ${result.data.user.username}`);
         setUser({ token, ...result.data.user });
-        console.log('[App] User set:', result.data.user.username);
       } else {
-        debug.push('getMe failed, clearing token');
-        console.error('[App] getMe failed:', result.error || 'No user in response');
         localStorage.removeItem('auth_token');
         setUser(null);
       }
       setLoading(false);
-      setDebugInfo(debug.join('\n'));
-    }).catch((err) => {
-      console.error('[App] getMe error:', err);
-      debug.push(`Error: ${err.message}`);
+    }).catch(() => {
       localStorage.removeItem('auth_token');
       setUser(null);
       setLoading(false);
-      setDebugInfo(debug.join('\n'));
     });
   }, []);
 
@@ -86,27 +68,15 @@ const App = () => {
             </div>
           </div>
           <p className="mt-4 text-gray-600 font-medium">Loading...</p>
-          <pre className="mt-2 text-xs text-red-500 whitespace-pre-wrap">{debugInfo}</pre>
         </div>
       </div>
     );
-  }
-
-  // DEBUG OVERLAY - shows current state
-  if (process.env.NODE_ENV === 'development' || true) {
-    setTimeout(() => {
-      const el = document.getElementById('debug-overlay');
-      if (el) {
-        el.textContent = `USER: ${user?.username || 'NONE'} | TOKEN: ${localStorage.getItem('auth_token') ? 'YES' : 'NO'} | LOADED`;
-      }
-    }, 100);
   }
 
   return (
     <ThemeProvider>
     <GlobalErrorHandler>
       <BrowserRouter>
-        <div id="debug-overlay" style={{position:'fixed',top:0,left:0,right:0,zIndex:9999,background:'rgba(0,0,0,0.8)',color:'lime',padding:'4px 8px',fontSize:'11px',fontFamily:'monospace'}}></div>
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         {user && (
           <header className="sticky top-0 z-40 glass border-b border-white/30 dark:border-gray-700 shadow-sm">

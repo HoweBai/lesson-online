@@ -39,7 +39,6 @@ const ClaudeChatSidebar = ({ tutorialId = 'default', onChapterGenerated }: Claud
       const msg = JSON.parse(data);
       switch (msg.type) {
         case 'connected':
-          console.log('Claude Chat: connected');
           break;
 
         case 'history':
@@ -81,7 +80,7 @@ const ClaudeChatSidebar = ({ tutorialId = 'default', onChapterGenerated }: Claud
           break;
 
         default:
-          console.log('Unknown message type:', msg.type);
+          break;
       }
     } catch (e) {
       console.error('Failed to parse WebSocket message:', e);
@@ -90,13 +89,9 @@ const ClaudeChatSidebar = ({ tutorialId = 'default', onChapterGenerated }: Claud
 
   const { send, isConnected, close } = useWebSocket(wsUrl, {
     token: getToken(),
-    onOpen: () => {
-      console.log('Claude Chat connected');
-    },
+    onOpen: () => {},
     onMessage: handleMessage,
-    onClose: () => {
-      console.log('Claude Chat disconnected');
-    }
+    onClose: () => {}
   });
 
   // Auto-scroll to bottom when messages change

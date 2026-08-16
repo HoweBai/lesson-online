@@ -148,4 +148,3 @@ def update_business_metrics(db_stats: Dict[str, int]):
     """Update metrics from database statistics."""
     _metrics["total_tutorials"] = db_stats.get("tutorials", 0)
     _metrics["total_chapters"] = db_stats.get("chapters", 0)
-    logger.debug(f"Business metrics updated: tutorials={db_stats.get('tutorials', 0)}, chapters={db_stats.get('chapters', 0)}")

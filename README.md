@@ -3,8 +3,8 @@
 一个生产级在线学习平台，核心功能是通过 **Claude API** 为用户生成循序渐进、个性化的计算机科学知识教程。支持游客浏览公开教程，注册用户可通过收集个人信息并使用 AI 生成完整课程大纲和逐章详细讲解（含数学公式推导、代码示例和练习题）。
 
 **版本**: v1.2.0  
-**最后更新**: 2026-08-14  
-**部署地址**: https://tlcw.yobeeo.com/
+**最后更新**: 2026-08-16  
+**部署**: Docker Compose 本地运行
 
 ---
 
@@ -97,7 +97,7 @@
 | API Key 加密存储 | ✅ | AES-GCM 加密 Claude API Key |
 | Celery 异步任务队列 | ✅ | 大纲/章节生成、文件导出异步化，独立 Worker 服务 |
 | MinIO 对象存储 | ✅ | 导出文件上传对象存储，预签名下载链接 |
-| PDF 依赖补全 | ✅ | Dockerfile.backend 集成 pango/cairo 等 WeasyPrint 系统库 |
+| PDF 依赖补全 | ✅ | Dockerfile 集成 pango/cairo 等 WeasyPrint 系统库 |
 
 ---
 
@@ -321,9 +321,11 @@ online-learning-platform/
 ├── nginx/
 │   └── nginx.production.conf        # 生产 Nginx 配置
 │
-├── deploy_compose.py                # Docker Compose 部署脚本
-├── deploy_full.py                   # 完整部署脚本（含 MinIO）
-├── docker-compose.yml               # 开发环境 Docker Compose
+├── scripts/
+│   └── deploy.py                    # 一键部署脚本（云服务器）
+├── nginx/
+│   └── nginx.production.conf        # 生产 Nginx 配置
+├── docker-compose.production.yml    # 生产环境 Docker Compose
 └── README.md                        # 本文档
 ```
 
@@ -353,21 +355,35 @@ cd src/frontend && npm install && npm start
 
 访问 `http://localhost:3000`，API 文档在 `http://localhost:8000/docs`。
 
-### 生产部署
+### 生产部署（云服务器）
 
 ```bash
-# 一键部署到云服务器
-python deploy_compose.py
+# 安装依赖
+pip install -r scripts/requirements.txt
+
+# 使用密码登录
+python scripts/deploy.py --host <服务器IP> --user root --domain <你的域名> --password 'SSH密码'
+
+# 使用 SSH 私钥登录（推荐）
+python scripts/deploy.py --host <服务器IP> --user root --domain <你的域名> --key ~/.ssh/id_rsa
+
+# 跳过 SSL 证书申请
+python scripts/deploy.py --host <服务器IP> --user root --domain <你的域名> --key ~/.ssh/id_rsa --no-certbot
 ```
 
-部署脚本会自动：
-- 构建前端静态资源
-- 上传后端源码和前端构建产物
-- 创建 Docker Compose 配置（PostgreSQL + Redis + Nginx）
-- 生成安全随机密钥
-- 启动所有服务
+脚本会自动完成：
+- 检查/安装 Docker 和 Docker Compose
+- 验证域名 DNS 解析
+- 生成安全随机密钥（SECRET_KEY, POSTGRES_PASSWORD 等）
+- 上传项目文件到服务器
+- 配置 Nginx 反向代理
+- 申请 Let's Encrypt SSL 证书
+- 构建并启动所有 Docker 容器
 
-部署后访问 https://tlcw.yobeeo.com/
+部署后访问:
+- 主站: https://你的域名/
+- API文档: https://你的域名/docs
+- 默认管理员: admin@ollp.local / ollp_admin_2024
 
 ---
 

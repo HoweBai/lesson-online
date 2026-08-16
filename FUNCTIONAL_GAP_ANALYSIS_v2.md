@@ -3,7 +3,7 @@
 **分析日期**: 2026-08-14  
 **版本**: v3.0（P0/P1/P2 全部完成）  
 **技术栈**: FastAPI + React + TypeScript + PostgreSQL + Redis + Celery + MinIO  
-**部署**: Docker Compose → tlcw.yobeeo.com
+**部署**: Docker Compose 本地运行
 
 ---
 

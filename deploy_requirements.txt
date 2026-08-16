@@ -1,4 +1,0 @@
-# 云端部署依赖
-paramiko>=3.4.0
-docker>=7.0.0
-docker-compose>=1.29.0

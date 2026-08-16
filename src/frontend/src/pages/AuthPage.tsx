@@ -20,25 +20,21 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [debugMsg, setDebugMsg] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     if (error) setError('');
-    setDebugMsg('');
   };
 
   const handleConfirmChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setConfirmPassword(e.target.value);
     if (error) setError('');
-    setDebugMsg('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    setDebugMsg('Submitting...');
 
     try {
       if (mode === 'forgot-password') {
@@ -73,40 +69,21 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
       }
 
       // LOGIN
-      setDebugMsg('Calling login API...');
-      console.log('[Login] Starting login with:', formData.email);
       const result = await api.login(formData.email, formData.password);
-      console.log('[Login] API response:', result);
-      setDebugMsg(`API Response: ${JSON.stringify(result).substring(0, 100)}...`);
 
       if (!result.success) {
-        console.log('[Login] FAILED:', result.error);
-        setDebugMsg(`Login FAILED: ${result.error}`);
         throw new Error(result.error || 'Login failed');
       }
 
-      console.log('[Login] Full response:', JSON.stringify(result));
-      console.log('[Login] result.success:', result.success);
-      console.log('[Login] result.data:', result.data);
-      console.log('[Login] result.data?.token:', result.data?.token);
-
       if (result.data?.token) {
         api.setToken(result.data.token);
-        console.log('[Login] Token saved to localStorage, length:', result.data.token.length);
-        console.log('[Login] localStorage after save:', localStorage.getItem('auth_token'));
-        setDebugMsg(`Token saved (${result.data.token.length} chars), redirecting...`);
       } else {
-        console.error('[Login] ERROR: No token found in response!');
-        setDebugMsg('ERROR: No token in response');
         throw new Error('No token received from server');
       }
 
       toast.success('Login successful!');
-      console.log('[Login] About to redirect to /');
       window.location.href = '/';
     } catch (err: any) {
-      console.error('[Login] Error:', err);
-      setDebugMsg(`ERROR: ${err.message || 'Unknown error'}`);
       setError(err.message || 'An error occurred');
     } finally {
       setLoading(false);
@@ -149,11 +126,6 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
               </svg>
               {error}
-            </div>
-          )}
-          {debugMsg && (
-            <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-xl text-yellow-800 text-xs font-mono">
-              {debugMsg}
             </div>
           )}
 
