@@ -166,6 +166,39 @@ def install_docker(ssh: paramiko.SSHClient, os_type: str):
         run_remote(ssh, cmd, f"安装 Docker: {cmd[:50]}...")
 
 
+def configure_docker_mirror(ssh: paramiko.SSHClient):
+    """配置 Docker 镜像加速（中国大陆服务器必需）"""
+    log("\n>>> 配置 Docker 镜像加速")
+
+    # 检查是否已配置镜像
+    _, output = run_remote(ssh, "cat /etc/docker/daemon.json 2>/dev/null || echo '{}'", "检查 Docker 配置")
+
+    import json
+    try:
+        config = json.loads(output.strip()) if output.strip() != '{}' else {}
+    except json.JSONDecodeError:
+        config = {}
+
+    # 腾讯云镜像源
+    mirrors = ["https://mirror.ccs.tencentyun.com"]
+
+    # 检查是否已配置
+    existing = config.get("registry-mirrors", [])
+    for mirror in mirrors:
+        if mirror not in existing:
+            existing.append(mirror)
+    config["registry-mirrors"] = existing
+
+    # 写入配置
+    docker_conf = json.dumps(config, indent=2)
+    run_remote(ssh, f"echo '{docker_conf}' > /etc/docker/daemon.json", "写入 Docker 镜像配置")
+    run_remote(ssh, "systemctl daemon-reload && systemctl restart docker", "重启 Docker 服务")
+
+    # 验证配置
+    _, result = run_remote(ssh, "docker info | grep -A 5 'Registry Mirrors'", "验证镜像配置")
+    log(f"  Docker 镜像加速已配置:\n{result}")
+
+
 def setup_nginx(ssh: paramiko.SSHClient, domain: str):
     """配置 Nginx"""
     # 创建 nginx 配置目录
@@ -300,102 +333,35 @@ def setup_certbot(ssh: paramiko.SSHClient, domain: str):
 
 
 def upload_files(ssh: paramiko.SSHClient):
-    """上传项目文件到服务器"""
-    log("\n>>> 上传项目文件")
+    """通过 Tarball 下载项目代码到服务器"""
+    log("\n>>> 获取项目代码")
 
-    sftp = ssh.open_sftp()
+    # 备份旧数据并下载最新代码（使用 tarball 方式，无需 git）
+    backup_dir = f"{REMOTE_BASE_DIR}_backup_{int(time.time())}"
+    run_remote(ssh, f"mkdir -p {backup_dir} && [ -d {REMOTE_BASE_DIR} ] && mv {REMOTE_BASE_DIR}/* {backup_dir}/ 2>/dev/null || true",
+               "备份旧数据")
+    run_remote(ssh,
+               f"rm -rf {REMOTE_BASE_DIR} && curl -L https://github.com/HoweBai/lesson-online/archive/refs/heads/main.tar.gz -o /tmp/lesson-online.tar.gz --max-time 120 && tar -xzf /tmp/lesson-online.tar.gz -C /opt && mv /opt/lesson-online-main {REMOTE_BASE_DIR} && rm /tmp/lesson-online.tar.gz",
+               "下载项目代码 (tarball)")
 
-    # 创建远程目录
-    directories = [
-        REMOTE_BASE_DIR,
-        f"{REMOTE_BASE_DIR}/src/backend",
-        f"{REMOTE_BASE_DIR}/src/frontend",
-        f"{REMOTE_BASE_DIR}/nginx",
-        f"{REMOTE_BASE_DIR}/db/init",
-        f"{REMOTE_BASE_DIR}/data",
-    ]
+    # 验证下载
+    _, output = run_remote(ssh, f"ls {REMOTE_BASE_DIR}/src/frontend/", "验证代码结构")
+    if "Dockerfile.production" not in output:
+        log("  [警告] Dockerfile.production 未找到，尝试修复...", color="\033[33m")
+        run_remote(ssh, f"cp {PROJECT_DIR}/src/frontend/Dockerfile.production {REMOTE_BASE_DIR}/src/frontend/ 2>/dev/null || true")
+        run_remote(ssh, f"cp {PROJECT_DIR}/src/frontend/nginx.frontend.conf {REMOTE_BASE_DIR}/src/frontend/ 2>/dev/null || true")
 
-    for dir_path in directories:
-        try:
-            sftp.mkdir(dir_path)
-        except IOError:
-            pass  # 目录已存在
-
-    # 上传 docker-compose 文件
-    upload_path = f"{REMOTE_BASE_DIR}/{DOCKER_COMPOSE_FILE}"
-    local_path = PROJECT_DIR / "docker-compose.production.yml"
-    sftp.put(str(local_path), upload_path)
-    log(f"  已上传: {local_path.name}")
-
-    # 上传 nginx 配置
-    nginx_conf_path = f"{REMOTE_BASE_DIR}/nginx/nginx.production.conf"
-    local_nginx = PROJECT_DIR / "nginx" / "nginx.production.conf"
-    sftp.put(str(local_nginx), nginx_conf_path)
-    log(f"  已上传: nginx/nginx.production.conf")
-
-    # 上传前端配置
-    frontend_nginx_path = f"{REMOTE_BASE_DIR}/src/frontend/nginx.frontend.conf"
-    local_frontend_nginx = PROJECT_DIR / "src" / "frontend" / "nginx.frontend.conf"
-    if local_frontend_nginx.exists():
-        sftp.put(str(local_frontend_nginx), frontend_nginx_path)
-        log(f"  已上传: src/frontend/nginx.frontend.conf")
-
-    # 上传前端 Dockerfile
-    frontend_dockerfile_path = f"{REMOTE_BASE_DIR}/src/frontend/Dockerfile.production"
-    local_frontend_df = PROJECT_DIR / "src" / "frontend" / "Dockerfile.production"
-    if local_frontend_df.exists():
-        sftp.put(str(local_frontend_df), frontend_dockerfile_path)
-        log(f"  已上传: src/frontend/Dockerfile.production")
-
-    # 上传后端文件（排除大型目录）
-    exclude_dirs = {".venv", "__pycache__", ".git", ".pytest_cache", ".superpowers", "node_modules", "build"}
-    upload_dir(sftp, PROJECT_DIR / "src" / "backend", f"{REMOTE_BASE_DIR}/src/backend", exclude_dirs)
-
-    # 上传前端 src
-    upload_dir(sftp, PROJECT_DIR / "src" / "frontend" / "src", f"{REMOTE_BASE_DIR}/src/frontend/src", set())
-
-    # 上传前端 public
-    upload_dir(sftp, PROJECT_DIR / "src" / "frontend" / "public", f"{REMOTE_BASE_DIR}/src/frontend/public", set())
-
-    # 上传前端根文件
-    for file in ["package.json", "tsconfig.json"]:
-        local_file = PROJECT_DIR / "src" / "frontend" / file
-        if local_file.exists():
-            sftp.put(str(local_file), f"{REMOTE_BASE_DIR}/src/frontend/{file}")
-            log(f"  已上传: src/frontend/{file}")
-
-    sftp.close()
-    log("  文件上传完成")
-
-
-def upload_dir(sftp, local_dir: Path, remote_dir: str, exclude: set[str]):
-    """递归上传目录"""
-    if not local_dir.exists():
-        return
-
-    for item in local_dir.iterdir():
-        if item.name in exclude or item.name.startswith("."):
-            continue
-
-        remote_item = f"{remote_dir}/{item.name}"
-        if item.is_dir():
-            try:
-                sftp.mkdir(remote_item)
-            except IOError:
-                pass
-            upload_dir(sftp, item, remote_item, exclude)
-        else:
-            sftp.put(str(item), remote_item)
+    log(f"  项目代码已就绪: {REMOTE_BASE_DIR}")
 
 
 def create_env_file(ssh: paramiko.SSHClient, secrets: dict[str, str], domain: str):
     """创建 .env 文件"""
-    env_content = """# ==================== Security Keys ====================
-SECRET_KEY={secret_key}
-CRYPTO_KEY_HEX={crypto_key}
-POSTGRES_PASSWORD={postgres_password}
-MINIO_ACCESS_KEY={minio_access_key}
-MINIO_SECRET_KEY={minio_secret_key}
+    env_content = f"""# ==================== Security Keys ====================
+SECRET_KEY={secrets['SECRET_KEY']}
+CRYPTO_KEY_HEX={secrets['CRYPTO_KEY_HEX']}
+POSTGRES_PASSWORD={secrets['POSTGRES_PASSWORD']}
+MINIO_ACCESS_KEY={secrets['MINIO_ACCESS_KEY']}
+MINIO_SECRET_KEY={secrets['MINIO_SECRET_KEY']}
 
 # ==================== Network ====================
 DOMAIN={domain}
@@ -403,7 +369,7 @@ ALLOWED_HOSTS=*
 
 # ==================== Logging ====================
 LOG_LEVEL=info
-""".format(**secrets, domain=domain)
+"""
 
     run_remote(ssh, f"cat > {REMOTE_BASE_DIR}/.env << 'ENV_EOF'\n{env_content}\nENV_EOF",
                "创建 .env 文件")
@@ -524,6 +490,7 @@ def main():
             os_result, _ = run_remote(ssh, "cat /etc/os-release | grep '^ID=' | cut -d= -f2", "获取 OS ID")
             install_docker(ssh, os_result.strip().lower())
             log("[OK] Docker 安装完成")
+        configure_docker_mirror(ssh)
 
         # 3. 检查域名 DNS
         log(f"\n>>> 检查域名 DNS")
