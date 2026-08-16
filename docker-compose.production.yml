@@ -81,23 +81,15 @@ services:
       - ollp-network
     restart: unless-stopped
 
-  # Frontend development/build server
+  # Frontend build server (serves static files)
   frontend:
     build:
       context: ./src/frontend
-      dockerfile: ../Dockerfile.frontend
+      dockerfile: Dockerfile.production
     container_name: ollp-frontend
-    ports:
-      - "3000:3000"
     networks:
       - ollp-network
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
 
   # MinIO object storage
   minio:
