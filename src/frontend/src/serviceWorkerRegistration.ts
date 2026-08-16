@@ -63,8 +63,7 @@ function checkValidServiceWorker(swUrl: string, config?: { onSuccess?: () => voi
         return;
       }
     })
-    .then(() => import(/* webpackIgnore: true */ swUrl))
-    });
+    .then(() => import(/* webpackIgnore: true */ swUrl));
 }
 
 export function unregister() {
