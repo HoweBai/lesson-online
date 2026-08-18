@@ -6,6 +6,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { useTranslation } from 'react-i18next';
 import CodeBlock from '../components/CodeBlock';
 import ClaudeChatSidebar from '../components/ClaudeChatSidebar';
 import CommentSection from '../components/CommentSection';
@@ -30,6 +31,7 @@ interface ChapterContent {
 }
 
 const TutorialDisplayPage = () => {
+  const { t } = useTranslation('tutorials');
   const toast = useToast();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -62,16 +64,16 @@ const TutorialDisplayPage = () => {
       if (result.success) {
         setChapter(result.data);
       } else {
-        throw new Error(result.error || 'Failed to load chapter');
+        throw new Error(result.error || t('errors.load_chapter', { ns: 'common' }));
       }
     } catch (err: any) {
       console.error('Error loading chapter:', err);
-      setError(err?.message || 'Failed to load tutorial chapter. Please try again.');
-      toast.error(err?.message || 'Failed to load tutorial chapter');
+      setError(err?.message || t('errors.load_chapter', { ns: 'common' }));
+      toast.error(t('errors.load_chapter', { ns: 'common' }));
     } finally {
       setLoading(false);
     }
-  }, [id, toast]);
+  }, [id, toast, t]);
 
   useEffect(() => {
     fetchChapter();
@@ -99,16 +101,16 @@ const TutorialDisplayPage = () => {
         if (result.success) {
           setChapter(result.data);
         } else {
-          toast.error('Failed to refresh chapter');
+          toast.error(t('errors.refresh_chapter', { ns: 'common' }));
         }
       } catch (err: any) {
-        toast.error('Failed to refresh chapter');
+        toast.error(t('errors.refresh_chapter', { ns: 'common' }));
         console.error('Error refreshing chapter:', err);
       } finally {
         setRefreshing(false);
       }
     }
-  }, [id, toast]);
+  }, [id, toast, t]);
 
   if (loading) {
     return (
@@ -118,7 +120,7 @@ const TutorialDisplayPage = () => {
             <div className="absolute inset-0 border-4 border-primary-200 rounded-full"></div>
             <div className="absolute inset-0 border-4 border-primary-600 rounded-full border-t-transparent animate-spin"></div>
           </div>
-          <p className="text-gray-600 font-medium">Loading tutorial...</p>
+          <p className="text-gray-600 font-medium">{t('loading_tutorial')}</p>
         </div>
       </div>
     );
@@ -129,11 +131,11 @@ const TutorialDisplayPage = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Failed to Load Tutorial</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('failed_to_load_tutorial')}</h2>
           <p className="text-gray-500 mb-2">{error}</p>
-          <p className="text-gray-400 text-sm mb-6">Please check your connection and try again.</p>
+          <p className="text-gray-400 text-sm mb-6">{t('please_check_connection')}</p>
           <button onClick={handleRetry} className="btn-primary">
-            Retry
+            {t('retry')}
           </button>
         </div>
       </div>
@@ -145,10 +147,10 @@ const TutorialDisplayPage = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">📭</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Tutorial Not Found</h2>
-          <p className="text-gray-500 mb-6">The tutorial you're looking for doesn't exist or has been removed.</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('tutorial_not_found')}</h2>
+          <p className="text-gray-500 mb-6">{t('tutorial_removed')}</p>
           <button onClick={() => navigate('/')} className="btn-primary">
-            Back to Library
+            {t('back_to_library')}
           </button>
         </div>
       </div>
@@ -166,10 +168,10 @@ const TutorialDisplayPage = () => {
         a.download = `${chapter?.title || 'tutorial'}.md`;
         a.click();
         URL.revokeObjectURL(url);
-        toast.success('Markdown exported successfully!');
+        toast.success(t('export_markdown_success'));
       }
     } catch (e: any) {
-      toast.error('Failed to export markdown: ' + e.message);
+      toast.error(t('errors.export_markdown', { ns: 'common' }));
     }
   };
 
@@ -184,10 +186,10 @@ const TutorialDisplayPage = () => {
         a.download = `${chapter?.title || 'tutorial'}.json`;
         a.click();
         URL.revokeObjectURL(url);
-        toast.success('JSON exported successfully!');
+        toast.success(t('export_json_success'));
       }
     } catch (e: any) {
-      toast.error('Failed to export JSON: ' + e.message);
+      toast.error(t('errors.export_json', { ns: 'common' }));
     }
   };
 
@@ -202,10 +204,10 @@ const TutorialDisplayPage = () => {
         a.download = `${chapter?.title || 'tutorial'}-outline.json`;
         a.click();
         URL.revokeObjectURL(url);
-        toast.success('Outline exported successfully!');
+        toast.success(t('export_outline_success'));
       }
     } catch (e: any) {
-      toast.error('Failed to export outline: ' + e.message);
+      toast.error(t('errors.export_outline', { ns: 'common' }));
     }
   };
 
@@ -220,9 +222,9 @@ const TutorialDisplayPage = () => {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      toast.success('PDF exported successfully!');
+      toast.success(t('export_pdf_success'));
     } catch (e: any) {
-      toast.error('Failed to export PDF: ' + e.message);
+      toast.error(t('errors.export_pdf', { ns: 'common' }));
     }
   };
 
@@ -235,10 +237,10 @@ const TutorialDisplayPage = () => {
         : await api.bookmarkTutorial(id);
       if (result.success) {
         setIsBookmarked(!isBookmarked);
-        toast.success(isBookmarked ? 'Removed from bookmarks' : 'Added to bookmarks');
+        toast.success(isBookmarked ? t('removed_from_bookmarks') : t('added_to_bookmarks'));
       }
     } catch (e: any) {
-      toast.error('Failed to update bookmark');
+      toast.error(t('errors.update_bookmark', { ns: 'common' }));
     } finally {
       setBookmarkLoading(false);
     }
@@ -254,12 +256,12 @@ const TutorialDisplayPage = () => {
     try {
       const result = await api.generateNextChapter(id!);
       if (result.success) {
-        toast.info('Generating next chapter... Please wait');
+        toast.info(t('generating_next_chapter_wait'));
       } else {
-        toast.error(result.error || 'Failed to generate next chapter');
+        toast.error(t('errors.generate_chapter', { ns: 'common' }));
       }
     } catch (e: any) {
-      toast.error('Failed to generate next chapter: ' + e.message);
+      toast.error(t('errors.generate_chapter', { ns: 'common' }));
     } finally {
       setGenerating(false);
     }
@@ -335,8 +337,8 @@ const TutorialDisplayPage = () => {
                     {formula.latex.replace(/\$/g, '')}
                   </div>
                   <div className="space-y-2 text-sm text-gray-700">
-                    <p><strong className="text-primary-700">Derivation:</strong> {formula.derivation}</p>
-                    <p><strong className="text-primary-700">Explanation:</strong> {formula.explanation}</p>
+                    <p><strong className="text-primary-700">{t('derivation')}:</strong> {formula.derivation}</p>
+                    <p><strong className="text-primary-700">{t('explanation')}:</strong> {formula.explanation}</p>
                   </div>
                 </div>
               ))}
@@ -408,11 +410,11 @@ const TutorialDisplayPage = () => {
                       {exercise.difficulty?.charAt(0).toUpperCase() + exercise.difficulty?.slice(1)}
                     </span>
                     {exercise.hint && (
-                      <p className="text-sm text-yellow-700">💡 Hint: {exercise.hint}</p>
+                      <p className="text-sm text-yellow-700">{t('hint')} {exercise.hint}</p>
                     )}
                   </div>
                   <button className="mt-3 px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors text-sm font-medium">
-                    Show Solution
+                    {t('show_solution')}
                   </button>
                 </div>
               ))}
@@ -424,7 +426,7 @@ const TutorialDisplayPage = () => {
         return (
           <div key={section.id} className="mb-8 p-6 bg-white rounded-2xl border border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900">{section.title}</h3>
-            <p className="text-gray-500 text-sm mt-1">(Section type not supported)</p>
+            <p className="text-gray-500 text-sm mt-1">{t('section_type_not_supported')}</p>
           </div>
         );
     }
@@ -448,7 +450,7 @@ const TutorialDisplayPage = () => {
         </button>
         <div className={`bg-white shadow-xl transition-all duration-300 ${showChapterList ? 'w-72' : 'w-0'} overflow-hidden`}>
           <div className="p-4">
-            <h3 className="font-bold text-gray-900 mb-3">Chapters</h3>
+            <h3 className="font-bold text-gray-900 mb-3">{t('chapters')}</h3>
             <div className="space-y-1">
               {chapters.map((ch) => (
                 <button
@@ -479,7 +481,7 @@ const TutorialDisplayPage = () => {
                 </button>
               ))}
               {chapters.length === 0 && (
-                <p className="text-sm text-gray-500 text-center py-4">No chapters yet</p>
+                <p className="text-sm text-gray-500 text-center py-4">{t('no_chapters')}</p>
               )}
             </div>
           </div>
@@ -497,7 +499,7 @@ const TutorialDisplayPage = () => {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            Back to Library
+            {t('back_to_library')}
           </button>
           <div className="flex gap-2">
             <button
@@ -510,7 +512,7 @@ const TutorialDisplayPage = () => {
               } disabled:opacity-50`}
             >
               <span>{isBookmarked ? '🔖' : '📑'}</span>
-              {isBookmarked ? 'Bookmarked' : 'Bookmark'}
+              {isBookmarked ? t('bookmarked') : t('bookmark')}
             </button>
             <button
               onClick={handleShare}
@@ -519,7 +521,7 @@ const TutorialDisplayPage = () => {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
               </svg>
-              Share
+              {t('share')}
             </button>
             <button
               onClick={handleExportMarkdown}
@@ -528,7 +530,7 @@ const TutorialDisplayPage = () => {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              Markdown
+              {t('export_markdown')}
             </button>
             <button
               onClick={handleExportJSON}
@@ -537,7 +539,7 @@ const TutorialDisplayPage = () => {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h7" />
               </svg>
-              JSON
+              {t('export_json')}
             </button>
             <button
               onClick={handleExportOutline}
@@ -546,7 +548,7 @@ const TutorialDisplayPage = () => {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
               </svg>
-              Outline
+              {t('export_outline')}
             </button>
             <button
               onClick={handleExportPDF}
@@ -556,7 +558,7 @@ const TutorialDisplayPage = () => {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16l-4-4m0 0l4-4m-4 4h18" />
               </svg>
-              PDF
+              {t('export_pdf')}
             </button>
           </div>
             <button
@@ -570,7 +572,7 @@ const TutorialDisplayPage = () => {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  Generating...
+                  {t('generating')}
                 </>
               ) : refreshing ? (
                 <>
@@ -578,11 +580,11 @@ const TutorialDisplayPage = () => {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  Refreshing...
+                  {t('refreshing')}
                 </>
               ) : (
                 <>
-                  Next Chapter
+                  {t('next_chapter')}
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
@@ -596,11 +598,11 @@ const TutorialDisplayPage = () => {
         <div className="bg-white rounded-2xl shadow-soft p-8 mb-6">
           <div className="flex items-center gap-3 mb-4">
             <span className="badge badge-primary text-sm">
-              Chapter {chapter.chapter_number || 1} of {chapter.totalChapters || '?'}
+              {t('chapter_of', { n: chapter.chapter_number || 1, total: chapter.totalChapters || '?' })}
             </span>
             {chapter.estimatedReadingTimeMin && (
               <span className="badge bg-gray-100 text-gray-600 text-sm">
-                ⏱ {Math.round(chapter.estimatedReadingTimeMin)} min read
+                ⏱ {Math.round(chapter.estimatedReadingTimeMin)} {t('min_read')}
               </span>
             )}
           </div>
@@ -619,7 +621,7 @@ const TutorialDisplayPage = () => {
         {/* Progress bar */}
         <div className="bg-white rounded-2xl shadow-soft p-4 mb-6">
           <div className="flex justify-between text-sm text-gray-600 mb-2">
-            <span>Progress</span>
+            <span>{t('progress')}</span>
             <span>{Math.round(progress)}%</span>
           </div>
           <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
@@ -629,7 +631,7 @@ const TutorialDisplayPage = () => {
             ></div>
           </div>
           <p className="text-xs text-gray-500 mt-2 text-right">
-            Chapter {chapter.chapter_number || 1}/{chapter.totalChapters || '?'}
+            {t('chapter_of', { n: chapter.chapter_number || 1, total: chapter.totalChapters || '?' })}
           </p>
         </div>
 
@@ -642,7 +644,7 @@ const TutorialDisplayPage = () => {
         {chapter.keyConceptsLearned && (
           <div className="mt-12 bg-gradient-to-r from-primary-50 to-accent-50 p-8 rounded-2xl border border-primary-200">
             <h3 className="text-xl font-bold text-primary-900 mb-4 flex items-center gap-2">
-              <span className="text-2xl">🎯</span> Key Concepts Learned
+              <span className="text-2xl">🎯</span> {t('key_concepts')}
             </h3>
             <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {chapter.keyConceptsLearned.map((concept: string, i: number) => (
@@ -663,7 +665,7 @@ const TutorialDisplayPage = () => {
             onClick={() => navigate('/')}
             className="btn-secondary"
           >
-            ← Back to Library
+            ← {t('back_to_library')}
           </button>
           <button
             onClick={handleNextChapter}
@@ -676,7 +678,7 @@ const TutorialDisplayPage = () => {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
-                Generating...
+                {t('generating')}
               </>
             ) : refreshing ? (
               <>
@@ -684,10 +686,10 @@ const TutorialDisplayPage = () => {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
-                Refreshing...
+                {t('refreshing')}
               </>
             ) : (
-              'Generate Next Chapter →'
+              t('generate_next')
             )}
           </button>
         </div>
