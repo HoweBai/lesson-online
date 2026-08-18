@@ -1,1 +1,7 @@
-{}
+{
+  "close_chat": "Close chat",
+  "ask_anything": "Ask anything about your tutorial",
+  "sending": "Sending...",
+  "chapter_generated": "Chapter generated successfully!",
+  "error_prefix": "Error:"
+}

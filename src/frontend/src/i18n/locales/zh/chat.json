@@ -1,1 +1,7 @@
-{}
+{
+  "close_chat": "关闭聊天",
+  "ask_anything": "询问关于你的教程的任何问题",
+  "sending": "发送中...",
+  "chapter_generated": "章节生成成功！",
+  "error_prefix": "错误："
+}

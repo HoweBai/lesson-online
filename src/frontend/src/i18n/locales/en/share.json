@@ -1,1 +1,9 @@
-{}
+{
+  "share_tutorial": "Share Tutorial",
+  "share_link": "Share Link",
+  "copy_link": "Copy",
+  "link_copied": "Link copied to clipboard!",
+  "twitter": "Twitter",
+  "linkedin": "LinkedIn",
+  "wechat": "WeChat"
+}
