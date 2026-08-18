@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { v4 as uuidv4 } from 'uuid';
 import { useToast } from '../hooks/useToast';
 import { useWebSocket } from '../hooks/useWebSocket';
@@ -21,6 +22,7 @@ interface ClaudeChatSidebarProps {
 }
 
 const ClaudeChatSidebar = ({ tutorialId = 'default', onChapterGenerated }: ClaudeChatSidebarProps) => {
+  const { t } = useTranslation('chat');
   const toast = useToast();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -71,12 +73,12 @@ const ClaudeChatSidebar = ({ tutorialId = 'default', onChapterGenerated }: Claud
           break;
 
         case 'error':
-          toast.error(`Error: ${msg.message}`);
+          toast.error(`${t('error_prefix')} ${msg.message}`);
           break;
 
         case 'chapter_generated':
           onChapterGenerated?.();
-          toast.success('Chapter generated successfully!');
+          toast.success(t('chapter_generated'));
           break;
 
         default:
@@ -85,7 +87,7 @@ const ClaudeChatSidebar = ({ tutorialId = 'default', onChapterGenerated }: Claud
     } catch (e) {
       console.error('Failed to parse WebSocket message:', e);
     }
-  }, [toast, onChapterGenerated]);
+  }, [toast, onChapterGenerated, t]);
 
   const { send, isConnected, close } = useWebSocket(wsUrl, {
     token: getToken(),
@@ -139,7 +141,7 @@ const ClaudeChatSidebar = ({ tutorialId = 'default', onChapterGenerated }: Claud
       <button
         onClick={toggleSidebar}
         className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-r from-primary-600 to-accent-600 text-white shadow-lg hover:shadow-xl flex items-center justify-center text-2xl transition-all hover:scale-105"
-        title={isOpen ? 'Close chat' : 'Open Claude chat'}
+        title={isOpen ? t('close_chat') : t('ask_anything')}
       >
         {isOpen ? '✕' : '💬'}
       </button>
@@ -154,13 +156,13 @@ const ClaudeChatSidebar = ({ tutorialId = 'default', onChapterGenerated }: Claud
         {/* Header */}
         <div className="p-3 bg-gray-800 flex items-center justify-between flex-shrink-0">
           <span className={`text-sm font-medium ${isConnected ? 'text-green-400' : 'text-red-400'}`}>
-            ● {isConnected ? 'Online' : 'Offline'}
+            ● {isConnected ? t('chat_online') : t('chat_offline')}
           </span>
-          <h3 className="text-white font-semibold text-sm truncate flex-1 mx-2">🤖 Claude Assistant</h3>
+          <h3 className="text-white font-semibold text-sm truncate flex-1 mx-2">🤖 {t('claude_assistant')}</h3>
           <button
             onClick={closeSidebar}
             className="text-gray-400 hover:text-white transition-colors"
-            title="Close"
+            title={t('close_chat')}
           >
             ‹
           </button>
@@ -170,7 +172,7 @@ const ClaudeChatSidebar = ({ tutorialId = 'default', onChapterGenerated }: Claud
         <div className="flex-1 overflow-y-auto p-3 space-y-2 bg-gray-900">
           {messages.length === 0 && !isTyping ? (
             <div className="text-gray-500 text-center py-8 text-sm">
-              Ready to chat with Claude<br/>Ask anything about your tutorial
+              {t('ready_to_chat')}<br/>{t('ask_anything')}
             </div>
           ) : (
             <>
@@ -209,7 +211,7 @@ const ClaudeChatSidebar = ({ tutorialId = 'default', onChapterGenerated }: Claud
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Type your question..."
+              placeholder={t('type_question')}
               disabled={!isConnected}
               className="flex-1 px-3 py-2 rounded-lg focus:outline-none focus:ring-2 bg-gray-700 text-white placeholder-gray-400 focus:bg-gray-600 focus:ring-blue-500 disabled:opacity-50"
             />
@@ -219,13 +221,13 @@ const ClaudeChatSidebar = ({ tutorialId = 'default', onChapterGenerated }: Claud
                 disabled={!input.trim()}
                 className="px-4 py-2 rounded-lg font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-600 disabled:text-gray-400 transition-colors"
               >
-                Send
+                {t('send')}
               </button>
             )}
           </div>
           {!isConnected && (
             <div className="mt-2 text-xs text-red-400 text-center">
-              Connecting... check server status
+              {t('connect_checking')}
             </div>
           )}
         </div>

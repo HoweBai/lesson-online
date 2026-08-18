@@ -3,5 +3,12 @@
   "ask_anything": "Ask anything about your tutorial",
   "sending": "Sending...",
   "chapter_generated": "Chapter generated successfully!",
-  "error_prefix": "Error:"
+  "error_prefix": "Error:",
+  "chat_online": "Online",
+  "chat_offline": "Offline",
+  "claude_assistant": "Claude Assistant",
+  "ready_to_chat": "Ready to chat with Claude",
+  "type_question": "Type your question...",
+  "connect_checking": "Connecting... check server status",
+  "send": "Send"
 }

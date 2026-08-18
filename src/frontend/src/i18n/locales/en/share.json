@@ -3,6 +3,7 @@
   "share_link": "Share Link",
   "copy_link": "Copy",
   "link_copied": "Link copied to clipboard!",
+  "failed_to_copy": "Failed to copy link",
   "twitter": "Twitter",
   "linkedin": "LinkedIn",
   "wechat": "WeChat"

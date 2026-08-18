@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation } from 'react-router-dom';
 import { api } from '../api/client';
 
@@ -7,6 +8,7 @@ interface AdminGuardProps {
 }
 
 const AdminGuard = ({ children }: AdminGuardProps) => {
+  const { t } = useTranslation('admin');
   const location = useLocation();
   const [checking, setChecking] = useState(true);
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -42,7 +44,7 @@ const AdminGuard = ({ children }: AdminGuardProps) => {
             <div className="absolute inset-0 border-4 border-primary-200 rounded-full"></div>
             <div className="absolute inset-0 border-4 border-primary-600 rounded-full border-t-transparent animate-spin"></div>
           </div>
-          <p className="text-gray-500">Checking admin access...</p>
+          <p className="text-gray-500">{t('checking_admin_access')}</p>
         </div>
       </div>
     );

@@ -3,6 +3,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '../api/client';
 import { useToast } from '../hooks/useToast';
 
@@ -21,6 +22,7 @@ interface CommentSectionProps {
 }
 
 const CommentSection = ({ tutorialId }: CommentSectionProps) => {
+  const { t } = useTranslation('tutorials');
   const toast = useToast();
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,7 +55,7 @@ const CommentSection = ({ tutorialId }: CommentSectionProps) => {
       setNewComment('');
       loadComments();
     } else {
-      toast.error(result.error || 'Failed to post comment');
+      toast.error(result.error || t('write_comment'));
     }
   };
 
@@ -68,7 +70,7 @@ const CommentSection = ({ tutorialId }: CommentSectionProps) => {
   return (
     <div className="bg-white rounded-2xl shadow-soft p-6 mt-8">
       <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-        <span>💬</span> Comments ({comments.length})
+        <span>💬</span> {t('comments')} ({comments.length})
       </h3>
 
       {/* Comment form */}
@@ -76,7 +78,7 @@ const CommentSection = ({ tutorialId }: CommentSectionProps) => {
         <textarea
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Write a comment..."
+          placeholder={t('write_comment')}
           rows={3}
           className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
         />
@@ -86,7 +88,7 @@ const CommentSection = ({ tutorialId }: CommentSectionProps) => {
             disabled={!newComment.trim()}
             className="px-5 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium"
           >
-            Post Comment
+            {t('write_comment')}
           </button>
         </div>
       </form>
@@ -94,8 +96,8 @@ const CommentSection = ({ tutorialId }: CommentSectionProps) => {
       {/* Comments list */}
       {comments.length === 0 ? (
         <div className="text-center py-8 text-gray-500">
-          <p className="text-lg">No comments yet</p>
-          <p className="text-sm">Be the first to share your thoughts!</p>
+          <p className="text-lg">{t('no_comments')}</p>
+          <p className="text-sm">{t('be_first')}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -118,6 +120,7 @@ const CommentItem = ({
   tutorialId: string;
   onRefresh: () => void;
 }) => {
+  const { t } = useTranslation('tutorials');
   const toast = useToast();
   const [replyText, setReplyText] = useState('');
   const [showReply, setShowReply] = useState(false);
@@ -166,7 +169,7 @@ const CommentItem = ({
             onClick={() => setShowReply(!showReply)}
             className="mt-2 text-xs text-primary-600 hover:text-primary-700 font-medium"
           >
-            Reply
+            {t('write_reply')}
           </button>
         </div>
       </div>
@@ -178,7 +181,7 @@ const CommentItem = ({
             type="text"
             value={replyText}
             onChange={(e) => setReplyText(e.target.value)}
-            placeholder="Write a reply..."
+            placeholder={t('write_reply')}
             className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
           <button
@@ -186,14 +189,14 @@ const CommentItem = ({
             disabled={!replyText.trim()}
             className="px-3 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 disabled:opacity-50"
           >
-            Reply
+            {t('write_reply')}
           </button>
           <button
             type="button"
             onClick={() => setShowReply(false)}
             className="px-3 py-2 text-gray-500 text-sm hover:text-gray-700"
           >
-            Cancel
+            {t('retry')}
           </button>
         </form>
       )}

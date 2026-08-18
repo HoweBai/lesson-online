@@ -1,6 +1,7 @@
 /** Progress indicator shown during tutorial outline generation. */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface GenerationProgressProps {
   status: 'idle' | 'generating' | 'completed' | 'failed';
@@ -19,6 +20,7 @@ export const GenerationProgress: React.FC<GenerationProgressProps> = ({
   onNavigate,
   onRetry,
 }) => {
+  const { t } = useTranslation('wizard');
   if (status === 'idle') return null;
 
   return (
@@ -32,7 +34,7 @@ export const GenerationProgress: React.FC<GenerationProgressProps> = ({
             </div>
           </div>
           <div className="text-center space-y-1">
-            <p className="text-lg font-semibold text-gray-800">Generating your outline…</p>
+            <p className="text-lg font-semibold text-gray-800">{t('processing_outline')}</p>
             {message && <p className="text-sm text-gray-500">{message}</p>}
           </div>
           <div className="w-64 bg-gray-200 rounded-full h-2">
@@ -52,15 +54,15 @@ export const GenerationProgress: React.FC<GenerationProgressProps> = ({
             </svg>
           </div>
           <div>
-            <p className="text-lg font-semibold text-gray-800">Tutorial generated!</p>
-            <p className="text-sm text-gray-500 mt-1">Tutorial ID: <span className="font-mono text-gray-700">{tutorialId}</span></p>
+            <p className="text-lg font-semibold text-gray-800">{t('tutorial_generated')}</p>
+            <p className="text-sm text-gray-500 mt-1">{t('tutorial_id')}: <span className="font-mono text-gray-700">{tutorialId}</span></p>
           </div>
           {onNavigate && (
             <button
               onClick={onNavigate}
               className="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition"
             >
-              View Tutorial
+              {t('view_tutorial')}
             </button>
           )}
         </div>
@@ -74,7 +76,7 @@ export const GenerationProgress: React.FC<GenerationProgressProps> = ({
             </svg>
           </div>
           <div>
-            <p className="text-lg font-semibold text-gray-800">Generation failed</p>
+            <p className="text-lg font-semibold text-gray-800">{t('generation_failed')}</p>
             {message && <p className="text-sm text-red-600 mt-1">{message}</p>}
           </div>
           {onRetry && (
@@ -82,7 +84,7 @@ export const GenerationProgress: React.FC<GenerationProgressProps> = ({
               onClick={onRetry}
               className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
             >
-              Try Again
+              {t('try_again')}
             </button>
           )}
         </div>

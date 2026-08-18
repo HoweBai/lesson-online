@@ -71,5 +71,6 @@
   "hours_per_day": " hours/day",
   "learning_profile_label": "Learning Profile:",
   "enter_api_config": "Enter your Claude API configuration below.",
-  "review_outline": "Review the generated outline. You can modify it in the sidebar or confirm as-is:"
+  "review_outline": "Review the generated outline. You can modify it in the sidebar or confirm as-is:",
+  "processing_outline": "Generating your outline…"
 }
