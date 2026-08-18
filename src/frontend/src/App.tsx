@@ -16,6 +16,8 @@ import CourseWizard from './components/CourseWizard';
 import { GlobalErrorHandler } from './components/GlobalErrorHandler';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { api } from './api/client';
+import './i18n';
+import LanguageSwitcher from './i18n/LanguageSwitcher';
 import './App.css';
 
 const App = () => {
@@ -104,6 +106,7 @@ const App = () => {
                   {user?.is_admin && <NavLink href="/admin" icon="🛡️" label="Admin" />}
                   <button onClick={handleLogout} className="text-gray-600 hover:text-red-600">Logout</button>
                   <ThemeToggle />
+                  <LanguageSwitcher />
                 </div>
               </div>
             </div>
