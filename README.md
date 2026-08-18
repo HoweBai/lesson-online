@@ -141,6 +141,16 @@ python scripts/uninstall.py --host <服务器IP> --user root --key ~/.ssh/id_rsa
 
 ---
 
+## 国际化 / Internationalization (i18n)
+
+本项目支持中文和英文双语界面。所有页面和组件均已迁移至 `t()` 函数调用，翻译文件位于 `src/frontend/src/i18n/locales/`。
+
+このプロジェクトは中国語と英語の二言語インターフェースをサポートしています。すべてのページとコンポーネントは `t()` 関数呼び出しに移行済みで、翻訳ファイルは `src/frontend/src/i18n/locales/` に格納されています。
+
+This project supports Chinese and English bilingual interfaces. All pages and components have been migrated to use `t()` function calls, with translation files located at `src/frontend/src/i18n/locales/`.
+
+---
+
 ## 环境配置
 
 项目根目录下的 `.env.example` 包含所有必需的环境变量模板。部署脚本会自动生成随机密钥，无需手动配置。
