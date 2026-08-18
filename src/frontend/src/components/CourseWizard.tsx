@@ -4,6 +4,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useToast } from '../hooks/useToast';
 import { api } from '../api/client';
 import ProfileFormStep from './WizardSteps/ProfileFormStep';
@@ -25,6 +26,7 @@ interface WizardStep {
 }
 
 export const CourseWizard = ({ onClose }: { onClose?: () => void }) => {
+  const { t } = useTranslation('wizard');
   const toast = useToast();
   const navigate = useNavigate();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
@@ -37,25 +39,25 @@ export const CourseWizard = ({ onClose }: { onClose?: () => void }) => {
   const [wizardSteps, setWizardSteps] = useState<WizardStep[]>([
     {
       id: 'profile',
-      title: 'Step 1: Understand Your Learning Situation',
+      title: t('step_1_title'),
       component: ProfileFormStep,
       validate: (data) => !!data.professional_level && !!data.learning_goal
     },
     {
       id: 'claude-config',
-      title: 'Step 2: Configure Claude API',
+      title: t('step_2_title'),
       component: ClaudeConfigStep,
       validate: (data) => !!data.base_url && !!data.api_key && !!data.model_name
     },
     {
       id: 'outline-draft',
-      title: 'Step 3: Review and Modify Draft Outline',
+      title: t('step_3_title'),
       component: OutlineEditorStep,
       validate: (data) => !!data.outline_content && !!data.selected_sections
     },
     {
       id: 'confirm',
-      title: 'Step 4: Confirm Generation',
+      title: t('step_4_title'),
       component: ConfirmGenerationStep,
       validate: (data) => true
     }
@@ -187,7 +189,7 @@ export const CourseWizard = ({ onClose }: { onClose?: () => void }) => {
               onClick={handleBack}
               className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
             >
-              ← Back
+              ← {t('back')}
             </button>
           )}
           {generationStatus === 'idle' && (
@@ -195,7 +197,7 @@ export const CourseWizard = ({ onClose }: { onClose?: () => void }) => {
               onClick={handleNext}
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
             >
-              {currentStepIndex < wizardSteps.length - 1 ? 'Next →' : '🚀 Start Generating Tutorial'}
+              {currentStepIndex < wizardSteps.length - 1 ? `${t('next')} →` : `🚀 ${t('start_generating')}`}
             </button>
           )}
         </div>
