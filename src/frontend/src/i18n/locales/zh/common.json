@@ -27,6 +27,7 @@
   "unavailable": "不可用",
   "authentication_failed": "认证失败",
   "signing_in": "正在登录...",
+  "back_to_login": "返回登录",
   "errors": {
     "copy_failed": "复制链接失败",
     "copy_success": "链接已复制到剪贴板！",
@@ -53,6 +54,9 @@
     "export_pdf": "导出 PDF 失败",
     "export_markdown": "导出 Markdown 失败",
     "export_json": "导出 JSON 失败",
-    "export_outline": "导出大纲失败"
+    "export_outline": "导出大纲失败",
+    "no_token": "未收到服务器返回的令牌",
+    "general": "发生错误",
+    "login_failed": "登录失败"
   }
 }
