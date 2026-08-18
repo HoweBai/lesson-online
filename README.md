@@ -101,10 +101,7 @@
 git clone https://github.com/HoweBai/lesson-online.git
 cd lesson-online
 
-# 2. 安装依赖
-pip install -r scripts/requirements.txt
-
-# 3. 一键部署
+# 2. 一键部署
 python scripts/local_deploy.py --domain <你的域名>
 
 # 或跳过 SSL 证书申请（使用已有证书）
