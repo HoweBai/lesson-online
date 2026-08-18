@@ -55,9 +55,12 @@ def run_cmd(cmd: str, desc: str = "", timeout: int = 300) -> tuple[str, str, int
         if output:
             for line in output.splitlines()[:25]:
                 log(f"    {line}")
-        if error and output:
-            for line in error.splitlines()[:5]:
+        if error:
+            for line in error.splitlines()[:10]:
                 log(f"    ERR: {line}", color="\033[31m")
+
+        if result.returncode != 0 and not output:
+            log(f"[!] 命令执行失败，退出码: {result.returncode}", color="\033[31m")
 
         return output, error, result.returncode
     except subprocess.TimeoutExpired:
@@ -305,6 +308,7 @@ def setup_local():
     # 6. 复制 docker-compose 文件
     run_cmd(f"cp {PROJECT_DIR}/docker-compose.production.yml {REMOTE_BASE_DIR}/", "复制 docker-compose 文件")
     run_cmd(f"cp -r {PROJECT_DIR}/nginx {REMOTE_BASE_DIR}/", "复制 nginx 配置")
+    run_cmd(f"cp -r {PROJECT_DIR}/src {REMOTE_BASE_DIR}/", "复制源代码 (backend/frontend)")
 
     # 7. 设置 Nginx
     setup_nginx(args.domain)
