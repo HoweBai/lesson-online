@@ -93,7 +93,13 @@ const App = () => {
                 </div>
                 <div className="flex items-center space-x-4">
                   <NavLink href="/" icon="📚" label="Tutorials" />
-                  <NavLink href="/wizard" icon="✨" label="Create" />
+                  <button
+                    onClick={() => setShowWizard(true)}
+                    className="flex items-center space-x-2 px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-700 rounded-xl transition-all"
+                  >
+                    <span className="text-lg">✨</span>
+                    <span className="font-medium">Create</span>
+                  </button>
                   <NavLink href="/profile" icon="👤" label="Profile" />
                   {user?.is_admin && <NavLink href="/admin" icon="🛡️" label="Admin" />}
                   <button onClick={handleLogout} className="text-gray-600 hover:text-red-600">Logout</button>
@@ -133,7 +139,6 @@ const App = () => {
               </>
             ) : (
               <>
-                <Route path="/wizard" element={<CourseWizard onClose={() => setShowWizard(false)} />} />
                 <Route path="/" element={<TutorialListPage />} />
                 <Route path="/tutorial/share/:shareCode" element={<ShareRedirect />} />
                 <Route path="/tutorial/:id" element={<TutorialDisplayPage />} />
@@ -143,6 +148,7 @@ const App = () => {
               </>
             )}
           </Routes>
+          {showWizard && <CourseWizard onClose={() => setShowWizard(false)} />}
         </main>
         </div>
       </BrowserRouter>

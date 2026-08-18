@@ -134,11 +134,8 @@ export const CourseWizard = ({ onClose }: { onClose?: () => void }) => {
   };
 
   const handleClose = () => {
-    // 直接使用 window.location 导航，避免路由问题
     if (onClose) {
       onClose();
-    } else {
-      window.location.href = '/';
     }
   };
 
