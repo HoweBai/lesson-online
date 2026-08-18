@@ -11,6 +11,7 @@
   python local_deploy.py --domain tlcw.yobeeo.com
   python local_deploy.py --domain example.com --no-certbot
 """
+from __future__ import annotations
 
 import argparse
 import json
