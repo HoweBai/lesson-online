@@ -13,7 +13,7 @@ class TaskLog(Base):
     __tablename__ = 'task_logs'
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    user_id = Column(String(36), ForeignKey('users.id'), nullable=False)
+    user_id = Column(String(36), ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     task_type = Column(SQLEnum("generate_outline", "generate_chapter", "save_config", "publish_tutorial", "delete_tutorial", name='task_type_enum'), nullable=False)
     status = Column(SQLEnum("pending", "running", "success", "failed", "cancelled", name='task_status_enum'), default="pending")
     progress = Column(Integer, default=0)

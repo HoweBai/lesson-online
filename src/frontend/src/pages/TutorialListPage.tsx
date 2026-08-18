@@ -9,7 +9,11 @@ import TutorialCard from '../components/TutorialCard';
 import { Tutorial } from '../types';
 import { useToast } from '../hooks/useToast';
 
-const TutorialListPage = () => {
+interface TutorialListPageProps {
+  onOpenWizard?: () => void;
+}
+
+const TutorialListPage = ({ onOpenWizard }: TutorialListPageProps) => {
   const navigate = useNavigate();
   const toast = useToast();
   const [tutorials, setTutorials] = useState<Tutorial[]>([]);
@@ -174,7 +178,7 @@ const TutorialListPage = () => {
           </div>
 
           <button
-            onClick={() => navigate('/wizard')}
+            onClick={() => onOpenWizard?.()}
             className="btn-primary flex items-center gap-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -233,7 +237,7 @@ const TutorialListPage = () => {
                 : 'Create your first AI-powered tutorial with our guided wizard.'}
             </p>
             <button
-              onClick={() => navigate('/wizard')}
+              onClick={() => onOpenWizard?.()}
               className="btn-primary inline-flex items-center gap-2 px-6 py-3"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

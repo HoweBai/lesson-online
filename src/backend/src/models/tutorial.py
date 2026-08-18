@@ -15,7 +15,7 @@ class Tutorial(Base):
     __tablename__ = 'tutorials'
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    owner_id = Column(String(36), ForeignKey('users.id'), nullable=False)
+    owner_id = Column(String(36), ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     title = Column(String(200), nullable=False)
     description = Column(Text, nullable=True)
     is_public = Column(Boolean, default=False)

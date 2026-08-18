@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """
-一键部署脚本 - Online Learning Platform
+一键部署/卸载脚本 - Online Learning Platform
 
 用法:
-  python deploy.py --host <服务器IP或域名> --user root --domain <你的域名>
+  部署: python deploy.py --host <服务器IP或域名> --user root --domain <你的域名>
+  卸载: python deploy.py --host <服务器IP或域名> --user root --uninstall [--keep-data]
 
 示例:
   python deploy.py --host 1.2.3.4 --user root --domain example.com
-  python deploy.py --host example.com --user root --password 'your_ssh_password'
-  python deploy.py --host example.com --user root --key ~/.ssh/id_rsa
+  python deploy.py --host example.com --user root --key ~/.ssh/id_rsa --uninstall
+  python deploy.py --host example.com --user root --key ~/.ssh/id_rsa --uninstall --keep-data
 """
 
 import argparse
@@ -333,18 +334,29 @@ def setup_certbot(ssh: paramiko.SSHClient, domain: str):
 
 
 def upload_files(ssh: paramiko.SSHClient):
-    """通过 Tarball 下载项目代码到服务器"""
+    """通过 Tarball 下载项目代码到服务器（保留 .env 文件）"""
     log("\n>>> 获取项目代码")
 
-    # 备份旧数据并下载最新代码（使用 tarball 方式，无需 git）
+    # 备份旧数据（保留 .env）
     backup_dir = f"{REMOTE_BASE_DIR}_backup_{int(time.time())}"
-    run_remote(ssh, f"mkdir -p {backup_dir} && [ -d {REMOTE_BASE_DIR} ] && mv {REMOTE_BASE_DIR}/* {backup_dir}/ 2>/dev/null || true",
-               "备份旧数据")
+    run_remote(ssh, f"mkdir -p {backup_dir} && [ -d {REMOTE_BASE_DIR} ] && find {REMOTE_BASE_DIR} -mindepth 1 -maxdepth 1 ! -name '.env' -exec mv {{}} {backup_dir}/ \\; 2>/dev/null || true",
+               "备份旧数据（保留 .env）")
+
     run_remote(ssh,
                f"rm -rf {REMOTE_BASE_DIR} && curl -L https://github.com/HoweBai/lesson-online/archive/refs/heads/main.tar.gz -o /tmp/lesson-online.tar.gz --max-time 120 && tar -xzf /tmp/lesson-online.tar.gz -C /opt && mv /opt/lesson-online-main {REMOTE_BASE_DIR} && rm /tmp/lesson-online.tar.gz",
                "下载项目代码 (tarball)")
 
-    # 验证下载
+    # 验证 .env 文件存在
+    _, env_check = run_remote(ssh, f"[ -f {REMOTE_BASE_DIR}/.env ] && echo 'exists' || echo 'missing'",
+                              "验证 .env 文件")
+    if env_check.strip() == 'missing':
+        log("  [警告] .env 文件不存在，将生成新密钥", color="\033[33m")
+        env_exists = False
+    else:
+        log("  .env 文件已保留")
+        env_exists = True
+
+    # 验证代码结构
     _, output = run_remote(ssh, f"ls {REMOTE_BASE_DIR}/src/frontend/", "验证代码结构")
     if "Dockerfile.production" not in output:
         log("  [警告] Dockerfile.production 未找到，尝试修复...", color="\033[33m")
@@ -352,27 +364,32 @@ def upload_files(ssh: paramiko.SSHClient):
         run_remote(ssh, f"cp {PROJECT_DIR}/src/frontend/nginx.frontend.conf {REMOTE_BASE_DIR}/src/frontend/ 2>/dev/null || true")
 
     log(f"  项目代码已就绪: {REMOTE_BASE_DIR}")
+    return env_exists
 
 
 def create_env_file(ssh: paramiko.SSHClient, secrets: dict[str, str], domain: str):
-    """创建 .env 文件"""
-    env_content = f"""# ==================== Security Keys ====================
-SECRET_KEY={secrets['SECRET_KEY']}
-CRYPTO_KEY_HEX={secrets['CRYPTO_KEY_HEX']}
-POSTGRES_PASSWORD={secrets['POSTGRES_PASSWORD']}
-MINIO_ACCESS_KEY={secrets['MINIO_ACCESS_KEY']}
-MINIO_SECRET_KEY={secrets['MINIO_SECRET_KEY']}
+    """创建 .env 文件（使用 SFTP 避免 shell 引号问题）"""
+    env_content = (
+        "# ==================== Security Keys ====================\n"
+        f"SECRET_KEY={secrets['SECRET_KEY']}\n"
+        f"CRYPTO_KEY_HEX={secrets['CRYPTO_KEY_HEX']}\n"
+        f"POSTGRES_PASSWORD={secrets['POSTGRES_PASSWORD']}\n"
+        f"MINIO_ACCESS_KEY={secrets['MINIO_ACCESS_KEY']}\n"
+        f"MINIO_SECRET_KEY={secrets['MINIO_SECRET_KEY']}\n"
+        "\n"
+        "# ==================== Network ====================\n"
+        f"DOMAIN={domain}\n"
+        "ALLOWED_HOSTS=*\n"
+        "\n"
+        "# ==================== Logging ====================\n"
+        "LOG_LEVEL=info\n"
+    )
 
-# ==================== Network ====================
-DOMAIN={domain}
-ALLOWED_HOSTS=*
-
-# ==================== Logging ====================
-LOG_LEVEL=info
-"""
-
-    run_remote(ssh, f"cat > {REMOTE_BASE_DIR}/.env << 'ENV_EOF'\n{env_content}\nENV_EOF",
-               "创建 .env 文件")
+    import io
+    f = io.BytesIO(env_content.encode())
+    sftp = ssh.open_sftp()
+    sftp.putfo(f, f"{REMOTE_BASE_DIR}/.env")
+    sftp.close()
     log("  .env 文件已创建")
 
 
@@ -433,20 +450,113 @@ def verify_deployment(ssh: paramiko.SSHClient, domain: str):
     return health
 
 
+def run_uninstall(ssh: paramiko.SSHClient, keep_data: bool = False):
+    """卸载平台服务"""
+    log(f"\n{'='*60}")
+    log(f"Online Learning Platform 卸载")
+    log(f"{'='*60}\n")
+
+    if not keep_data:
+        answer = input("警告: 这将删除所有数据（数据库、对象存储、备份）！确认卸载? (yes/no): ")
+        if answer.strip().lower() != 'yes':
+            log("已取消")
+            return
+    else:
+        log("  保留数据模式 (--keep-data)，仅停止并删除容器和镜像\n")
+
+    # 1. 停止并删除容器
+    log("\n>>> 1. 停止并删除 Docker 容器")
+    run_remote(ssh, f"cd {REMOTE_BASE_DIR} && docker compose -f {DOCKER_COMPOSE_FILE} down 2>/dev/null || true",
+               "停止容器")
+    run_remote(ssh, f"cd {REMOTE_BASE_DIR} && docker compose -f {DOCKER_COMPOSE_FILE} rm -f 2>/dev/null || true",
+               "删除容器")
+
+    # 2. 删除 Docker 卷（除非保留数据）
+    if keep_data:
+        log("  跳过 Docker 卷（--keep-data）")
+    else:
+        log("\n>>> 2. 删除 Docker 卷")
+        run_remote(ssh, "docker volume ls -q | grep -E 'ollp_' | xargs -r docker volume rm",
+                   "删除数据卷")
+        run_remote(ssh, "docker network ls -q | grep -E 'ollp' | xargs -r docker network rm",
+                   "删除网络")
+
+    # 3. 删除 Docker 镜像
+    log("\n>>> 3. 删除 Docker 镜像")
+    run_remote(ssh, "docker images -q ollp-* | xargs -r docker rmi -f",
+               "删除 ollp 镜像")
+
+    # 4. 清理 Nginx 配置
+    log("\n>>> 4. 清理 Nginx 配置")
+    run_remote(ssh, "rm -f /etc/nginx/nginx.conf && nginx -t 2>/dev/null || true",
+               "移除 nginx 配置")
+    # 恢复默认 nginx 或停止 nginx
+    run_remote(ssh, "systemctl stop nginx 2>/dev/null || true", "停止 nginx")
+    run_remote(ssh, "apt-get remove -y nginx 2>/dev/null || yum remove -y nginx 2>/dev/null || true",
+               "卸载 nginx")
+    run_remote(ssh, "rm -rf /etc/nginx 2>/dev/null || true", "清理 nginx 目录")
+    # 清理 certbot 证书
+    run_remote(ssh, "certbot delete --non-interactive 2>/dev/null || true",
+               "删除 SSL 证书")
+    run_remote(ssh, "rm -rf /etc/letsencrypt 2>/dev/null || true", "清理 letsencrypt 目录")
+    run_remote(ssh, "ufw delete allow 80/tcp 2>/dev/null || iptables -D INPUT -p tcp --dport 80 -j ACCEPT 2>/dev/null || true",
+               "关闭 HTTP 端口")
+    run_remote(ssh, "ufw delete allow 443/tcp 2>/dev/null || iptables -D INPUT -p tcp --dport 443 -j ACCEPT 2>/dev/null || true",
+               "关闭 HTTPS 端口")
+
+    # 5. 删除项目目录
+    log("\n>>> 5. 删除项目目录")
+    if not keep_data:
+        run_remote(ssh, f"rm -rf {REMOTE_BASE_DIR}", "删除项目目录")
+        log(f"  已删除: {REMOTE_BASE_DIR}")
+    else:
+        run_remote(ssh, f"rm -rf {REMOTE_BASE_DIR}/src {REMOTE_BASE_DIR}/{DOCKER_COMPOSE_FILE} {REMOTE_BASE_DIR}/.env {REMOTE_BASE_DIR}/nginx 2>/dev/null || true",
+                   "清理项目文件（保留 data 目录）")
+        log(f"  已清理项目文件，保留: {REMOTE_BASE_DIR}/data")
+
+    # 6. 清理 Docker（可选）
+    log("\n>>> 6. 清理 Docker 残留")
+    run_remote(ssh, "docker system prune -af --volumes 2>/dev/null || true",
+               "清理 Docker 无用资源")
+
+    # 7. 验证
+    log("\n>>> 7. 验证卸载")
+    _, ps_out = run_remote(ssh, "docker ps -a --format '{{.Names}}' 2>/dev/null",
+                           "检查容器")
+    _, img_out = run_remote(ssh, "docker images --format '{{.Repository}}' 2>/dev/null | grep -E 'ollp|python.*slim' || true",
+                            "检查镜像")
+    _, dir_out = run_remote(ssh, f"[ -d {REMOTE_BASE_DIR} ] && echo EXISTS || echo REMOVED",
+                            "检查目录")
+
+    log(f"\n{'='*60}")
+    if dir_out.strip() == 'REMOVED':
+        log("卸载完成!")
+    elif keep_data:
+        log("卸载完成！（保留了 data 目录）")
+    else:
+        log("[警告] 项目目录仍存在，请手动清理")
+    log(f"{'='*60}\n")
+
+    if ps_out.strip():
+        log("  残留容器:", color="\033[33m")
+        log(f"  {ps_out}")
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Online Learning Platform - 一键部署脚本",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 示例:
-  # 使用密码登录
+  # 部署
   python deploy.py --host 1.2.3.4 --user root --domain example.com --password 'your_password'
-
-  # 使用 SSH 私钥登录
   python deploy.py --host example.com --user root --domain example.com --key ~/.ssh/id_rsa
 
-  # 交互模式（会提示输入密码）
-  python deploy.py --host example.com --user root --domain example.com
+  # 卸载（删除所有数据）
+  python deploy.py --host example.com --user root --uninstall
+
+  # 卸载（保留数据库和对象存储数据）
+  python deploy.py --host example.com --user root --uninstall --keep-data
         """
     )
 
@@ -456,6 +566,8 @@ def main():
     parser.add_argument("--password", help="SSH 密码（可选，建议使用 --key）")
     parser.add_argument("--key", help="SSH 私钥文件路径")
     parser.add_argument("--no-certbot", action="store_true", help="跳过 SSL 证书申请")
+    parser.add_argument("--uninstall", action="store_true", help="卸载平台（停止并删除所有容器、镜像、卷）")
+    parser.add_argument("--keep-data", action="store_true", help="卸载时保留数据目录（数据库备份、MinIO 对象存储）")
 
     args = parser.parse_args()
 
@@ -469,18 +581,23 @@ def main():
             log("无法获取密码，请使用 --password 或 --key 参数", color="\033[33m")
             sys.exit(1)
 
-    log(f"\n{'='*60}")
-    log(f"Online Learning Platform 一键部署")
-    log(f"版本: {VERSION}")
-    log(f"目标服务器: {args.host}")
-    log(f"域名: {args.domain}")
-    log(f"{'='*60}\n")
-
     ssh = None
     try:
-        # 1. 连接服务器
+        # 连接服务器
         ssh = get_ssh_client(args.host, args.user, password, args.key)
         log("[OK] SSH 连接成功")
+
+        # 卸载模式
+        if args.uninstall:
+            run_uninstall(ssh, args.keep_data)
+            return
+
+        log(f"\n{'='*60}")
+        log(f"Online Learning Platform 一键部署")
+        log(f"版本: {VERSION}")
+        log(f"目标服务器: {args.host}")
+        log(f"域名: {args.domain}")
+        log(f"{'='*60}\n")
 
         # 2. 检查 Docker
         docker_ok = check_docker(ssh)
@@ -515,10 +632,13 @@ def main():
         run_remote(ssh, "systemctl enable docker 2>/dev/null || true", "启用 Docker 服务")
 
         # 6. 上传文件
-        upload_files(ssh)
+        env_exists = upload_files(ssh)
 
-        # 7. 创建 .env 文件
-        create_env_file(ssh, secrets, args.domain)
+        # 7. 创建 .env 文件（仅在不存在时生成新密钥）
+        if not env_exists:
+            create_env_file(ssh, secrets, args.domain)
+        else:
+            log("  保留现有 .env 文件")
 
         # 8. 设置 Nginx（不使用 certbot 自动配置，因为我们要用自定义配置）
         if not args.no_certbot:
@@ -532,11 +652,27 @@ def main():
         # 9. 部署 Docker 容器
         deploy_docker(ssh)
 
-        # 10. 等待服务就绪
-        if wait_for_services(ssh):
-            # 11. 验证部署
-            verify_deployment(ssh, args.domain)
+        # 10. 运行数据库外键约束修复
+        log("\n>>> 应用数据库外键约束修复")
+        fk_sql = (
+            "ALTER TABLE tutorials DROP CONSTRAINT IF EXISTS tutorials_owner_id_fkey; "
+            "ALTER TABLE tutorials ADD CONSTRAINT tutorials_owner_id_fkey "
+            "FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE; "
+            "ALTER TABLE public_catalog DROP CONSTRAINT IF EXISTS public_catalog_published_by_fkey; "
+            "ALTER TABLE public_catalog ADD CONSTRAINT public_catalog_published_by_fkey "
+            "FOREIGN KEY (published_by) REFERENCES users(id) ON DELETE CASCADE; "
+            "ALTER TABLE public_catalog DROP CONSTRAINT IF EXISTS public_catalog_approved_by_fkey; "
+            "ALTER TABLE public_catalog ADD CONSTRAINT public_catalog_approved_by_fkey "
+            "FOREIGN KEY (approved_by) REFERENCES users(id) ON DELETE SET NULL; "
+            "ALTER TABLE task_logs DROP CONSTRAINT IF EXISTS task_logs_user_id_fkey; "
+            "ALTER TABLE task_logs ADD CONSTRAINT task_logs_user_id_fkey "
+            "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;"
+        )
+        run_remote(ssh, f"docker exec ollp-db psql -U ollp_user -d ollp_db -c '{fk_sql}'",
+                   "修复外键约束")
 
+        # 11. 等待服务就绪
+        if wait_for_services(ssh):
             # 12. 输出初始管理员信息
             log(f"\n{'='*60}")
             log(f"初始管理员账户:")

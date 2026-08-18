@@ -139,7 +139,7 @@ const App = () => {
               </>
             ) : (
               <>
-                <Route path="/" element={<TutorialListPage />} />
+                <Route path="/" element={<TutorialListPage onOpenWizard={() => setShowWizard(true)} />} />
                 <Route path="/tutorial/share/:shareCode" element={<ShareRedirect />} />
                 <Route path="/tutorial/:id" element={<TutorialDisplayPage />} />
                 <Route path="/profile" element={<ProfilePage />} />

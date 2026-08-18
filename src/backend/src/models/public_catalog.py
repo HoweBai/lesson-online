@@ -14,9 +14,9 @@ class PublicCatalog(Base):
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     tutorial_id = Column(String(36), ForeignKey('tutorials.id'), unique=True, nullable=False)
-    published_by = Column(String(36), ForeignKey('users.id'), nullable=False)
+    published_by = Column(String(36), ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
     publish_time = Column(DateTime, default=datetime.utcnow)
-    approved_by = Column(String(36), ForeignKey('users.id'), nullable=True)
+    approved_by = Column(String(36), ForeignKey('users.id', ondelete='SET NULL'), nullable=True)
     view_count = Column(Integer, default=0)
     like_count = Column(Integer, default=0)
     reported_count = Column(Integer, default=0)
