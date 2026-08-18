@@ -73,6 +73,17 @@
   "enter_api_config": "Enter your Claude API configuration below.",
   "review_outline": "Review the generated outline. You can modify it in the sidebar or confirm as-is:",
   "processing_outline": "Generating your outline…",
-  "back": "Back",
-  "next": "Next"
+  "math_background_placeholder": "Describe your math knowledge (calculus, linear algebra, probability...)",
+  "available_hours_label": "Available study time per day (hours)",
+  "preferred_style_label": "Preferred learning style",
+  "style_visual": "Visual",
+  "style_text": "Text",
+  "style_code": "Code",
+  "style_exercise": "Exercise",
+  "intro_claude_config": "Enter your Claude API configuration. This allows the platform to generate personalized tutorial content using your account.",
+  "system_prompt_label": "System Prompt (optional)",
+  "system_prompt_placeholder": "Custom instructions for the AI when generating your tutorial...",
+  "chapter_n": "Chapter {n}",
+  "continue_generating": "You can continue generating chapters later one by one",
+  "tip_chat": "Tip: Use the Claude Chat Sidebar on the right side of the screen to ask questions or request modifications to the outline!"
 }
