@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api/client';
 import { useToast } from '../hooks/useToast';
+import { useTranslation } from 'react-i18next';
 import { User } from '../types';
 
 const AdminUsersPage = () => {
+  const { t } = useTranslation('admin');
   const toast = useToast();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -65,11 +67,11 @@ const AdminUsersPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">User Management</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('user_management')}</h1>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{totalUsers} total users</p>
             </div>
             <Link to="/admin" className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 text-sm font-medium">
-              ← Dashboard
+              {t('back_to_dashboard')}
             </Link>
           </div>
         </div>
@@ -80,7 +82,7 @@ const AdminUsersPage = () => {
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-soft border border-gray-100 dark:border-gray-700 mb-6">
           <input
             type="text"
-            placeholder="Search by username or email..."
+            placeholder={t('search_by_username_or_email')}
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             className="w-full px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 outline-none"
@@ -95,17 +97,17 @@ const AdminUsersPage = () => {
               <div className="w-10 h-10 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto"></div>
             </div>
           ) : users.length === 0 ? (
-            <div className="p-12 text-center text-gray-400">No users found</div>
+            <div className="p-12 text-center text-gray-400">{t('no_users_found')}</div>
           ) : (
             <>
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-100 dark:border-gray-700">
-                    <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">User</th>
-                    <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Email</th>
-                    <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Joined</th>
-                    <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Admin</th>
-                    <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Actions</th>
+                    <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{t('user')}</th>
+                    <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{t('email')}</th>
+                    <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{t('joined')}</th>
+                    <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{t('admin')}</th>
+                    <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{t('action')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -129,7 +131,7 @@ const AdminUsersPage = () => {
                             ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
                             : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
                         }`}>
-                          {user.is_admin ? 'Admin' : 'User'}
+                          {user.is_admin ? t('admin') : t('user')}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
@@ -138,13 +140,13 @@ const AdminUsersPage = () => {
                             onClick={() => handleToggleAdmin(user)}
                             className="px-3 py-1.5 text-xs font-medium rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 dark:bg-primary-900/20 dark:text-primary-400 dark:hover:bg-primary-900/30"
                           >
-                            {user.is_admin ? 'Remove Admin' : 'Make Admin'}
+                            {user.is_admin ? t('remove_admin') : t('make_admin')}
                           </button>
                           <button
                             onClick={() => handleDeleteUser(user)}
                             className="px-3 py-1.5 text-xs font-medium rounded-lg bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30"
                           >
-                            Delete
+                            {t('delete')}
                           </button>
                         </div>
                       </td>
@@ -156,21 +158,21 @@ const AdminUsersPage = () => {
               {/* Desktop pagination */}
               {totalPages > 1 && (
                 <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 dark:border-gray-700">
-                  <span className="text-sm text-gray-500 dark:text-gray-400">Page {page} of {totalPages}</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">{t('page_of', { page, totalPages })}</span>
                   <div className="flex gap-2">
                     <button
                       onClick={() => setPage(p => Math.max(1, p - 1))}
                       disabled={page === 1}
                       className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
                     >
-                      Previous
+                      {t('previous')}
                     </button>
                     <button
                       onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                       disabled={page === totalPages}
                       className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
                     >
-                      Next
+                      {t('next')}
                     </button>
                   </div>
                 </div>
@@ -196,18 +198,18 @@ const AdminUsersPage = () => {
                     ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
                     : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
                 }`}>
-                  {user.is_admin ? 'Admin' : 'User'}
+                  {user.is_admin ? t('admin') : t('user')}
                 </span>
               </div>
               <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-gray-700">
                 <span className="text-xs text-gray-400 dark:text-gray-500">
-                  Joined {new Date(user.created_at).toLocaleDateString()}
+                  {t('joined')} {new Date(user.created_at).toLocaleDateString()}
                 </span>
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleToggleAdmin(user)}
                     className="w-11 h-11 flex items-center justify-center rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 dark:bg-primary-900/20 dark:text-primary-400 dark:hover:bg-primary-900/30 text-sm"
-                    title={user.is_admin ? 'Remove Admin' : 'Make Admin'}
+                    title={user.is_admin ? t('remove_admin') : t('make_admin')}
                     aria-label={user.is_admin ? 'Remove admin' : 'Make admin'}
                   >
                     {user.is_admin ? '🔓' : '🔒'}
@@ -229,21 +231,21 @@ const AdminUsersPage = () => {
         {/* Mobile pagination — OUTSIDE the hidden wrapper */}
         {totalPages > 1 && (
           <div className="md:hidden flex items-center justify-between px-4 py-3">
-            <span className="text-sm text-gray-500 dark:text-gray-400">Page {page} of {totalPages}</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400">{t('page_of', { page, totalPages })}</span>
             <div className="flex gap-2">
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
                 className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
               >
-                Previous
+                {t('previous')}
               </button>
               <button
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
                 className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
               >
-                Next
+                {t('next')}
               </button>
             </div>
           </div>
