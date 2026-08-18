@@ -133,16 +133,23 @@ export const CourseWizard = ({ onClose }: { onClose?: () => void }) => {
     setGenerationProgress(0);
   };
 
+  const handleClose = () => {
+    // 直接使用 window.location 导航，避免路由问题
+    if (onClose) {
+      onClose();
+    } else {
+      window.location.href = '/';
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={(e) => {
-      if (e.target === e.currentTarget) onClose?.();
-    }}>
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl h-[90vh] overflow-hidden flex flex-col relative z-10">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={handleClose}>
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl h-[90vh] overflow-hidden flex flex-col relative z-10" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="p-6 border-b bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold">{currentStep.title}</h2>
-            <button onClick={(e) => { e.stopPropagation(); onClose?.(); }} className="text-white hover:text-opacity-80 focus:outline-none" type="button">✕</button>
+            <button onClick={handleClose} className="text-white hover:text-opacity-80 focus:outline-none" type="button">✕</button>
           </div>
           {/* Progress bar */}
           <div className="mt-4 bg-white bg-opacity-20 rounded-full h-2">
