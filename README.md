@@ -3,8 +3,8 @@
 一个生产级在线学习平台，核心功能是通过 **Claude API** 为用户生成循序渐进、个性化的计算机科学知识教程。支持游客浏览公开教程，注册用户可通过收集个人信息并使用 AI 生成完整课程大纲和逐章详细讲解（含数学公式推导、代码示例和练习题）。
 
 **版本**: v1.2.0  
-**最后更新**: 2026-08-16  
-**部署**: Docker Compose 本地运行
+**最后更新**: 2026-08-18  
+**在线演示**: https://tlcw.yobeeo.com/
 
 ---
 
@@ -17,7 +17,7 @@
 | **AI 集成** | Claude API / OpenAI API (通过统一 LLM Adapter) |
 | **实时通信** | WebSocket (Claude Code 聊天室) |
 | **认证** | JWT + OAuth2 (Google / GitHub) |
-| **部署** | Docker Compose (PostgreSQL + Redis + Nginx) |
+| **部署** | Docker Compose + Nginx |
 | **测试** | pytest + FastAPI TestClient |
 
 ---
@@ -78,14 +78,6 @@
 | 数据统计 | ✅ | 用户增长、教程统计、活跃度分析 |
 | 仪表盘 | ✅ | 概览统计 + 图表可视化 |
 
-### 实时通信
-
-| 功能 | 状态 | 说明 |
-|------|------|------|
-| WebSocket 聊天 | ✅ | 基于教程的实时 Claude Code 对话 |
-| 消息历史 | ✅ | SQLite 持久化聊天记录 |
-| 在线状态 | ✅ | 连接管理、断线重连 |
-
 ### 系统功能
 
 | 功能 | 状态 | 说明 |
@@ -95,311 +87,89 @@
 | 告警服务 | ✅ | 异常检测与通知 |
 | 审计日志 | ✅ | 用户操作记录 |
 | API Key 加密存储 | ✅ | AES-GCM 加密 Claude API Key |
-| Celery 异步任务队列 | ✅ | 大纲/章节生成、文件导出异步化，独立 Worker 服务 |
+| Celery 异步任务队列 | ✅ | 大纲/章节生成、文件导出异步化 |
 | MinIO 对象存储 | ✅ | 导出文件上传对象存储，预签名下载链接 |
-| PDF 依赖补全 | ✅ | Dockerfile 集成 pango/cairo 等 WeasyPrint 系统库 |
-
----
-
-## API 概览
-
-### 认证 (`/api/v1/auth`)
-
-```
-POST   /api/v1/auth/register          注册
-POST   /api/v1/auth/login             登录
-POST   /api/v1/auth/logout            登出
-GET    /api/v1/auth/me                当前用户
-POST   /api/v1/auth/forgot-password   忘记密码
-POST   /api/v1/auth/reset-password    重置密码
-```
-
-### OAuth (`/api/v1/oauth`)
-
-```
-GET    /api/v1/oauth/google/init      Google 授权初始化
-GET    /api/v1/oauth/github/init      GitHub 授权初始化
-GET    /api/v1/oauth/google/callback  Google 回调
-GET    /api/v1/oauth/github/callback  GitHub 回调
-GET    /api/v1/oauth/me               当前 OAuth 连接
-DELETE /api/v1/oauth/{provider}       取消 OAuth 授权
-```
-
-### 教程 (`/api/v1/tutorials`)
-
-```
-GET    /api/v1/tutorials              我的教程列表
-POST   /api/v1/tutorials              创建教程
-GET    /api/v1/tutorials/{id}         教程详情
-PUT    /api/v1/tutorials/{id}         更新教程
-DELETE /api/v1/tutorials/{id}         删除教程
-POST   /api/v1/tutorials/{id}/publish 发布教程
-POST   /api/v1/tutorials/{id}/unpublish 取消发布
-POST   /api/v1/tutorials/generate-outline 生成大纲
-PUT    /api/v1/tutorials/outlines/{id}/confirm 确认大纲
-POST   /api/v1/tutorials/{id}/generate-next 生成下一章
-GET    /api/v1/tutorials/{id}/chapters/{n}/status 章节状态
-GET    /api/v1/tutorials/{id}/export/markdown  Markdown 导出
-GET    /api/v1/tutorials/{id}/export/json     JSON 导出
-GET    /api/v1/tutorials/{id}/export/outline  大纲导出
-GET    /api/v1/tutorials/{id}/export/pdf      PDF 导出
-POST   /api/v1/tutorials/{id}/export/{format} 异步导出（Celery + MinIO）
-GET    /api/v1/tutorials/{id}/export/{format}/{task_id} 查询导出进度
-DELETE /api/v1/tutorials/tasks/{task_id}      取消异步任务
-GET    /api/v1/tutorials/share/{code}         分享码跳转
-```
-
-### 公共课程库 (`/api/v1/catalog`)
-
-```
-GET    /api/v1/catalog                公开教程列表（搜索/排序/分页）
-GET    /api/v1/catalog/popular        热门教程
-GET    /api/v1/catalog/{id}           教程详情
-POST   /api/v1/catalog/{id}/like      点赞
-POST   /api/v1/catalog/{id}/report    举报
-```
-
-### 书签 (`/api/v1/bookmarks`)
-
-```
-GET    /api/v1/bookmarks/bookmarks    我的收藏
-POST   /api/v1/bookmarks/{tutorial_id}/bookmark  收藏
-DELETE /api/v1/bookmarks/{tutorial_id}/bookmark  取消收藏
-```
-
-### 评论 (`/api/v1/comments`)
-
-```
-GET    /api/v1/comments/{tutorial_id}        获取评论
-POST   /api/v1/comments/{tutorial_id}        发表评论
-POST   /api/v1/comments/{tutorial_id}/replies  回复评论
-POST   /api/v1/comments/{id}/like            点赞评论
-DELETE /api/v1/comments/{id}                 删除评论
-```
-
-### 用户档案 (`/api/v1/users/profile`)
-
-```
-GET    /api/v1/users/profile           获取档案
-PUT    /api/v1/users/profile           更新档案
-GET    /api/v1/users/profile/stats     学习统计
-```
-
-### 管理员 (`/api/v1/admin`)
-
-```
-POST   /api/v1/admin/login           管理员登录
-GET    /api/v1/admin/me              管理员信息
-GET    /api/v1/admin/users           用户列表
-GET    /api/v1/admin/users/{id}      用户详情
-PUT    /api/v1/admin/users/{id}/status  更新用户状态
-DELETE /api/v1/admin/users/{id}      删除用户
-GET    /api/v1/admin/catalog/pending 待审核教程
-PUT    /api/v1/admin/catalog/{id}/review 审核教程
-GET    /api/v1/admin/stats/overview  概览统计
-GET    /api/v1/admin/stats/users     用户统计
-GET    /api/v1/admin/stats/tutorials 教程统计
-```
-
-### 系统 (`/`)
-
-```
-GET    /health                       健康检查
-WS     /ws/claude/{tutorial_id}/{channel_id}  WebSocket 聊天
-GET    /monitor/health               监控健康
-GET    /monitor/metrics              系统指标
-POST   /backup/now                   立即备份
-POST   /backup/upload                上传备份
-```
-
----
-
-## 项目结构
-
-```
-online-learning-platform/
-├── src/
-│   ├── backend/                    # FastAPI 后端
-│   │   ├── src/
-│   │   │   ├── api/                # API 路由层
-│   │   │   │   ├── main.py         # 应用入口 + 路由注册
-│   │   │   │   ├── auth.py         # 认证 API
-│   │   │   │   ├── oauth.py        # OAuth 第三方登录
-│   │   │   │   ├── tutorials.py    # 教程 CRUD + 生成
-│   │   │   │   ├── catalog.py      # 公共课程库
-│   │   │   │   ├── bookmarks.py    # 书签
-│   │   │   │   ├── comments.py     # 评论
-│   │   │   │   ├── profile.py      # 用户档案
-│   │   │   │   ├── export.py       # 内容导出
-│   │   │   │   ├── admin.py        # 管理 API
-│   │   │   │   ├── websocket.py    # WebSocket 聊天
-│   │   │   │   ├── backup.py       # 备份/恢复
-│   │   │   │   ├── monitor.py      # 系统监控
-│   │   │   │   └── alerts.py       # 告警
-│   │   │   ├── models/             # SQLAlchemy 数据模型
-│   │   │   │   ├── user.py         # 用户
-│   │   │   │   ├── tutorial.py     # 教程
-│   │   │   │   ├── chapter.py      # 章节
-│   │   │   │   ├── bookmark.py     # 书签
-│   │   │   │   ├── comment.py      # 评论
-│   │   │   │   ├── profile.py      # 用户档案
-│   │   │   │   ├── oauth_token.py  # OAuth 令牌
-│   │   │   │   ├── chat_history.py # 聊天历史
-│   │   │   │   ├── task_log.py     # 任务日志
-│   │   │   │   ├── audit_log.py    # 审计日志
-│   │   │   │   ├── public_catalog.py # 公开课程
-│   │   │   │   ├── claude_config.py  # Claude 配置
-│   │   │   │   └── knowledge_mapping.py # 知识映射
-│   │   │   ├── services/           # 业务逻辑层
-│   │   │   │   ├── auth_service.py
-│   │   │   │   ├── oauth_service.py
-│   │   │   │   ├── export_service.py
-│   │   │   │   ├── admin_service.py
-│   │   │   │   ├── content_security.py  # 安全扫描
-│   │   │   │   ├── knowledge_inferencer.py # 知识推断
-│   │   │   │   ├── prerequisite_checker.py # 前置检查
-│   │   │   │   ├── outline_generator.py   # 大纲生成
-│   │   │   │   ├── chapter_generator.py   # 章节生成
-│   │   │   │   ├── llm_adapter.py         # LLM 适配器
-│   │   │   │   ├── crypto_service.py      # 加密服务
-│   │   │   │   ├── backup_service.py      # 备份服务
-│   │   │   │   └── alert_service.py       # 告警服务
-│   │   │   ├── middleware/
-│   │   │   │   └── rate_limiter.py  # 速率限制
-│   │   │   └── database/
-│   │   │       ├── database.py      # 数据库连接 + 迁移
-│   │   │       └── migrations/      # 数据库迁移脚本
-│   │   ├── tests/                   # 测试套件 (179 passed)
-│   │   │   ├── test_auth.py
-│   │   │   ├── test_oauth.py
-│   │   │   ├── test_bookmarks.py
-│   │   │   ├── test_comments.py
-│   │   │   ├── test_admin.py
-│   │   │   ├── test_password_reset.py
-│   │   │   └── ...
-│   │   ├── celery_worker.py           # Celery Worker 入口
-│   │   ├── tasks/                   # Celery 异步任务
-│   │   │   ├── outline_tasks.py   # 大纲生成任务
-│   │   │   ├── chapter_tasks.py   # 章节生成任务
-│   │   │   └── export_tasks.py    # 文件导出任务
-│   │   └── requirements.txt
-│   │
-│   └── frontend/                    # React + TypeScript 前端
-│       ├── src/
-│       │   ├── api/
-│       │   │   └── client.ts        # API 客户端
-│       │   ├── components/
-│       │   │   ├── CodeBlock.tsx    # 代码高亮
-│       │   │   ├── MathFormula.tsx  # 公式渲染 (KaTeX)
-│       │   │   ├── TutorialCard.tsx # 教程卡片
-│       │   │   ├── CommentSection.tsx  # 评论区域
-│       │   │   ├── ShareModal.tsx   # 分享弹窗
-│       │   │   ├── LearningChart.tsx # 学习图表
-│       │   │   ├── GenerationProgress.tsx # 进度指示
-│       │   │   ├── ClaudeChatSidebar.tsx # 聊天侧栏
-│       │   │   ├── AdminGuard.tsx   # 管理员守卫
-│       │   │   └── WizardSteps/     # 向导步骤组件
-│       │   ├── contexts/
-│       │   │   ├── ThemeContext.tsx # 主题切换
-│       │   │   └── ToastContext.tsx # Toast 通知
-│       │   ├── hooks/
-│       │   │   ├── useToast.ts      # Toast hook
-│       │   │   └── useWebSocket.ts  # WebSocket hook
-│       │   └── pages/
-│       │       ├── AuthPage.tsx     # 登录/注册（含 OAuth 按钮）
-│       │       ├── AuthCallbackPage.tsx  # OAuth 回调
-│       │       ├── TutorialListPage.tsx  # 教程列表
-│       │       ├── TutorialDisplayPage.tsx # 教程详情
-│       │       ├── ProfilePage.tsx  # 个人中心
-│       │       ├── ClaudeConfigPage.tsx # Claude 配置
-│       │       ├── AdminLoginPage.tsx  # 管理员登录
-│       │       ├── AdminDashboardPage.tsx # 管理仪表盘
-│       │       ├── AdminUsersPage.tsx    # 用户管理
-│       │       └── AdminCatalogPage.tsx  # 教程审核
-│       └── package.json
-│
-├── nginx/
-│   └── nginx.production.conf        # 生产 Nginx 配置
-│
-├── scripts/
-│   └── deploy.py                    # 一键部署脚本（云服务器）
-├── nginx/
-│   └── nginx.production.conf        # 生产 Nginx 配置
-├── docker-compose.production.yml    # 生产环境 Docker Compose
-└── README.md                        # 本文档
-```
 
 ---
 
 ## 快速开始
 
-### 开发环境
+### 云服务器一键部署（推荐新手）
 
 ```bash
-# 1. 复制环境变量
-cp .env.example .env
-# 编辑 .env，填入数据库连接等信息
-
-# 2. 启动基础设施（PostgreSQL + Redis）
-docker-compose up -d
-
-# 3. 初始化数据库
-cd src/backend && python src/initdb.py
-
-# 4. 启动后端
-uvicorn src.api.main:app --reload --port 8000
-
-# 5. 启动前端（另一终端）
-cd src/frontend && npm install && npm start
-```
-
-访问 `http://localhost:3000`，API 文档在 `http://localhost:8000/docs`。
-
-### 生产部署（云服务器）
-
-```bash
-# 安装依赖
+# 1. 安装依赖
 pip install -r scripts/requirements.txt
 
-# 使用密码登录
-python scripts/deploy.py --host <服务器IP> --user root --domain <你的域名> --password 'SSH密码'
-
-# 使用 SSH 私钥登录（推荐）
+# 2. 一键部署（SSH 私钥方式，推荐）
 python scripts/deploy.py --host <服务器IP> --user root --domain <你的域名> --key ~/.ssh/id_rsa
 
-# 跳过 SSL 证书申请
+# 或使用密码方式
+python scripts/deploy.py --host <服务器IP> --user root --domain <你的域名> --password 'SSH密码'
+
+# 跳过 SSL 证书申请（使用已有证书）
 python scripts/deploy.py --host <服务器IP> --user root --domain <你的域名> --key ~/.ssh/id_rsa --no-certbot
 ```
 
-脚本会自动完成：
-- 检查/安装 Docker 和 Docker Compose
+脚本自动完成：
+- 检查/安装 Docker 和 Docker Compose（中国大陆自动配置镜像加速）
 - 验证域名 DNS 解析
 - 生成安全随机密钥（SECRET_KEY, POSTGRES_PASSWORD 等）
-- 上传项目文件到服务器
+- 下载并上传项目代码到服务器
+- 保留现有 `.env` 文件（避免覆盖密钥）
 - 配置 Nginx 反向代理
 - 申请 Let's Encrypt SSL 证书
 - 构建并启动所有 Docker 容器
 
-部署后访问:
-- 主站: https://你的域名/
-- API文档: https://你的域名/docs
-- 默认管理员: admin@ollp.local / ollp_admin_2024
+部署完成后访问：
+- 主站: `https://你的域名/`
+- API 文档: `https://你的域名/docs`
+- 健康检查: `https://你的域名/health`
+- 初始管理员: `admin@ollp.local` / `ollp_admin_2024`
+
+### 卸载
+
+```bash
+# 完全卸载（删除所有数据）
+python scripts/deploy.py --host <服务器IP> --user root --uninstall
+
+# 保留数据库和对象存储数据卸载
+python scripts/deploy.py --host <服务器IP> --user root --uninstall --keep-data
+
+# 或使用独立脚本
+python scripts/uninstall.py --host <服务器IP> --user root --key ~/.ssh/id_rsa
+```
 
 ---
 
 ## 环境配置
 
+项目根目录下的 `.env.example` 包含所有必需的环境变量模板。部署脚本会自动生成随机密钥，无需手动配置。
+
 | 变量 | 必填 | 说明 |
 |------|------|------|
 | `SECRET_KEY` | ✅ | JWT 签名密钥 (`openssl rand -hex 32`) |
 | `CRYPTO_KEY_HEX` | ✅ | AES-GCM 加密密钥（64 位十六进制） |
-| `DATABASE_URL` | ✅ | PostgreSQL 连接字符串 |
-| `REDIS_URL` | ✅ | Redis 连接地址 |
-| `FRONTEND_URL` | ✅ | 前端 URL（OAuth 回调用） |
+| `POSTGRES_PASSWORD` | ✅ | PostgreSQL 数据库密码 |
+| `MINIO_ACCESS_KEY` | ❌ | MinIO 对象存储访问密钥 |
+| `MINIO_SECRET_KEY` | ❌ | MinIO 对象存储密钥 |
 | `GOOGLE_CLIENT_ID` | ❌ | Google OAuth 客户端 ID |
 | `GOOGLE_CLIENT_SECRET` | ❌ | Google OAuth 客户端密钥 |
 | `GITHUB_CLIENT_ID` | ❌ | GitHub OAuth 客户端 ID |
 | `GITHUB_CLIENT_SECRET` | ❌ | GitHub OAuth 客户端密钥 |
+
+> **注意**: 首次使用时请执行 `cp .env.example .env` 并修改必要配置。
+
+---
+
+## 常见问题
+
+| 问题 | 原因 | 解决 |
+|------|------|------|
+| 部署后 `502 Bad Gateway` | `.env` 文件丢失 | 重新运行 `deploy.py` 或手动创建 `.env` |
+| 登录失败 `invalid credentials` | 数据库密码不匹配 | 检查 `.env` 中 `POSTGRES_PASSWORD` |
+| 生成教程失败 | Claude API Key 未配置 | 在「Claude 配置」页面填入有效 API Key |
+| Docker 拉取镜像超时 | 中国大陆网络限制 | 脚本已自动配置腾讯云镜像加速 |
+| 无法删除用户 | 外键约束冲突 | 已修复，用户可正常删除 |
 
 ---
 
@@ -422,13 +192,6 @@ python scripts/deploy.py --host <服务器IP> --user root --domain <你的域名
 # 运行全部测试
 cd src/backend && python -m pytest tests/ -v
 
-# 运行指定测试
-python -m pytest tests/test_oauth.py -v
-python -m pytest tests/test_pdf_export.py -v
-python -m pytest tests/test_bookmarks.py -v
-python -m pytest tests/test_comments.py -v
-python -m pytest tests/test_admin.py -v
-
 # 前端构建验证
 cd src/frontend && npm run build
 ```
@@ -445,22 +208,6 @@ cd src/frontend && npm run build
 | 后端测试 | 23 | ~3,200 |
 | 前端 TypeScript | 30+ | ~5,200 |
 | **总计** | **~100** | **~15,000** |
-
----
-
-## 路线图
-
-| 里程碑 | 状态 | 日期 |
-|--------|------|------|
-| MVP 核心功能 | ✅ 完成 | 2026-07 |
-| P0 体验优化 (Toast, 教程详情, 搜索排序) | ✅ 完成 | 2026-08-11 |
-| P1 社交功能 (书签, 评论, 分享) | ✅ 完成 | 2026-08-12 |
-| P2 管理后台 (管理员, 用户管理, 审核, 暗色模式) | ✅ 完成 | 2026-08-12 |
-| P3 OAuth + PDF 导出 | ✅ 完成 | 2026-08-13 |
-| P0 安全修复 (启动校验, WS 认证, 房间权限) | ✅ 完成 | 2026-08-14 |
-| P1 异步任务 + 对象存储 (Celery + MinIO) | ✅ 完成 | 2026-08-14 |
-| P2 部署修复 + 响应式适配 (WeasyPrint deps, 移动端布局) | ✅ 完成 | 2026-08-14 |
-| P3 PWA 离线支持 (manifest + Service Worker) | ✅ 完成 | 2026-08-14 |
 
 ---
 
