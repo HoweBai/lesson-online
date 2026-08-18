@@ -4,6 +4,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { api } from '../api/client';
 import TutorialCard from '../components/TutorialCard';
 import { Tutorial } from '../types';
@@ -16,6 +17,7 @@ interface TutorialListPageProps {
 const TutorialListPage = ({ onOpenWizard }: TutorialListPageProps) => {
   const navigate = useNavigate();
   const toast = useToast();
+  const { t } = useTranslation('tutorials');
   const [tutorials, setTutorials] = useState<Tutorial[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -67,7 +69,7 @@ const TutorialListPage = ({ onOpenWizard }: TutorialListPageProps) => {
         setTutorials(result.data.data || []);
       }
     } catch (error) {
-      toast.error('Failed to fetch tutorials. Please try again.');
+      toast.error(t('errors.load_tutorials', { ns: 'common' }));
     } finally {
       setLoading(false);
     }
@@ -118,7 +120,7 @@ const TutorialListPage = ({ onOpenWizard }: TutorialListPageProps) => {
               <span className="text-2xl">📚</span>
             </div>
           </div>
-          <p className="text-gray-600 font-medium text-lg">Loading tutorials...</p>
+          <p className="text-gray-600 font-medium text-lg">{t('loading_tutorials')}</p>
         </div>
       </div>
     );
@@ -130,8 +132,8 @@ const TutorialListPage = ({ onOpenWizard }: TutorialListPageProps) => {
         {/* Hero Section */}
         <div className="text-center mb-12 animate-fade-in">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Welcome to{' '}
-            <span className="gradient-text">LearnHub</span>
+            {t('welcome_to_learnhub')}{' '}
+            <span className="gradient-text">{t('learnHub_title')}</span>
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Discover AI-powered personalized learning tutorials crafted just for you
@@ -199,7 +201,7 @@ const TutorialListPage = ({ onOpenWizard }: TutorialListPageProps) => {
               </div>
               <input
                 type="text"
-                placeholder="Search tutorials..."
+                placeholder={t('search_tutorials')}
                 value={searchTerm}
                 onChange={(e) => handleSearch(e.target.value)}
                 className="input pl-11"
