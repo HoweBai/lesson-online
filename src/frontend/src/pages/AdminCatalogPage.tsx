@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api/client';
 import { useToast } from '../hooks/useToast';
+import { useTranslation } from 'react-i18next';
 
 interface PendingTutorial {
   id: string;
@@ -17,6 +18,7 @@ interface PendingTutorial {
 }
 
 const AdminCatalogPage = () => {
+  const { t } = useTranslation('admin');
   const toast = useToast();
   const [tutorials, setTutorials] = useState<PendingTutorial[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,11 +74,11 @@ const AdminCatalogPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Tutorial Review</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('tutorial_review')}</h1>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{totalItems} tutorials pending review</p>
             </div>
             <Link to="/admin" className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 text-sm font-medium">
-              ← Dashboard
+              {t('back_to_dashboard')}
             </Link>
           </div>
         </div>
@@ -90,8 +92,8 @@ const AdminCatalogPage = () => {
         ) : tutorials.length === 0 ? (
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-12 text-center shadow-soft border border-gray-100 dark:border-gray-700">
             <div className="text-5xl mb-4">🎉</div>
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">All caught up!</h3>
-            <p className="text-gray-500 dark:text-gray-400 mt-2">No tutorials pending review.</p>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">{t('all_caught_up')}</h3>
+            <p className="text-gray-500 dark:text-gray-400 mt-2">{t('no_tutorials_pending_review')}</p>
           </div>
         ) : (
           <>
@@ -163,17 +165,17 @@ const AdminCatalogPage = () => {
                   disabled={page === 1}
                   className="px-4 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
                 >
-                  Previous
+                  {t('previous')}
                 </button>
                 <span className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
-                  Page {page} of {totalPages}
+                  {t('page_of', { page, totalPages })}
                 </span>
                 <button
                   onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
                   className="px-4 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
                 >
-                  Next
+                  {t('next')}
                 </button>
               </div>
             )}

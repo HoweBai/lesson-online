@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api/client';
 import { useToast } from '../hooks/useToast';
+import { useTranslation } from 'react-i18next';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
 const AdminDashboardPage = () => {
+  const { t } = useTranslation('admin');
   const toast = useToast();
   const [stats, setStats] = useState<any>(null);
   const [userGrowth, setUserGrowth] = useState<any[]>([]);
@@ -42,12 +44,12 @@ const AdminDashboardPage = () => {
   }
 
   const statCards = [
-    { label: 'Total Users', value: stats?.total_users ?? 0, icon: '👥', color: 'from-blue-500 to-cyan-500' },
-    { label: 'Total Tutorials', value: stats?.total_tutorials ?? 0, icon: '📚', color: 'from-purple-500 to-pink-500' },
-    { label: 'Published', value: stats?.published_tutorials ?? 0, icon: '✅', color: 'from-green-500 to-emerald-500' },
-    { label: 'Pending Review', value: stats?.pending_tutorials ?? 0, icon: '⏳', color: 'from-yellow-500 to-orange-500' },
-    { label: 'New (7 days)', value: stats?.new_users_last_7_days ?? 0, icon: '📈', color: 'from-indigo-500 to-violet-500' },
-    { label: 'Published (month)', value: stats?.published_this_month ?? 0, icon: '🆕', color: 'from-rose-500 to-red-500' },
+    { label: t('total_users'), value: stats?.total_users ?? 0, icon: '👥', color: 'from-blue-500 to-cyan-500' },
+    { label: t('total_tutorials'), value: stats?.total_tutorials ?? 0, icon: '📚', color: 'from-purple-500 to-pink-500' },
+    { label: t('published'), value: stats?.published_tutorials ?? 0, icon: '✅', color: 'from-green-500 to-emerald-500' },
+    { label: t('pending_review'), value: stats?.pending_tutorials ?? 0, icon: '⏳', color: 'from-yellow-500 to-orange-500' },
+    { label: t('new_7days'), value: stats?.new_users_last_7_days ?? 0, icon: '📈', color: 'from-indigo-500 to-violet-500' },
+    { label: t('published_month'), value: stats?.published_this_month ?? 0, icon: '🆕', color: 'from-rose-500 to-red-500' },
   ];
 
   return (
@@ -57,15 +59,15 @@ const AdminDashboardPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Platform overview and statistics</p>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin_dashboard')}</h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('platform_overview')}</p>
             </div>
             <div className="flex items-center gap-3">
               <Link to="/admin/users" className="px-4 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 text-sm font-medium">
-                Manage Users
+                {t('manage_users')}
               </Link>
               <Link to="/admin/catalog" className="px-4 py-2 bg-purple-600 text-white rounded-xl hover:bg-purple-700 text-sm font-medium">
-                Review Tutorials
+                {t('review_tutorials')}
               </Link>
             </div>
           </div>
@@ -90,7 +92,7 @@ const AdminDashboardPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* User Growth */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-soft border border-gray-100 dark:border-gray-700 overflow-x-auto">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">User Growth (30 days)</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">{t('user_growth')}</h3>
             {userGrowth.length > 0 ? (
               <ResponsiveContainer width="100%" height={200}>
                 <LineChart data={userGrowth}>
@@ -102,13 +104,13 @@ const AdminDashboardPage = () => {
                 </LineChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-64 flex items-center justify-center text-gray-400">No data</div>
+              <div className="h-64 flex items-center justify-center text-gray-400">{t('no_data')}</div>
             )}
           </div>
 
           {/* Tutorial Stats */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-soft border border-gray-100 dark:border-gray-700 overflow-x-auto">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Tutorial Status Distribution</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">{t('tutorial_status_distribution')}</h3>
             {tutorialStats && (
               <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={Object.entries(tutorialStats.by_status ?? {}).map(([k, v]) => ({ name: k, value: v }))}>
