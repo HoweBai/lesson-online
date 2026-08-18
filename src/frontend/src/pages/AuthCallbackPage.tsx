@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client';
+import { useTranslation } from 'react-i18next';
 
 const AuthCallbackPage = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation('common');
   const [searchParams] = useSearchParams();
   const [error, setError] = useState<string | null>(null);
 
@@ -32,13 +34,13 @@ const AuthCallbackPage = () => {
         {error ? (
           <>
             <div className="text-4xl mb-4">⚠️</div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">Authentication Failed</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">{t('authentication_failed')}</h2>
             <p className="text-gray-500 dark:text-gray-400 mb-4">{error}</p>
             <button
               onClick={() => navigate('/login')}
               className="px-6 py-2 bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-colors"
             >
-              Back to Login
+              {t('back_to_login')}
             </button>
           </>
         ) : (
@@ -47,7 +49,7 @@ const AuthCallbackPage = () => {
               <div className="absolute inset-0 border-4 border-primary-200 rounded-full"></div>
               <div className="absolute inset-0 border-4 border-primary-600 rounded-full border-t-transparent animate-spin"></div>
             </div>
-            <p className="text-gray-600 dark:text-gray-300 font-medium">Signing you in...</p>
+            <p className="text-gray-600 dark:text-gray-300 font-medium">{t('signing_in')}</p>
           </>
         )}
       </div>

@@ -27,6 +27,7 @@
   "unavailable": "Unavailable",
   "authentication_failed": "Authentication Failed",
   "signing_in": "Signing you in...",
+  "back_to_login": "Back to Login",
   "errors": {
     "copy_failed": "Failed to copy link",
     "copy_success": "Link copied to clipboard!",
@@ -53,6 +54,9 @@
     "export_pdf": "Failed to export PDF",
     "export_markdown": "Failed to export markdown",
     "export_json": "Failed to export JSON",
-    "export_outline": "Failed to export outline"
+    "export_outline": "Failed to export outline",
+    "no_token": "No token received from server",
+    "general": "An error occurred",
+    "login_failed": "Login failed"
   }
 }

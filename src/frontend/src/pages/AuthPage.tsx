@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { api } from '../api/client';
 import { useToast } from '../hooks/useToast';
+import { useTranslation } from 'react-i18next';
 
 interface AuthPageProps {
   mode: 'login' | 'register' | 'forgot-password' | 'reset-password';
@@ -15,6 +16,7 @@ interface AuthPageProps {
 const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
   const navigate = useNavigate();
   const toast = useToast();
+  const { t } = useTranslation('auth');
   const [formData, setFormData] = useState({ email: '', password: '', username: '' });
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
@@ -40,7 +42,7 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
       if (mode === 'forgot-password') {
         const result = await api.forgotPassword(formData.email);
         if (!result.success) throw new Error(result.error || 'Request failed');
-        toast.success('Password reset link sent to your email');
+        toast.success(t('password_reset_sent'));
         navigate('/login');
         return;
       }
@@ -50,11 +52,11 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
           throw new Error('Invalid reset token');
         }
         if (formData.password !== confirmPassword) {
-          throw new Error('Passwords do not match');
+          throw new Error(t('passwords_no_match'));
         }
         const result = await api.resetPassword(resetToken, formData.password);
-        if (!result.success) throw new Error(result.error || 'Password reset failed');
-        toast.success('Password reset successful');
+        if (!result.success) throw new Error(result.error || t('password_reset_failed'));
+        toast.success(t('password_reset_successful'));
         navigate('/login');
         return;
       }
@@ -63,7 +65,7 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
         const result = await api.register(formData.username, formData.email, formData.password);
         if (!result.success) throw new Error(result.error || 'Registration failed');
         if (result.data?.token) api.setToken(result.data.token);
-        toast.success('Account created successfully!');
+        toast.success(t('register_success'));
         window.location.href = '/';
         return;
       }
@@ -72,19 +74,19 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
       const result = await api.login(formData.email, formData.password);
 
       if (!result.success) {
-        throw new Error(result.error || 'Login failed');
+        throw new Error(result.error || t('errors.login_failed', { ns: 'common' }));
       }
 
       if (result.data?.token) {
         api.setToken(result.data.token);
       } else {
-        throw new Error('No token received from server');
+        throw new Error(t('errors.no_token', { ns: 'common' }));
       }
 
-      toast.success('Login successful!');
+      toast.success(t('login_successful'));
       window.location.href = '/';
     } catch (err: any) {
-      setError(err.message || 'An error occurred');
+      setError(err.message || t('errors.general', { ns: 'common' }));
     } finally {
       setLoading(false);
     }
@@ -111,10 +113,10 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
             <span className="text-3xl font-bold gradient-text">OL</span>
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">
-            {mode === 'login' ? 'Welcome Back' : mode === 'register' ? 'Join Us' : mode === 'forgot-password' ? 'Reset Password' : 'Set New Password'}
+            {mode === 'login' ? t('welcome_back') : mode === 'register' ? t('join_us') : mode === 'forgot-password' ? t('reset_password') : t('set_new_password')}
           </h1>
           <p className="text-primary-100">
-            {mode === 'login' ? 'Sign in to continue your learning journey' : mode === 'register' ? 'Create your account to start learning' : mode === 'forgot-password' ? 'Enter your email to receive a reset link' : 'Enter your new password below'}
+            {mode === 'login' ? t('login_subtitle') : mode === 'register' ? t('create_your_account') : mode === 'forgot-password' ? t('enter_email_reset') : t('enter_new_password_hint')}
           </p>
         </div>
 
@@ -133,7 +135,7 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
             {isLoginOrRegister && mode === 'register' && (
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-gray-700">
-                  Username
+                  {t('username_label')}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -148,7 +150,7 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
                     value={formData.username}
                     onChange={handleChange}
                     className="input pl-11"
-                    placeholder="Enter your username"
+                    placeholder={t('username_placeholder')}
                   />
                 </div>
               </div>
@@ -157,7 +159,7 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
             {(isLoginOrRegister || mode === 'forgot-password') && (
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-gray-700">
-                  Email Address
+                  {t('email_address')}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -182,7 +184,7 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
               <>
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-gray-700">
-                    New Password
+                    {t('new_password')}
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -204,7 +206,7 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-semibold text-gray-700">
-                    Confirm New Password
+                    {t('confirm_new_password')}
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -230,7 +232,7 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
             {(mode === 'login' || mode === 'register') && (
               <div className="space-y-2">
                 <label className="block text-sm font-semibold text-gray-700">
-                  Password
+                  {t('password_label')}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -275,7 +277,7 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
                 </div>
                 <div className="relative flex justify-center text-sm">
                   <span className="px-4 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
-                    Or continue with
+                    {t('or_sign_in_with')}
                   </span>
                 </div>
               </div>
@@ -299,7 +301,7 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
                     <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                   </svg>
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Google</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{t('google')}</span>
                 </button>
                 <button
                   onClick={async () => {
@@ -313,7 +315,7 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-7.29 0-.166.042-.327.042-.327.056-.092.195-.136.352-.136h.003c.157 0 .296.044.352.136.042.12.083.282.083.472 0 3.133-1.513 4.476-3.087 4.955.262.216.52.638.52 1.287v3.609c0 .318.192.694.703.577 4.765-1.589 8.199-6.085 8.199-11.387 0-6.627-5.373-12-12-12z"/>
                   </svg>
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-200">GitHub</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{t('github')}</span>
                 </button>
               </div>
             )}
@@ -329,9 +331,9 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  Processing...
+                  {t('processing')}
                 </span>
-              ) : mode === 'login' ? 'Sign In' : mode === 'register' ? 'Create Account' : mode === 'forgot-password' ? 'Send Reset Link' : 'Reset Password'}
+              ) : mode === 'login' ? t('sign_in') : mode === 'register' ? t('create_account') : mode === 'forgot-password' ? t('send_reset_link') : t('reset_password')}
             </button>
           </form>
 
@@ -339,7 +341,7 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
           {mode === 'login' && (
             <div className="mt-4 text-center">
               <Link to="/forgot-password" className="text-sm text-primary-600 hover:text-primary-700 font-medium">
-                Forgot Password?
+                {t('forgot_password')}
               </Link>
             </div>
           )}
@@ -347,7 +349,7 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
           {(mode === 'forgot-password' || mode === 'reset-password') && (
             <div className="mt-8 text-center">
               <Link to="/login" className="text-primary-600 hover:text-primary-700 font-semibold">
-                Back to Login
+                {t('back_to_login')}
               </Link>
             </div>
           )}
@@ -355,13 +357,13 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
           {mode === 'register' && (
             <div className="mt-8 text-center">
               <Link to="/forgot-password" className="text-sm text-primary-600 hover:text-primary-700 font-medium block mb-4">
-                Forgot Password?
+                {t('forgot_password')}
               </Link>
               <Link
                 to="/login"
                 className="text-primary-600 hover:text-primary-700 font-semibold"
               >
-                Already have an account? Sign in
+                {t('already_have_account')}
               </Link>
             </div>
           )}
@@ -372,7 +374,7 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
                 to="/register"
                 className="text-primary-600 hover:text-primary-700 font-semibold"
               >
-                Don't have an account? Sign up
+                {t('dont_have_account')}
               </Link>
             </div>
           )}
@@ -380,7 +382,7 @@ const AuthPage = ({ mode, resetToken }: AuthPageProps) => {
 
         {/* Footer */}
         <p className="mt-8 text-center text-primary-100 text-sm">
-          By continuing, you agree to our Terms of Service and Privacy Policy
+          {t('terms_text')}
         </p>
       </div>
     </div>
