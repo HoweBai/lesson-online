@@ -94,28 +94,27 @@
 
 ## 快速开始
 
-### 云服务器一键部署（推荐新手）
+### 在服务器上本地部署（推荐）
 
 ```bash
-# 1. 安装依赖
+# 1. 克隆项目
+git clone https://github.com/HoweBai/lesson-online.git
+cd lesson-online
+
+# 2. 安装依赖
 pip install -r scripts/requirements.txt
 
-# 2. 一键部署（SSH 私钥方式，推荐）
-python scripts/deploy.py --host <服务器IP> --user root --domain <你的域名> --key ~/.ssh/id_rsa
+# 3. 一键部署
+python scripts/local_deploy.py --domain <你的域名>
 
-# 或使用密码方式
-python scripts/deploy.py --host <服务器IP> --user root --domain <你的域名> --password 'SSH密码'
-
-# 跳过 SSL 证书申请（使用已有证书）
-python scripts/deploy.py --host <服务器IP> --user root --domain <你的域名> --key ~/.ssh/id_rsa --no-certbot
+# 或跳过 SSL 证书申请（使用已有证书）
+python scripts/local_deploy.py --domain <你的域名> --no-certbot
 ```
 
 脚本自动完成：
 - 检查/安装 Docker 和 Docker Compose（中国大陆自动配置镜像加速）
-- 验证域名 DNS 解析
 - 生成安全随机密钥（SECRET_KEY, POSTGRES_PASSWORD 等）
-- 下载并上传项目代码到服务器
-- 保留现有 `.env` 文件（避免覆盖密钥）
+- 创建 `.env` 配置文件
 - 配置 Nginx 反向代理
 - 申请 Let's Encrypt SSL 证书
 - 构建并启动所有 Docker 容器
@@ -125,19 +124,6 @@ python scripts/deploy.py --host <服务器IP> --user root --domain <你的域名
 - API 文档: `https://你的域名/docs`
 - 健康检查: `https://你的域名/health`
 - 初始管理员: `admin@ollp.local` / `ollp_admin_2024`
-
-### 卸载
-
-```bash
-# 完全卸载（删除所有数据）
-python scripts/deploy.py --host <服务器IP> --user root --uninstall
-
-# 保留数据库和对象存储数据卸载
-python scripts/deploy.py --host <服务器IP> --user root --uninstall --keep-data
-
-# 或使用独立脚本
-python scripts/uninstall.py --host <服务器IP> --user root --key ~/.ssh/id_rsa
-```
 
 ---
 
@@ -175,7 +161,7 @@ This project supports Chinese and English bilingual interfaces. All pages and co
 
 | 问题 | 原因 | 解决 |
 |------|------|------|
-| 部署后 `502 Bad Gateway` | `.env` 文件丢失 | 重新运行 `deploy.py` 或手动创建 `.env` |
+| 部署后 `502 Bad Gateway` | `.env` 文件丢失 | 重新运行 `local_deploy.py` 或手动创建 `.env` |
 | 登录失败 `invalid credentials` | 数据库密码不匹配 | 检查 `.env` 中 `POSTGRES_PASSWORD` |
 | 生成教程失败 | Claude API Key 未配置 | 在「Claude 配置」页面填入有效 API Key |
 | Docker 拉取镜像超时 | 中国大陆网络限制 | 脚本已自动配置腾讯云镜像加速 |
