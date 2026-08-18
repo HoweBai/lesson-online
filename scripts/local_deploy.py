@@ -230,7 +230,13 @@ def setup_certbot(domain: str):
     """配置 Let's Encrypt SSL 证书"""
     run_cmd("ufw allow 80/tcp 2>/dev/null || iptables -I INPUT -p tcp --dport 80 -j ACCEPT || true", "开放 HTTP 端口")
     run_cmd("ufw allow 443/tcp 2>/dev/null || iptables -I INPUT -p tcp --dport 443 -j ACCEPT || true", "开放 HTTPS 端口")
-    run_cmd("apt-get install -y certbot python3-certbot-nginx", "安装 Certbot")
+
+    # 根据系统选择包管理器
+    os_id, _, _ = run_cmd("grep '^ID=' /etc/os-release | cut -d= -f2", "检测系统类型")
+    if os_id.strip() in ('centos', 'rhel', 'fedora'):
+        run_cmd("yum install -y epel-release && yum install -y certbot python3-certbot-nginx", "安装 Certbot")
+    else:
+        run_cmd("apt-get update && apt-get install -y certbot python3-certbot-nginx", "安装 Certbot")
 
     temp_conf = f"""server {{
     listen 80;
