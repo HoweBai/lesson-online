@@ -4,12 +4,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { api } from '../api/client';
 import { User, UserProfile } from '../types';
 import { useToast } from '../hooks/useToast';
 import { LearningChart } from '../components/LearningChart';
 
 const ProfilePage = () => {
+  const { t } = useTranslation('tutorials');
   const toast = useToast();
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
@@ -103,7 +105,7 @@ const ProfilePage = () => {
             <div className="absolute inset-0 border-4 border-primary-200 rounded-full"></div>
             <div className="absolute inset-0 border-4 border-primary-600 rounded-full border-t-transparent animate-spin"></div>
           </div>
-          <p className="text-gray-600 font-medium">Loading profile...</p>
+          <p className="text-gray-600 font-medium">{t('loading')}</p>
         </div>
       </div>
     );
@@ -114,8 +116,8 @@ const ProfilePage = () => {
       <div className="max-w-5xl mx-auto">
         {/* Page header */}
         <div className="mb-8 animate-fade-in">
-          <h1 className="text-3xl font-bold text-gray-900">Profile & Learning Stats</h1>
-          <p className="text-gray-600 mt-1">Manage your account and track your learning progress</p>
+          <h1 className="text-3xl font-bold text-gray-900">{t('learning_profile')}</h1>
+          <p className="text-gray-600 mt-1">{t('manage_profile')}</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -147,11 +149,11 @@ const ProfilePage = () => {
             <div className="mt-6 pt-6 border-t border-gray-100 grid grid-cols-2 gap-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-primary-600">{progress?.total_tutorials || 0}</div>
-                <div className="text-xs text-gray-500">Tutorials</div>
+                <div className="text-xs text-gray-500">{t('tutorials')}</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-accent-600">{progress?.streak_days || 0}</div>
-                <div className="text-xs text-gray-500">Day Streak</div>
+                <div className="text-xs text-gray-500">{t('day_streak')}</div>
               </div>
             </div>
           </div>
@@ -172,7 +174,7 @@ const ProfilePage = () => {
                 {/* Progress bar */}
                 <div className="mt-6">
                   <div className="flex justify-between text-sm text-gray-600 mb-2">
-                    <span>Overall Progress</span>
+                    <span>{t('overall_progress')}</span>
                     <span>{Math.round(((progress.completed_chapters || 0) / (progress.total_chapters || 1)) * 100)}%</span>
                   </div>
                   <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
@@ -184,7 +186,7 @@ const ProfilePage = () => {
                 </div>
               </div>
             ) : (
-              <p className="text-gray-500 text-center py-8">No progress data yet</p>
+              <p className="text-gray-500 text-center py-8">{t('no_progress')}</p>
             )}
           </div>
 
@@ -199,7 +201,7 @@ const ProfilePage = () => {
                 chapterStats={stats.chapter_stats || null}
               />
             ) : (
-              <p className="text-gray-500 text-center py-8">No stats available yet</p>
+              <p className="text-gray-500 text-center py-8">{t('no_stats')}</p>
             )}
           </div>
 
