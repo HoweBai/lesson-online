@@ -237,7 +237,12 @@ def setup_certbot(domain: str):
     # 根据系统选择包管理器
     os_id, _, _ = run_cmd("grep '^ID=' /etc/os-release | cut -d= -f2", "检测系统类型")
     if os_id.strip() in ('centos', 'rhel', 'fedora'):
-        run_cmd("yum install -y epel-release && yum install -y certbot python3-certbot-nginx", "安装 Certbot")
+        run_cmd("yum install -y epel-release", "安装 EPEL")
+        run_cmd("yum install -y nginx certbot python3-certbot-nginx", "安装 nginx 和 Certbot")
+        # CentOS 上停止并禁用系统 nginx，避免占用 80/443 端口
+        run_cmd("systemctl stop nginx && systemctl disable nginx 2>/dev/null || true", "停止系统 nginx")
+        run_cmd("fuser -k 80/tcp 2>/dev/null || true", "释放 80 端口")
+        run_cmd("fuser -k 443/tcp 2>/dev/null || true", "释放 443 端口")
     else:
         run_cmd("apt-get update && apt-get install -y certbot python3-certbot-nginx", "安装 Certbot")
 
@@ -253,6 +258,10 @@ def setup_certbot(domain: str):
     run_cmd("nginx -t && systemctl reload nginx", "测试并重载 nginx")
     run_cmd(f"certbot --nginx -d {domain} --non-interactive --agree-tos -m admin@{domain} --redirect", "申请 SSL 证书")
     run_cmd("rm -f /etc/nginx/sites-enabled/default && rm -f /etc/nginx/sites-available/default", "清理临时配置")
+    # 将 Let's Encrypt 证书复制到 docker nginx 可访问的位置
+    run_cmd(f"cp /etc/letsencrypt/live/{domain}/fullchain.pem {REMOTE_BASE_DIR}/nginx/ssl/fullchain.pem && cp /etc/letsencrypt/live/{domain}/privkey.pem {REMOTE_BASE_DIR}/nginx/ssl/privkey.pem", "复制 SSL 证书到 nginx 目录")
+    # 更新 nginx 配置中的证书路径
+    run_cmd(f"sed -i 's|/etc/letsencrypt/live/{domain}/|/etc/nginx/ssl/|g' {REMOTE_BASE_DIR}/nginx/nginx.production.conf", "更新 nginx 证书路径")
 
 
 def setup_local():
@@ -321,7 +330,13 @@ def setup_local():
     # 8. 部署 Docker 容器
     log("\n>>> 8. 部署 Docker 容器")
     run_cmd(f"cd {REMOTE_BASE_DIR} && docker compose -f {DOCKER_COMPOSE_FILE} down --remove-orphans", "停止旧容器")
-    run_cmd(f"cd {REMOTE_BASE_DIR} && docker compose -f {DOCKER_COMPOSE_FILE} up -d --build", "构建并启动容器", timeout=600)
+    # 分步构建以避免 SSH 超时
+    log("    先构建后端镜像...")
+    run_cmd(f"cd {REMOTE_BASE_DIR} && docker build -t ollp-backend -f src/backend/Dockerfile src/backend/ 2>&1 | tail -20", "构建 backend 镜像", timeout=600)
+    log("    构建 worker 镜像...")
+    run_cmd(f"cd {REMOTE_BASE_DIR} && docker build -t ollp-worker -f src/backend/Dockerfile src/backend/ 2>&1 | tail -20", "构建 worker 镜像", timeout=300)
+    log("    启动所有容器...")
+    run_cmd(f"cd {REMOTE_BASE_DIR} && docker compose -f {DOCKER_COMPOSE_FILE} up -d", "启动容器", timeout=120)
 
     # 9. 等待服务就绪
     log("\n>>> 9. 等待服务就绪")
@@ -357,15 +372,15 @@ def setup_local():
         run_cmd(f"docker compose -f {REMOTE_BASE_DIR}/{DOCKER_COMPOSE_FILE} logs --tail=20", "查看服务日志")
 
 
-def wait_for_services(timeout: int = 120) -> bool:
+def wait_for_services(timeout: int = 300) -> bool:
     """等待服务就绪"""
     log("\n>>> 等待服务就绪")
     end_time = time.time() + timeout
     while time.time() < end_time:
-        status, _, _ = run_cmd(
+        status, err, rc = run_cmd(
             f"docker compose -f {REMOTE_BASE_DIR}/{DOCKER_COMPOSE_FILE} ps --format json"
         )
-        if "healthy" in status or "running" in status.lower():
+        if rc == 0 and ("healthy" in status or "running" in status.lower()):
             log("  服务已启动")
             return True
         time.sleep(5)
