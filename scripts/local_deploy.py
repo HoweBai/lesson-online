@@ -359,6 +359,34 @@ def setup_local():
         )
         run_cmd(f"docker exec ollp-db psql -U ollp_user -d ollp_db -c '{fk_sql}'", "修复外键约束")
 
+        # 11. 创建管理员账户
+        log("\n>>> 11. 创建管理员账户")
+        import base64
+        admin_script = (
+            'from src.database import get_session\n'
+            'from src.models.user import User\n'
+            'from src.services.auth_service import AuthService\n'
+            'auth = AuthService()\n'
+            'db = get_session()\n'
+            'a = db.query(User).filter_by(email="admin@ollp.local").first()\n'
+            'if a:\n'
+            '    a.password_hash = auth.hash_password("ollp_admin_2024")\n'
+            '    a.is_admin = True\n'
+            '    print("Updated admin")\n'
+            'else:\n'
+            '    a = User(username="admin", email="admin@ollp.local", is_admin=True)\n'
+            '    a.password_hash = auth.hash_password("ollp_admin_2024")\n'
+            '    db.add(a)\n'
+            '    print("Created admin")\n'
+            'db.commit()\n'
+            'db.close()\n'
+            'print("Done!")\n'
+        )
+        admin_b64 = base64.b64encode(admin_script.encode()).decode()
+        run_cmd(f"echo {admin_b64} | base64 -d > /tmp/ca.py", "准备管理员脚本")
+        run_cmd("docker cp /tmp/ca.py ollp-backend:/tmp/ca.py", "复制到后端容器")
+        run_cmd("docker exec ollp-backend python3 /tmp/ca.py", "创建管理员账户")
+
         log(f"\n{'='*60}")
         log(f"部署完成!")
         log(f"{'='*60}")
