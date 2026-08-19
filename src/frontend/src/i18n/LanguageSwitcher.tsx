@@ -15,9 +15,9 @@ const LanguageSwitcher: React.FC = () => {
     <button
       onClick={toggleLanguage}
       className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-      title="Switch language"
+      title={i18n.t('switch_language', { ns: 'common' })}
     >
-      {currentLang === 'en' ? '🇨🇳 中文' : '🇬🇧 EN'}
+      {currentLang === 'en' ? i18n.t('chinese', { ns: 'common' }) : i18n.t('english', { ns: 'common' })}
     </button>
   );
 };

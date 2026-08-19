@@ -107,5 +107,26 @@
   "math_background_placeholder": "描述你的数学背景（微积分、线性代数、概率论等）",
   "system_prompt_placeholder": "输入系统提示词...",
   "outline_default_hint": "点击下一步后，AI 将在此生成课程大纲。生成后，你可以使用 Claude 聊天侧边栏进行修改。",
-  "export_pdf_btn": "导出为 PDF"
+  "export_pdf_btn": "导出为 PDF",
+  "learning_statistics": "学习统计",
+  "auto_inferred": "根据你的学习档案自动推断",
+  "update_knowledge_map": "更新知识图谱",
+  "save_changes": "💾 保存更改",
+  "edit_profile": "✏️ 编辑资料",
+  "learning_general": "综合学习",
+  "job_preparation": "求职准备",
+  "academic_research": "学术研究",
+  "style_visual": "视觉",
+  "style_text": "文本",
+  "style_code": "代码",
+  "style_exercise": "练习",
+  "created": "创建于",
+  "public": "公开",
+  "no_description": "暂无描述",
+  "chapter_status": {
+    "completed": "已完成",
+    "pending": "待生成",
+    "generating": "生成中...",
+    "failed": "失败"
+  }
 }

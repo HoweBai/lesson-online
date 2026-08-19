@@ -90,16 +90,16 @@ export const CourseWizard = ({ onClose }: { onClose?: () => void }) => {
 
   const submitGeneration = async (data: any) => {
     setGenerationStatus('generating');
-    setGenerationMessage('Starting outline generation...');
+    setGenerationMessage(t('generate_outline_msg'));
     setGenerationProgress(10);
     setError('');
     try {
       const result = await api.generateOutline(data.claude_config_id, data.topics);
       if (!result.success) {
-        throw new Error(result.error || 'Failed to generate outline');
+        throw new Error(result.error || t('generate_failed', { ns: 'common' }));
       }
       setGenerationProgress(100);
-      setGenerationMessage('Generating outline... Confirming tutorial');
+      setGenerationMessage(t('confirm_tutorial'));
 
       // Confirm outline to create the tutorial
       const confirmResult = await api.confirmOutline(result.data?.task_id, {
@@ -108,18 +108,18 @@ export const CourseWizard = ({ onClose }: { onClose?: () => void }) => {
         selected_chapters: formData.selected_sections || []
       });
       if (!confirmResult.success) {
-        throw new Error(confirmResult.error || 'Failed to confirm outline');
+        throw new Error(confirmResult.error || t('confirm_outline', { ns: 'common' }));
       }
 
       const tutorialId = confirmResult.data?.tutorial_id;
       setGeneratedTutorialId(tutorialId);
       setGenerationStatus('completed');
-      toast.success('Tutorial generated successfully!');
+      toast.success(t('tutorial_generated_success'));
     } catch (err: any) {
       setGenerationStatus('failed');
-      setGenerationMessage(err.message || 'Failed to generate tutorial');
-      setError(err.message || 'Failed to generate tutorial');
-      toast.error(err.message || 'Failed to generate tutorial');
+      setGenerationMessage(err.message || t('generation_failed'));
+      setError(err.message || t('generation_failed'));
+      toast.error(err.message || t('generation_failed'));
     }
   };
 

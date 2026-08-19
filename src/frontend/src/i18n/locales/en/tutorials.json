@@ -107,5 +107,26 @@
   "math_background_placeholder": "Describe your math background...",
   "system_prompt_placeholder": "Enter system prompt...",
   "outline_default_hint": "The AI will generate your course outline here after clicking \"Next\". Once generated, you can edit it using the Claude Chat Sidebar.",
-  "export_pdf_btn": "Export as PDF"
+  "export_pdf_btn": "Export as PDF",
+  "learning_statistics": "Learning Statistics",
+  "auto_inferred": "Auto-inferred from your learning profile",
+  "update_knowledge_map": "Update Knowledge Map",
+  "save_changes": "💾 Save Changes",
+  "edit_profile": "✏️ Edit Profile",
+  "learning_general": "General Learning",
+  "job_preparation": "Job Preparation",
+  "academic_research": "Academic Research",
+  "style_visual": "Visual",
+  "style_text": "Text",
+  "style_code": "Code",
+  "style_exercise": "Exercise",
+  "created": "Created",
+  "public": "Public",
+  "no_description": "No description available",
+  "chapter_status": {
+    "completed": "Completed",
+    "pending": "Pending",
+    "generating": "Generating...",
+    "failed": "Failed"
+  }
 }

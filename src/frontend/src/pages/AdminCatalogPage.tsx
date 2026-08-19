@@ -41,7 +41,7 @@ const AdminCatalogPage = () => {
         setTotalItems(result.data.pagination?.total || 0);
       }
     } catch {
-      toast.error('Failed to load pending tutorials');
+      toast.error(t('load_pending_failed'));
     } finally {
       setLoading(false);
     }
@@ -51,17 +51,17 @@ const AdminCatalogPage = () => {
     setReviewingId(tutorialId);
     try {
       const reason = action === 'reject'
-        ? prompt('Enter rejection reason (optional):') || ''
+        ? prompt(t('enter_rejection_reason')) || ''
         : '';
       const result = await api.adminReviewTutorial(tutorialId, action, reason || undefined);
       if (result.success) {
         toast.success(`Tutorial ${action}d successfully`);
         loadTutorials();
       } else {
-        toast.error(result.error || 'Failed to review tutorial');
+        toast.error(result.error || t('review_failed'));
       }
     } catch (e: any) {
-      toast.error(e.message || 'Failed to review tutorial');
+      toast.error(e.message || t('review_failed'));
     } finally {
       setReviewingId(null);
     }

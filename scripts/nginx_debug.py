@@ -1,0 +1,12 @@
+import paramiko
+c = paramiko.SSHClient()
+c.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+c.connect('119.27.173.222', username='root', password='tlcw_CENTOS@#2023', timeout=15)
+stdin, stdout, stderr = c.exec_command('docker logs ollp-nginx 2>&1 | tail -30')
+print('NGINX LOGS:')
+print(stdout.read().decode())
+stdin, stdout, stderr = c.exec_command('ls -la /opt/ollp/nginx/')
+print('NGINX DIR:', stdout.read().decode())
+stdin, stdout, stderr = c.exec_command('cat /opt/ollp/nginx/nginx.production.conf | head -30')
+print('CONFIG HEAD:', stdout.read().decode())
+c.close()

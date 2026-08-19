@@ -64,7 +64,7 @@ const ChapterPieChart: React.FC<{ stats: LearningChartProps['chapterStats'] }> =
           <Cell key={`cell-${index}`} fill={entry.color} />
         ))}
       </Pie>
-      <Tooltip formatter={(value: number) => `${value} chapters`} />
+      <Tooltip formatter={(value: number) => [`${value} ${t('chapters')}`]} />
       <Legend />
     </PieChart>
   );
@@ -90,8 +90,8 @@ const TutorialBarChart: React.FC<{ stats: LearningChartProps['tutorialStats'] }>
       <XAxis dataKey="month" tick={{ fontSize: 12 }} />
       <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
       <Tooltip
-        formatter={(value: number) => [`${value} tutorial${value !== 1 ? 's' : ''}`, 'Created']}
-        labelFormatter={(label) => `Month: ${label}`}
+        formatter={(value: number) => [`${value} ${t('tutorial', { defaultValue: 'tutorial' })}`, t('created', { defaultValue: 'Created' })]}
+        labelFormatter={(label) => `${t('month', { defaultValue: 'Month' })}: ${label}`}
       />
       <Bar dataKey="count" fill="#6366f1" radius={[4, 4, 0, 0]} />
     </BarChart>

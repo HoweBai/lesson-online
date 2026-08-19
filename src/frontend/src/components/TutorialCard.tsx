@@ -4,6 +4,7 @@
 
 import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 import { Tutorial } from '../types';
 
 interface TutorialCardProps {
@@ -15,6 +16,7 @@ interface TutorialCardProps {
 }
 
 const TutorialCard = ({ tutorial, onClick, onLike, isBookmarked, onBookmark }: TutorialCardProps) => {
+  const { t } = useTranslation('tutorials');
   return (
     <div
       className="card p-6 cursor-pointer group hover:-translate-y-1 transition-all duration-300 hover:shadow-hover"
@@ -29,7 +31,7 @@ const TutorialCard = ({ tutorial, onClick, onLike, isBookmarked, onBookmark }: T
           </h3>
           {tutorial.is_public && (
             <span className="badge badge-success flex-shrink-0 ml-2">
-              <span className="mr-1">🌍</span> Public
+              <span className="mr-1">🌍</span> {t('public')}
             </span>
           )}
         </div>
@@ -39,25 +41,25 @@ const TutorialCard = ({ tutorial, onClick, onLike, isBookmarked, onBookmark }: T
 
       {/* Description */}
       <p className="text-gray-600 text-sm mb-4 line-clamp-2 min-h-[2.5em] group-hover:text-gray-700 transition-colors duration-300">
-        {tutorial.description || 'No description available'}
+        {tutorial.description || t('no_description')}
       </p>
 
       {/* Meta information */}
       <div className="flex flex-wrap gap-3 text-xs text-gray-500 mb-4">
         <span className="flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-1 rounded-lg group-hover:bg-blue-100 transition-colors duration-300">
-          <span>📖</span> {tutorial.total_chapters || 0} chapters
+          <span>📖</span> {tutorial.total_chapters || 0} {t('chapters')}
         </span>
         <span className="flex items-center gap-1 bg-purple-50 text-purple-700 px-2 py-1 rounded-lg group-hover:bg-purple-100 transition-colors duration-300">
-          <span>👁️</span> {tutorial.views || 0} views
+          <span>👁️</span> {tutorial.views || 0} {t('view_count')}
         </span>
         <span className="flex items-center gap-1 bg-pink-50 text-pink-700 px-2 py-1 rounded-lg group-hover:bg-pink-100 transition-colors duration-300">
-          <span>❤️</span> {tutorial.likes || 0} likes
+          <span>❤️</span> {tutorial.likes || 0} {t('likes')}
         </span>
         {onBookmark && (
           <span className={`flex items-center gap-1 px-2 py-1 rounded-lg transition-colors duration-300 ${
             isBookmarked ? 'bg-amber-100 text-amber-700' : 'bg-gray-50 text-gray-400'
           }`}>
-            <span>{isBookmarked ? '🔖' : '📑'}</span> {isBookmarked ? 'Saved' : 'Save'}
+            <span>{isBookmarked ? '🔖' : '📑'}</span> {isBookmarked ? t('bookmarked') : t('bookmark')}
           </span>
         )}
       </div>
@@ -65,7 +67,7 @@ const TutorialCard = ({ tutorial, onClick, onLike, isBookmarked, onBookmark }: T
       {/* Footer */}
       <div className="flex items-center justify-between pt-4 border-t border-gray-100 group-hover:border-primary-200 transition-colors duration-300">
         <span className="text-xs text-gray-400">
-          Created {formatDistanceToNow(new Date(tutorial.created_at), { addSuffix: true })}
+          {t('created', { defaultValue: `Created ${formatDistanceToNow(new Date(tutorial.created_at), { addSuffix: true })}` })}
         </span>
         {onLike && (
           <button
@@ -75,7 +77,7 @@ const TutorialCard = ({ tutorial, onClick, onLike, isBookmarked, onBookmark }: T
             }}
             className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200 hover:scale-105"
           >
-            <span>❤️</span> Like
+            <span>❤️</span> {t('like')}
           </button>
         )}
         {onBookmark && (
@@ -86,7 +88,7 @@ const TutorialCard = ({ tutorial, onClick, onLike, isBookmarked, onBookmark }: T
             }}
             className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200 hover:scale-105"
           >
-            <span>{isBookmarked ? '🔖' : '📑'}</span> {isBookmarked ? 'Bookmarked' : 'Bookmark'}
+            <span>{isBookmarked ? '🔖' : '📑'}</span> {isBookmarked ? t('bookmarked') : t('bookmark')}
           </button>
         )}
       </div>

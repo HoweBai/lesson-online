@@ -47,22 +47,28 @@ services:
   # ==================== Celery Worker 异步任务 ====================
   worker:
     build:
-      context: .
-      dockerfile: Dockerfile.worker
+      context: ./src/backend
+      dockerfile: Dockerfile
     container_name: ollp-worker
+    command: celery -A src.tasks.celery_app worker --loglevel=info
     restart: always
     environment:
       - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=${SECRET_KEY}
       - CRYPTO_KEY_HEX=${CRYPTO_KEY_HEX}
-      - LOG_LEVEL=${LOG_LEVEL}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - DATABASE_URL=postgresql://ollp_user:${POSTGRES_PASSWORD}@db:5432/ollp_db
+      - MINIO_ENDPOINT=http://minio:9000
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
     volumes:
-      - app_logs:/app/logs
-      - ./src/backend:/app/src/backend:ro
+      - backend_logs:/app/logs
+      - ./data:/app/data
     depends_on:
       redis:
         condition: service_started
     networks:
-      - platform-net
+      - ollp-network
 
   # ==================== 后端 API 服务 ====================
   backend:

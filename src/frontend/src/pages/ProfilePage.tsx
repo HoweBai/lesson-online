@@ -75,7 +75,7 @@ const ProfilePage = () => {
       } catch {}
 
     } catch (error) {
-      toast.error('Failed to load profile. Please try again.');
+      toast.error(t('errors.load_profile', { ns: 'common' }));
     } finally {
       setLoading(false);
     }
@@ -92,7 +92,7 @@ const ProfilePage = () => {
   const handleInferKnowledge = async () => {
     const result = await api.inferKnowledge();
     if (result.success) {
-      toast.success('Knowledge mapping updated!');
+      toast.success(t('knowledge_mapping_updated'));
       loadData();
     }
   };
@@ -193,7 +193,7 @@ const ProfilePage = () => {
           {/* Statistics Card */}
           <div className="card p-6 animate-slide-up md:col-span-2" style={{ animationDelay: '0.2s' }}>
             <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <span>📈</span> Learning Statistics
+              <span>📈</span> {t('learning_statistics', { defaultValue: 'Learning Statistics' })}
             </h3>
             {stats ? (
               <LearningChart
@@ -209,7 +209,7 @@ const ProfilePage = () => {
           {Object.keys(knowledgeMap).length > 0 && (
             <div className="card p-6 animate-slide-up" style={{ animationDelay: '0.15s' }}>
               <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <span>🧠</span> Knowledge Map
+                <span>🧠</span> {t('knowledge_map', { defaultValue: 'Knowledge Map' })}
               </h3>
               <div className="flex flex-wrap gap-2">
                 {Object.entries(knowledgeMap).map(([topic, level]) => (
@@ -226,7 +226,7 @@ const ProfilePage = () => {
                 ))}
               </div>
               <p className="text-xs text-gray-400 mt-3">
-                Auto-inferred from your learning profile
+                {t('auto_inferred', { defaultValue: 'Auto-inferred from your learning profile' })}
               </p>
             </div>
           )}
@@ -243,13 +243,13 @@ const ProfilePage = () => {
                 onClick={handleInferKnowledge}
                 className="px-4 py-2 text-sm bg-gradient-to-r from-purple-600 to-accent-600 text-white rounded-xl hover:from-purple-700 hover:to-accent-700 transition-all font-medium shadow-soft"
               >
-                Update Knowledge Map
+                {t('update_knowledge_map', { defaultValue: 'Update Knowledge Map' })}
               </button>
               <button
                 onClick={() => editing ? handleSave() : setEditing(true)}
                 className="px-4 py-2 text-sm bg-primary-600 text-white rounded-xl hover:bg-primary-700 transition-all font-medium shadow-soft"
               >
-                {editing ? '💾 Save Changes' : '✏️ Edit Profile'}
+                {editing ? t('save_changes', { defaultValue: '💾 Save Changes' }) : t('edit_profile', { defaultValue: '✏️ Edit Profile' })}
               </button>
             </div>
           </div>
@@ -280,10 +280,10 @@ const ProfilePage = () => {
                   onChange={(e) => setFormData({...formData, learning_goal: e.target.value})}
                   className="input"
                 >
-                  <option value="general">📚 General Learning</option>
-                  <option value="job_search">💼 Job Preparation</option>
-                  <option value="self_study">🧠 Self Improvement</option>
-                  <option value="academic">🎓 Academic Research</option>
+                  <option value="general">📚 {t('learning_general', { defaultValue: 'General Learning' })}</option>
+                  <option value="job_search">💼 {t('job_preparation', { defaultValue: 'Job Preparation' })}</option>
+                  <option value="self_study">🧠 {t('self_improvement', { defaultValue: 'Self Improvement' })}</option>
+                  <option value="academic">🎓 {t('academic_research', { defaultValue: 'Academic Research' })}</option>
                 </select>
               </div>
 
@@ -331,7 +331,7 @@ const ProfilePage = () => {
                           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                     >
-                      {style.charAt(0).toUpperCase() + style.slice(1)}
+                      {t(`style_${style}`, { defaultValue: style.charAt(0).toUpperCase() + style.slice(1) })}
                     </button>
                   ))}
                 </div>

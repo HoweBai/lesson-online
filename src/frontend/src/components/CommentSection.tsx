@@ -135,7 +135,7 @@ const CommentItem = ({
       setShowReply(false);
       onRefresh();
     } else {
-      toast.error('Failed to post reply');
+      toast.error(t('errors.reply_failed', { ns: 'common' }));
     }
   };
 

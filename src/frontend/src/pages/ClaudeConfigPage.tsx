@@ -50,13 +50,13 @@ const ClaudeConfigPage = () => {
     setSuccess('');
 
     if (!formData.api_key) {
-      setError('API key is required');
+      setError(t('api_key_required'));
       return;
     }
 
     const result = await api.saveClaudeConfig(formData);
     if (result.success) {
-      setSuccess('Configuration saved successfully!');
+      setSuccess(t('config_saved_success'));
       setShowForm(false);
       setFormData({
         base_url: 'https://api.anthropic.com/v1',
@@ -67,12 +67,12 @@ const ClaudeConfigPage = () => {
       });
       loadConfigs();
     } else {
-      setError(result.error || 'Failed to save configuration');
+      setError(result.error || t('errors.save_config', { ns: 'common' }));
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this configuration?')) return;
+    if (!confirm(t('delete_config_confirm'))) return;
 
     const result = await api.deleteClaudeConfig(id);
     if (result.success) {
@@ -105,12 +105,12 @@ const ClaudeConfigPage = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Claude API Configuration</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('claude_api_config', { defaultValue: 'Claude API Configuration' })}</h1>
         <button
           onClick={() => setShowForm(true)}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
         >
-          + Add Configuration
+          {t('add_configuration_btn')}
         </button>
       </div>
 
@@ -129,10 +129,10 @@ const ClaudeConfigPage = () => {
       {/* Add Form */}
       {showForm && (
         <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold mb-4">Add New Configuration</h2>
+          <h2 className="text-lg font-semibold mb-4">{t('new_configuration_title')}</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">t("base_url")</label>
+              <label className="block text-sm font-medium text-gray-700">{t('base_url_label', { defaultValue: 'API Base URL' })}</label>
               <input
                 type="text"
                 value={formData.base_url}
@@ -143,7 +143,7 @@ const ClaudeConfigPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">API Key *</label>
+              <label className="block text-sm font-medium text-gray-700">{t('api_key')} *</label>
               <input
                 type="password"
                 value={formData.api_key}
@@ -154,22 +154,22 @@ const ClaudeConfigPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Model Name</label>
+              <label className="block text-sm font-medium text-gray-700">{t('model_name')}</label>
               <select
                 value={formData.model_name}
                 onChange={(e) => setFormData({...formData, model_name: e.target.value})}
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2"
               >
-                <option value="claude-3-opus-20240925">t("claude_opus")</option>
-                <option value="claude-3-sonnet-20240925">t("claude_sonnet")</option>
-                <option value="claude-3-haiku-20240925">t("claude_haiku")</option>
-                <option value="claude-2.1">Claude 2.1</option>
-                <option value="custom">t("custom_model")</option>
+                <option value="claude-3-opus-20240925">{t('claude_opus')}</option>
+                <option value="claude-3-sonnet-20240925">{t('claude_sonnet')}</option>
+                <option value="claude-3-haiku-20240925">{t('claude_haiku')}</option>
+                <option value="claude-2.1">{t('claude_2_1', { defaultValue: 'Claude 2.1' })}</option>
+                <option value="custom">{t('custom_model')}</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">t("system_prompt_label")</label>
+              <label className="block text-sm font-medium text-gray-700">{t('system_prompt_label')}</label>
               <textarea
                 value={formData.system_prompt}
                 onChange={(e) => setFormData({...formData, system_prompt: e.target.value})}
@@ -187,19 +187,19 @@ const ClaudeConfigPage = () => {
                 onChange={(e) => setFormData({...formData, is_default: e.target.checked})}
                 className="form-checkbox text-blue-600 h-4 w-4"
               />
-              <label htmlFor="is_default" className="ml-2 text-sm text-gray-700">Set as default configuration</label>
+              <label htmlFor="is_default" className="ml-2 text-sm text-gray-700">{t('set_default_label')}</label>
             </div>
 
             <div className="flex gap-4 pt-4">
               <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                Save Configuration
+                {t('save_config_btn')}
               </button>
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
                 className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300"
               >
-                Cancel
+                {t('cancel')}
               </button>
             </div>
           </form>
@@ -210,7 +210,7 @@ const ClaudeConfigPage = () => {
       <div className="space-y-3">
         {configs.length === 0 ? (
           <div className="text-center py-8 bg-white rounded-lg shadow">
-            <p className="text-gray-500">No configurations found. Add your first Claude API configuration above.</p>
+            <p className="text-gray-500">{t('no_configs_found')}</p>
           </div>
         ) : (
           configs.map(config => (
@@ -218,7 +218,7 @@ const ClaudeConfigPage = () => {
               <div>
                 {config.is_default && (
                   <span className="inline-block px-2 py-1 rounded-full text-xs bg-green-100 text-green-800 mr-2">
-                    Default
+                    {t('default_label')}
                   </span>
                 )}
                 <span className="font-mono text-sm">{config.model_name}</span>
@@ -229,13 +229,13 @@ const ClaudeConfigPage = () => {
                   onClick={() => handleSetDefault(config.id)}
                   className="px-3 py-1 text-sm bg-gray-100 rounded hover:bg-gray-200"
                 >
-                  Set Default
+                  {t('set_as_default', { defaultValue: 'Set Default' })}
                 </button>
                 <button
                   onClick={() => handleDelete(config.id)}
                   className="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded"
                 >
-                  Delete
+                  {t('delete')}
                 </button>
               </div>
             </div>
@@ -245,13 +245,13 @@ const ClaudeConfigPage = () => {
 
       {/* Info */}
       <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h3 className="font-semibold text-blue-900 mb-2">How to get your API key</h3>
+        <h3 className="font-semibold text-blue-900 mb-2">{t('how_to_get_key_title')}</h3>
         <ol className="list-decimal list-inside text-sm text-blue-800 space-y-1">
-          <li>Go to <a href="https://console.anthropic.com" target="_blank" rel="noopener noreferrer" className="underline">console.anthropic.com</a></li>
-          <li>Create an account or sign in</li>
-          <li>Go to API Keys section</li>
-          <li>Create a new API key and copy it</li>
-          <li>Paste it in the API Key field above</li>
+          <li>{t('get_key_step1')}</li>
+          <li>{t('get_key_step2')}</li>
+          <li>{t('get_key_step3')}</li>
+          <li>{t('get_key_step4')}</li>
+          <li>{t('get_key_step5')}</li>
         </ol>
       </div>
     </div>

@@ -82,5 +82,16 @@
   "review_outline": "Review the generated outline. You can modify it in the sidebar or confirm as-is:",
   "approve_btn": "Approve",
   "reject_btn": "Reject",
-  "delete_user_btn": "Delete user"
+  "delete_user_btn": "Delete user",
+  "load_users_failed": "Failed to load users",
+  "update_status_failed": "Failed to update user status",
+  "user_deleted": "User deleted",
+  "delete_user_failed": "Failed to delete user",
+  "remove_admin_confirm": "Remove admin",
+  "make_admin_confirm": "Make admin",
+  "removed_from_admin": "removed from",
+  "added_to_admin": "added to",
+  "load_pending_failed": "Failed to load pending tutorials",
+  "review_failed": "Failed to review tutorial",
+  "load_dashboard_failed": "Failed to load dashboard data"
 }

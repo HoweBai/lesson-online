@@ -29,7 +29,7 @@ const AdminUsersPage = () => {
         setTotalUsers(result.data.pagination?.total || 0);
       }
     } catch {
-      toast.error('Failed to load users');
+      toast.error(t('load_users_failed'));
     } finally {
       setLoading(false);
     }
@@ -39,11 +39,11 @@ const AdminUsersPage = () => {
     try {
       const result = await api.adminUpdateUserStatus(user.id, { is_admin: !user.is_admin });
       if (result.success) {
-        toast.success(`User ${user.is_admin ? 'removed from' : 'added to'} admin`);
+        toast.success(`User ${user.is_admin ? t('removed_from_admin', { defaultValue: 'removed from' }) : t('added_to_admin', { defaultValue: 'added to' })} admin`);
         loadUsers();
       }
     } catch {
-      toast.error('Failed to update user status');
+      toast.error(t('update_status_failed'));
     }
   };
 
@@ -52,11 +52,11 @@ const AdminUsersPage = () => {
     try {
       const result = await api.adminDeleteUser(user.id);
       if (result.success) {
-        toast.success('User deleted');
+        toast.success(t('user_deleted'));
         loadUsers();
       }
     } catch {
-      toast.error('Failed to delete user');
+      toast.error(t('delete_user_failed'));
     }
   };
 
@@ -210,7 +210,7 @@ const AdminUsersPage = () => {
                     onClick={() => handleToggleAdmin(user)}
                     className="w-11 h-11 flex items-center justify-center rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 dark:bg-primary-900/20 dark:text-primary-400 dark:hover:bg-primary-900/30 text-sm"
                     title={user.is_admin ? t('remove_admin') : t('make_admin')}
-                    aria-label={user.is_admin ? 'Remove admin' : 'Make admin'}
+                    aria-label={user.is_admin ? t('remove_admin_confirm', { defaultValue: 'Remove admin' }) : t('make_admin_confirm', { defaultValue: 'Make admin' })}
                   >
                     {user.is_admin ? '🔓' : '🔒'}
                   </button>

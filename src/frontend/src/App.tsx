@@ -1,6 +1,7 @@
 /** Main application component for the Online Learning Platform. */
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import AuthPage from './pages/AuthPage';
 import TutorialListPage from './pages/TutorialListPage';
 import TutorialDisplayPage from './pages/TutorialDisplayPage';
@@ -21,6 +22,7 @@ import LanguageSwitcher from './i18n/LanguageSwitcher';
 import './App.css';
 
 const App = () => {
+  const { t } = useTranslation('common');
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showWizard, setShowWizard] = useState(false);
@@ -69,7 +71,7 @@ const App = () => {
               <span className="text-xl font-bold text-primary-600">OL</span>
             </div>
           </div>
-          <p className="mt-4 text-gray-600 font-medium">Loading...</p>
+          <p className="mt-4 text-gray-600 font-medium">{t('loading')}</p>
         </div>
       </div>
     );
@@ -89,22 +91,22 @@ const App = () => {
                     <span className="text-white font-bold text-lg">OL</span>
                   </div>
                   <div>
-                    <h1 className="text-xl font-bold text-gray-900">LearnHub</h1>
-                    <p className="text-xs text-gray-500">AI Learning Platform</p>
+                    <h1 className="text-xl font-bold text-gray-900">{t('learnhub_name')}</h1>
+                    <p className="text-xs text-gray-500">{t('learnhub_tagline')}</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-4">
-                  <NavLink href="/" icon="📚" label="Tutorials" />
+                  <NavLink href="/" icon="📚" label={t('nav_tutorials')} />
                   <button
                     onClick={() => setShowWizard(true)}
                     className="flex items-center space-x-2 px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-700 rounded-xl transition-all"
                   >
                     <span className="text-lg">✨</span>
-                    <span className="font-medium">Create</span>
+                    <span className="font-medium">{t('nav_create')}</span>
                   </button>
-                  <NavLink href="/profile" icon="👤" label="Profile" />
-                  {user?.is_admin && <NavLink href="/admin" icon="🛡️" label="Admin" />}
-                  <button onClick={handleLogout} className="text-gray-600 hover:text-red-600">Logout</button>
+                  <NavLink href="/profile" icon="👤" label={t('nav_profile')} />
+                  {user?.is_admin && <NavLink href="/admin" icon="🛡️" label={t('nav_admin')} />}
+                  <button onClick={handleLogout} className="text-gray-600 hover:text-red-600">{t('nav_logout')}</button>
                   <ThemeToggle />
                   <LanguageSwitcher />
                 </div>

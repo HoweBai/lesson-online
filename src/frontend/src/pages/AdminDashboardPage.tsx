@@ -29,7 +29,7 @@ const AdminDashboardPage = () => {
       if (userRes.success) setUserGrowth(userRes.data?.growth || []);
       if (tutorialRes.success) setTutorialStats(tutorialRes.data);
     } catch {
-      toast.error('Failed to load dashboard data');
+      toast.error(t('load_dashboard_failed'));
     } finally {
       setLoading(false);
     }

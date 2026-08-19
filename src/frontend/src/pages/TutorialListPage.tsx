@@ -136,7 +136,7 @@ const TutorialListPage = ({ onOpenWizard }: TutorialListPageProps) => {
             <span className="gradient-text">{t('learnHub_title')}</span>
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Discover AI-powered personalized learning tutorials crafted just for you
+            {t('hero_title')}
           </p>
         </div>
 
@@ -152,7 +152,7 @@ const TutorialListPage = ({ onOpenWizard }: TutorialListPageProps) => {
               }`}
             >
               <span className="flex items-center gap-2">
-                🌍 Public Tutorials
+                🌍 {t('tab_public')}
                 <span className={`text-xs px-2 py-0.5 rounded-full ${
                   activeTab === 'public' ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
                 }`}>
@@ -169,7 +169,7 @@ const TutorialListPage = ({ onOpenWizard }: TutorialListPageProps) => {
               }`}
             >
               <span className="flex items-center gap-2">
-                👤 My Tutorials
+                👤 {t('tab_mine')}
                 <span className={`text-xs px-2 py-0.5 rounded-full ${
                   activeTab === 'mine' ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
                 }`}>
@@ -186,7 +186,7 @@ const TutorialListPage = ({ onOpenWizard }: TutorialListPageProps) => {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Create Tutorial
+            {t('create_tutorial_btn')}
           </button>
         </div>
 
@@ -221,7 +221,7 @@ const TutorialListPage = ({ onOpenWizard }: TutorialListPageProps) => {
               type="submit"
               className="btn-primary px-8"
             >
-              Search
+              {t('search')}
             </button>
           </form>
         </div>
@@ -231,12 +231,12 @@ const TutorialListPage = ({ onOpenWizard }: TutorialListPageProps) => {
           <div className="text-center py-20 bg-white rounded-3xl shadow-soft">
             <div className="text-6xl mb-4">📭</div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              {activeTab === 'public' ? 'No public tutorials yet' : 'You haven\'t created any tutorials'}
+              {activeTab === 'public' ? t('hero_empty_public') : t('hero_empty_mine')}
             </h3>
             <p className="text-gray-500 mb-6 max-w-md mx-auto">
               {activeTab === 'public'
-                ? 'Share your knowledge with the community! Create your first AI-powered tutorial.'
-                : 'Create your first AI-powered tutorial with our guided wizard.'}
+                ? t('hero_cta_public')
+                : t('hero_cta_mine')}
             </p>
             <button
               onClick={() => onOpenWizard?.()}
@@ -245,7 +245,7 @@ const TutorialListPage = ({ onOpenWizard }: TutorialListPageProps) => {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              {activeTab === 'public' ? 'Create & Publish Tutorial' : 'Create Your First Tutorial'}
+              {activeTab === 'public' ? t('hero_btn_public') : t('hero_btn_mine')}
             </button>
           </div>
         ) : (

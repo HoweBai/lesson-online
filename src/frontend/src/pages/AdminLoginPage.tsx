@@ -19,13 +19,13 @@ const AdminLoginPage = () => {
     setError('');
     try {
       const result = await api.adminLogin(email, password);
-      if (!result.success) throw new Error(result.error || 'Admin login failed');
+      if (!result.success) throw new Error(result.error || t('admin_login_failed_text'));
       if (result.data?.token) api.setToken(result.data.token);
-      toast.success('Admin login successful!');
+      toast.success(t('admin_login_success'));
       navigate('/admin');
     } catch (err: any) {
-      setError(err.message || 'Admin login failed');
-      toast.error(err.message || 'Admin login failed');
+      setError(err.message || t('admin_login_failed_text'));
+      toast.error(err.message || t('admin_login_failed_text'));
     } finally {
       setLoading(false);
     }
