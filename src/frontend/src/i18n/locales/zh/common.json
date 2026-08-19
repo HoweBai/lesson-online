@@ -189,5 +189,9 @@
   "write_comment": "撰写评论...",
   "no_comments": "暂无评论",
   "be_first": "来发表您的第一条评论吧！",
-  "write_reply": "撰写回复..."
+  "write_reply": "撰写回复...",
+  "tutorials_count": "教程",
+  "tutorials_by_month": "每月教程数",
+  "no_tutorial_data": "暂无教程数据",
+  "no_chapter_data": "暂无章节数据"
 }

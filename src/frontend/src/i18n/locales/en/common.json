@@ -190,5 +190,8 @@
   "no_comments": "No comments yet",
   "be_first": "Be the first to share your thoughts!",
   "write_reply": "Write a reply...",
-  "tutorials_count": "tutorials"
+  "tutorials_count": "tutorials",
+  "tutorials_by_month": "Tutorials by Month",
+  "no_tutorial_data": "No tutorial data",
+  "no_chapter_data": "No chapter data"
 }
