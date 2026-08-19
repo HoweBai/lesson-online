@@ -236,7 +236,7 @@ const ProfilePage = () => {
         <div className="card p-6 mt-6 animate-slide-up" style={{ animationDelay: '0.3s' }}>
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-              <span>⚙️</span> Learning Preferences
+              <span>⚙️</span> {t('learning_preferences')}
             </h3>
             <div className="flex gap-2">
               <button
