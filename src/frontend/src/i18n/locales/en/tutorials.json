@@ -27,9 +27,9 @@
   "generating": "Generating...",
   "generate_success": "Chapter generated successfully!",
   "chapter_status": {
+    "completed": "Completed",
     "pending": "Pending",
     "generating": "Generating...",
-    "completed": "Completed",
     "failed": "Failed"
   },
   "key_concepts": "Key Concepts Learned",
@@ -123,10 +123,5 @@
   "created": "Created",
   "public": "Public",
   "no_description": "No description available",
-  "chapter_status": {
-    "completed": "Completed",
-    "pending": "Pending",
-    "generating": "Generating...",
-    "failed": "Failed"
-  }
+  "tutorials_count": "tutorials"
 }

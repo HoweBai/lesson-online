@@ -109,7 +109,6 @@
   "tab_public": "Public Tutorials",
   "tab_mine": "My Tutorials",
   "create_tutorial_btn": "Create Tutorial",
-  "loading": "Loading...",
   "search_placeholder": "Search tutorials...",
   "learnhub_name": "LearnHub",
   "learnhub_tagline": "AI Learning Platform",
@@ -119,5 +118,6 @@
   "something_went_wrong": "Something went wrong",
   "unexpected_error": "An unexpected error occurred. Please try reloading the page.",
   "reload_page": "Reload Page",
-  "error_details": "Error details"
+  "error_details": "Error details",
+  "member_since": "Member since"
 }

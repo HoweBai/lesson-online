@@ -106,5 +106,8 @@
   "get_key_step5": "将其粘贴到上方的 API Key 字段中",
   "default_label": "默认",
   "how_to_get_key_title": "如何获取 API 密钥",
-  "set_as_default": "设为默认"
+  "set_as_default": "设为默认",
+  "wizard_profile_label_programming": "编程水平",
+  "wizard_profile_label_goal": "学习目标",
+  "wizard_profile_label_time": "学习时间"
 }

@@ -17,9 +17,9 @@ export const ConfirmGenerationStep = ({ formData, updateFormData }: ConfirmGener
         <div className="space-y-2 text-sm text-green-900">
           <p><strong>{t('learning_profile_label')}</strong></p>
           <ul className="list-disc list-inside ml-4 space-y-1">
-            <li>Programming Level: {formData.professional_level || t('not_set')}</li>
-            <li>Learning Goal: {formData.learning_goal || t('not_set')}</li>
-            <li>Study Time: {formData.available_hours_per_day ? formData.available_hours_per_day + t('hours_per_day') : t('not_set')}</li>
+            <li>{t('wizard_profile_label_programming')}: {formData.professional_level || t('not_set')}</li>
+            <li>{t('wizard_profile_label_goal')}: {formData.learning_goal || t('not_set')}</li>
+            <li>{t('wizard_profile_label_time')}: {formData.available_hours_per_day ? formData.available_hours_per_day + t('hours_per_day') : t('not_set')}</li>
           </ul>
           <p className="mt-2"><strong>Claude API Configuration:</strong></p>
           <ul className="list-disc list-inside ml-4 space-y-1">

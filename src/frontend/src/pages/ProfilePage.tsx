@@ -141,7 +141,7 @@ const ProfilePage = () => {
               <p className="text-gray-500 text-sm">{user?.email || ''}</p>
               <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-success-50 text-success-700 rounded-full text-sm font-medium">
                 <span className="w-2 h-2 bg-success-500 rounded-full animate-pulse"></span>
-                Member since {new Date(user?.created_at || Date.now()).toLocaleDateString()}
+                {t('member_since', { defaultValue: 'Member since' })} {new Date(user?.created_at || Date.now()).toLocaleDateString()}
               </div>
             </div>
 
@@ -149,7 +149,7 @@ const ProfilePage = () => {
             <div className="mt-6 pt-6 border-t border-gray-100 grid grid-cols-2 gap-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-primary-600">{progress?.total_tutorials || 0}</div>
-                <div className="text-xs text-gray-500">{t('tutorials')}</div>
+                <div className="text-xs text-gray-500">{t('tutorials_count', { defaultValue: 'tutorials' })}</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-accent-600">{progress?.streak_days || 0}</div>

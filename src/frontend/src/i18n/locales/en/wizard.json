@@ -106,5 +106,8 @@
   "get_key_step5": "Paste it in the API Key field above",
   "default_label": "Default",
   "how_to_get_key_title": "How to get your API key",
-  "set_as_default": "Set Default"
+  "set_as_default": "Set Default",
+  "wizard_profile_label_programming": "Programming Level",
+  "wizard_profile_label_goal": "Learning Goal",
+  "wizard_profile_label_time": "Study Time"
 }
