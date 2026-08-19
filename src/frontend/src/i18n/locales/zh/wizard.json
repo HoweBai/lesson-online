@@ -85,5 +85,6 @@
   "system_prompt_placeholder": "生成教程时给 AI 的自定义指令...",
   "chapter_n": "第{n}章",
   "continue_generating": "您可以稍后逐一继续生成章节",
-  "tip_chat": "提示：使用屏幕右侧的 Claude Chat 侧边栏提问或请求修改大纲！"
+  "tip_chat": "提示：使用屏幕右侧的 Claude Chat 侧边栏提问或请求修改大纲！",
+  "outline_default_hint": "点击下一步后，AI 将在此生成课程大纲。生成后，你可以使用 Claude 聊天侧边栏进行修改。"
 }

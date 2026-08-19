@@ -161,15 +161,15 @@ const ProfilePage = () => {
           {/* Learning Progress Card */}
           <div className="card p-6 animate-slide-up" style={{ animationDelay: '0.1s' }}>
             <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <span>📊</span> Learning Progress
+              <span>📊</span> {t('learning_preferences')}
             </h3>
             {progress ? (
               <div className="space-y-4">
-                <StatRow label="Total Tutorials" value={progress.total_tutorials || 0} icon="📚" color="primary" />
-                <StatRow label="Completed Chapters" value={progress.completed_chapters || 0} icon="✅" color="success" />
-                <StatRow label="In Progress" value={progress.in_progress_chapters || 0} icon="⏳" color="warning" />
-                <StatRow label="Study Time" value={`${Math.round((progress.total_study_time_minutes || 0) / 60)}h`} icon="⏱️" color="accent" />
-                <StatRow label="Streak" value={`${progress.streak_days || 0} days`} icon="🔥" color="orange" />
+                <StatRow label={t('profile_stat_total_tutorials')} value={progress.total_tutorials || 0} icon="📚" color="primary" />
+                <StatRow label={t('profile_stat_completed_chapters')} value={progress.completed_chapters || 0} icon="✅" color="success" />
+                <StatRow label={t('profile_stat_in_progress')} value={progress.in_progress_chapters || 0} icon="⏳" color="warning" />
+                <StatRow label={t('profile_stat_study_time')} value={`${Math.round((progress.total_study_time_minutes || 0) / 60)}h`} icon="⏱️" color="accent" />
+                <StatRow label={t('profile_stat_streak')} value={`${progress.streak_days || 0} ${t('profile_stat_days_suffix')}`} icon="🔥" color="orange" />
 
                 {/* Progress bar */}
                 <div className="mt-6">
@@ -258,7 +258,7 @@ const ProfilePage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Programming Level (1-5)
+                  {t('programming_level_label')}
                 </label>
                 <select
                   value={formData.programming_level}
@@ -266,14 +266,14 @@ const ProfilePage = () => {
                   className="input"
                 >
                   {[1, 2, 3, 4, 5].map(n => (
-                    <option key={n} value={n}>{n} - {n === 1 ? 'Beginner' : n === 5 ? 'Expert' : 'Intermediate'}</option>
+                    <option key={n} value={n}>{n} - {n === 1 ? t('level_beginner') : n === 2 ? t('level_elementary') : n === 3 ? t('level_intermediate') : n === 4 ? t('level_advanced') : t('level_expert')}</option>
                   ))}
                 </select>
               </div>
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Learning Goal
+                  {t('learning_goal_label')}
                 </label>
                 <select
                   value={formData.learning_goal}
@@ -289,20 +289,20 @@ const ProfilePage = () => {
 
               <div className="md:col-span-2">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Math Background
+                  {t('math_background_label')}
                 </label>
                 <textarea
                   value={formData.math_background}
                   onChange={(e) => setFormData({...formData, math_background: e.target.value})}
                   className="input"
                   rows={3}
-                  placeholder="Describe your math background..."
+                  placeholder={t('math_background_placeholder')}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Study Time (hours/day)
+                  {t('study_time_label')}
                 </label>
                 <input
                   type="number"
@@ -317,7 +317,7 @@ const ProfilePage = () => {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Preferred Learning Style
+                  {t('learning_style_label')}
                 </label>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {['text', 'visual', 'code', 'exercise'].map(style => (
@@ -339,11 +339,11 @@ const ProfilePage = () => {
             </div>
           ) : profile ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InfoRow label="Programming Level" value={['Beginner', 'Elementary', 'Intermediate', 'Advanced', 'Expert'][profile.programming_level - 1] || 'Not set'} />
-              <InfoRow label="Learning Goal" value={profile.learning_goal || 'Not set'} />
-              <InfoRow label="Math Background" value={profile.math_background || 'Not set'} />
-              <InfoRow label="Study Time" value={`${profile.available_hours_per_day || 0} hours/day`} />
-              <InfoRow label="Learning Style" value={profile.preferred_style || 'Not set'} />
+              <InfoRow label={t('programming_level_label')} value={[t('level_beginner'), t('level_elementary'), t('level_intermediate'), t('level_advanced'), t('level_expert')][profile.programming_level - 1] || t('not_set')} />
+              <InfoRow label={t('learning_goal_label')} value={profile.learning_goal || t('not_set')} />
+              <InfoRow label={t('math_background_label')} value={profile.math_background || t('not_set')} />
+              <InfoRow label={t('study_time_label')} value={`${profile.available_hours_per_day || 0} ${t('hours_per_day_suffix')}`} />
+              <InfoRow label={t('learning_style_label')} value={profile.preferred_style || t('not_set')} />
             </div>
           ) : null}
         </div>

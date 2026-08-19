@@ -212,10 +212,10 @@ const TutorialListPage = ({ onOpenWizard }: TutorialListPageProps) => {
               onChange={(e) => setSortBy(e.target.value)}
               className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-gray-700"
             >
-              <option value="publish_time">📅 Latest</option>
-              <option value="views">👁️ Most Viewed</option>
-              <option value="likes">❤️ Most Liked</option>
-              <option value="created_at">🕐 Oldest</option>
+              <option value="publish_time">📅 {t('sort_latest')}</option>
+              <option value="views">👁️ {t('sort_views')}</option>
+              <option value="likes">❤️ {t('sort_likes')}</option>
+              <option value="created_at">🕐 {t('sort_oldest')}</option>
             </select>
             <button
               type="submit"
@@ -266,10 +266,10 @@ const TutorialListPage = ({ onOpenWizard }: TutorialListPageProps) => {
 
         {/* Stats Footer */}
         <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatCard label="Total Tutorials" value={tutorials.length} icon="📚" />
-          <StatCard label="Public Tutorials" value={tutorials.filter(t => t.is_public).length} icon="🌍" />
-          <StatCard label="Total Views" value={tutorials.reduce((sum, t) => sum + (t.views || 0), 0)} icon="👁️" />
-          <StatCard label="Bookmarked" value={bookmarks.size} icon="🔖" />
+          <StatCard label={t('stat_total_tutorials')} value={tutorials.length} icon="📚" />
+          <StatCard label={t('stat_public_tutorials')} value={tutorials.filter(t => t.is_public).length} icon="🌍" />
+          <StatCard label={t('stat_total_views')} value={tutorials.reduce((sum, t) => sum + (t.views || 0), 0)} icon="👁️" />
+          <StatCard label={t('stat_bookmarked')} value={bookmarks.size} icon="🔖" />
         </div>
       </div>
     </div>

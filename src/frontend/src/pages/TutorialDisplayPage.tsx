@@ -553,7 +553,7 @@ const TutorialDisplayPage = () => {
             <button
               onClick={handleExportPDF}
               className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all font-medium shadow-soft"
-              title="Export as PDF"
+              title={t('export_pdf_btn')}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16l-4-4m0 0l4-4m-4 4h18" />

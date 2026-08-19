@@ -124,14 +124,14 @@ const AdminCatalogPage = () => {
                         disabled={reviewingId === tutorial.id}
                         className="hidden sm:flex px-4 py-2 bg-green-500 text-white rounded-xl hover:bg-green-600 text-sm font-medium disabled:opacity-50"
                       >
-                        {reviewingId === tutorial.id ? '...' : '✓ Approve'}
+                        {reviewingId === tutorial.id ? '...' : `✓ ${t('approve_btn')}`}
                       </button>
                       <button
                         onClick={() => handleReview(tutorial.id, 'approve')}
                         disabled={reviewingId === tutorial.id}
                         className="sm:hidden w-9 h-9 flex items-center justify-center rounded-lg bg-green-500 text-white text-sm disabled:opacity-50"
-                        title="Approve"
-                        aria-label="Approve"
+                        title={t('approve_btn')}
+                        aria-label={t('approve_btn')}
                       >
                         ✓
                       </button>
@@ -140,14 +140,14 @@ const AdminCatalogPage = () => {
                         disabled={reviewingId === tutorial.id}
                         className="hidden sm:flex px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 text-sm font-medium disabled:opacity-50"
                       >
-                        {reviewingId === tutorial.id ? '...' : '✗ Reject'}
+                        {reviewingId === tutorial.id ? '...' : `✗ ${t('reject_btn')}`}
                       </button>
                       <button
                         onClick={() => handleReview(tutorial.id, 'reject')}
                         disabled={reviewingId === tutorial.id}
                         className="sm:hidden w-9 h-9 flex items-center justify-center rounded-lg bg-red-500 text-white text-sm disabled:opacity-50"
-                        title="Reject"
-                        aria-label="Reject"
+                        title={t('reject_btn')}
+                        aria-label={t('reject_btn')}
                       >
                         ✗
                       </button>

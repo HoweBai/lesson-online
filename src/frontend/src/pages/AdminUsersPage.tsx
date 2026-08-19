@@ -217,8 +217,8 @@ const AdminUsersPage = () => {
                   <button
                     onClick={() => handleDeleteUser(user)}
                     className="w-11 h-11 flex items-center justify-center rounded-lg bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30 text-sm"
-                    title="Delete user"
-                    aria-label="Delete user"
+                    title={t('delete_user_btn')}
+                    aria-label={t('delete_user_btn')}
                   >
                     🗑️
                   </button>

@@ -18,7 +18,7 @@ export const OutlineEditorStep = ({ formData, updateFormData }: OutlineEditorSte
         <h4 className="font-semibold mb-2">{t('outline_generated')}:</h4>
         <div className="text-sm text-gray-700 space-y-2">
           {/* Display the outline content - would normally come from AI response */}
-          <p>{formData.outline_content || 'The AI will generate your course outline here after clicking "Next". Once generated, you can edit it using the Claude Chat Sidebar.'}</p>
+          <p>{formData.outline_content || t('outline_default_hint')}</p>
         </div>
       </div>
 

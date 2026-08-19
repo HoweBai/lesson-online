@@ -4,6 +4,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { api } from '../api/client';
 
 interface ClaudeConfig {
@@ -15,6 +16,7 @@ interface ClaudeConfig {
 }
 
 const ClaudeConfigPage = () => {
+  const { t } = useTranslation('wizard');
   const navigate = useNavigate();
   const [configs, setConfigs] = useState<ClaudeConfig[]>([]);
   const [showForm, setShowForm] = useState(false);
@@ -130,7 +132,7 @@ const ClaudeConfigPage = () => {
           <h2 className="text-lg font-semibold mb-4">Add New Configuration</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">API Base URL</label>
+              <label className="block text-sm font-medium text-gray-700">t("base_url")</label>
               <input
                 type="text"
                 value={formData.base_url}
@@ -146,7 +148,7 @@ const ClaudeConfigPage = () => {
                 type="password"
                 value={formData.api_key}
                 onChange={(e) => setFormData({...formData, api_key: e.target.value})}
-                placeholder="sk-ant-..."
+                placeholder={t("api_key_hint")}
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2"
               />
             </div>
@@ -158,20 +160,20 @@ const ClaudeConfigPage = () => {
                 onChange={(e) => setFormData({...formData, model_name: e.target.value})}
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2"
               >
-                <option value="claude-3-opus-20240925">Claude 3 Opus</option>
-                <option value="claude-3-sonnet-20240925">Claude 3 Sonnet</option>
-                <option value="claude-3-haiku-20240925">Claude 3 Haiku</option>
+                <option value="claude-3-opus-20240925">t("claude_opus")</option>
+                <option value="claude-3-sonnet-20240925">t("claude_sonnet")</option>
+                <option value="claude-3-haiku-20240925">t("claude_haiku")</option>
                 <option value="claude-2.1">Claude 2.1</option>
-                <option value="custom">Custom Model</option>
+                <option value="custom">t("custom_model")</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">System Prompt (optional)</label>
+              <label className="block text-sm font-medium text-gray-700">t("system_prompt_label")</label>
               <textarea
                 value={formData.system_prompt}
                 onChange={(e) => setFormData({...formData, system_prompt: e.target.value})}
-                placeholder="Enter system prompt..."
+                placeholder={t("system_prompt_placeholder")}
                 className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                 rows={3}
               />

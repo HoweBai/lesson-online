@@ -79,5 +79,8 @@
   "connect_checking": "Connecting... check server status",
   "send": "Send",
   "enter_api_config": "Enter your Claude API configuration below.",
-  "review_outline": "Review the generated outline. You can modify it in the sidebar or confirm as-is:"
+  "review_outline": "Review the generated outline. You can modify it in the sidebar or confirm as-is:",
+  "approve_btn": "Approve",
+  "reject_btn": "Reject",
+  "delete_user_btn": "Delete user"
 }

@@ -85,5 +85,6 @@
   "system_prompt_placeholder": "Custom instructions for the AI when generating your tutorial...",
   "chapter_n": "Chapter {n}",
   "continue_generating": "You can continue generating chapters later one by one",
-  "tip_chat": "Tip: Use the Claude Chat Sidebar on the right side of the screen to ask questions or request modifications to the outline!"
+  "tip_chat": "Tip: Use the Claude Chat Sidebar on the right side of the screen to ask questions or request modifications to the outline!",
+  "outline_default_hint": "The AI will generate your course outline here after clicking \"Next\". Once generated, you can edit it using the Claude Chat Sidebar."
 }
