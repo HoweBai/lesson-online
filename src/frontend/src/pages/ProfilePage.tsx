@@ -11,7 +11,7 @@ import { useToast } from '../hooks/useToast';
 import { LearningChart } from '../components/LearningChart';
 
 const ProfilePage = () => {
-  const { t } = useTranslation('tutorials');
+  const { t } = useTranslation();
   const toast = useToast();
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);

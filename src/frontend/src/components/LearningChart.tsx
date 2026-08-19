@@ -24,7 +24,7 @@ interface LearningChartProps {
 const CHAPTER_COLORS = ['#22c55e', '#f59e0b', '#3b82f6', '#ef4444'];
 
 const ChapterPieChart: React.FC<{ stats: LearningChartProps['chapterStats'] }> = ({ stats }) => {
-  const { t } = useTranslation('tutorials');
+  const { t } = useTranslation();
   if (!stats || stats.total === 0) {
     return (
       <div className="text-center py-8 text-gray-400">
@@ -71,7 +71,7 @@ const ChapterPieChart: React.FC<{ stats: LearningChartProps['chapterStats'] }> =
 };
 
 const TutorialBarChart: React.FC<{ stats: LearningChartProps['tutorialStats'] }> = ({ stats }) => {
-  const { t } = useTranslation('tutorials');
+  const { t } = useTranslation();
   if (!stats || Object.keys(stats.by_month).length === 0) {
     return (
       <div className="text-center py-8 text-gray-400">
@@ -99,7 +99,7 @@ const TutorialBarChart: React.FC<{ stats: LearningChartProps['tutorialStats'] }>
 };
 
 export const LearningChart: React.FC<LearningChartProps> = ({ tutorialStats, chapterStats }) => {
-  const { t } = useTranslation('tutorials');
+  const { t } = useTranslation();
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div className="card p-6">

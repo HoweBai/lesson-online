@@ -17,7 +17,7 @@ interface TutorialListPageProps {
 const TutorialListPage = ({ onOpenWizard }: TutorialListPageProps) => {
   const navigate = useNavigate();
   const toast = useToast();
-  const { t } = useTranslation('tutorials');
+  const { t } = useTranslation();
   const [tutorials, setTutorials] = useState<Tutorial[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');

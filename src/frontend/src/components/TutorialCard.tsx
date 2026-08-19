@@ -16,7 +16,7 @@ interface TutorialCardProps {
 }
 
 const TutorialCard = ({ tutorial, onClick, onLike, isBookmarked, onBookmark }: TutorialCardProps) => {
-  const { t } = useTranslation('tutorials');
+  const { t } = useTranslation();
   return (
     <div
       className="card p-6 cursor-pointer group hover:-translate-y-1 transition-all duration-300 hover:shadow-hover"

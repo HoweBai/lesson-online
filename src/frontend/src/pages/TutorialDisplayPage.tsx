@@ -31,7 +31,7 @@ interface ChapterContent {
 }
 
 const TutorialDisplayPage = () => {
-  const { t } = useTranslation('tutorials');
+  const { t } = useTranslation();
   const toast = useToast();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();

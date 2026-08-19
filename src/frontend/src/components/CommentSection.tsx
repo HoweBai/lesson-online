@@ -22,7 +22,7 @@ interface CommentSectionProps {
 }
 
 const CommentSection = ({ tutorialId }: CommentSectionProps) => {
-  const { t } = useTranslation('tutorials');
+  const { t } = useTranslation();
   const toast = useToast();
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -120,7 +120,7 @@ const CommentItem = ({
   tutorialId: string;
   onRefresh: () => void;
 }) => {
-  const { t } = useTranslation('tutorials');
+  const { t } = useTranslation();
   const toast = useToast();
   const [replyText, setReplyText] = useState('');
   const [showReply, setShowReply] = useState(false);
