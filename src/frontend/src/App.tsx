@@ -91,8 +91,8 @@ const App = () => {
                     <span className="text-white font-bold text-lg">OL</span>
                   </div>
                   <div>
-                    <h1 className="text-xl font-bold text-gray-900">{t('learnhub_name')}</h1>
-                    <p className="text-xs text-gray-500">{t('learnhub_tagline')}</p>
+                    <h1 className="text-xl font-bold text-gray-900 dark:text-white">{t('learnhub_name')}</h1>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{t('learnhub_tagline')}</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-4">
@@ -106,7 +106,7 @@ const App = () => {
                   </button>
                   <NavLink href="/profile" icon="👤" label={t('nav_profile')} />
                   {user?.is_admin && <NavLink href="/admin" icon="🛡️" label={t('nav_admin')} />}
-                  <button onClick={handleLogout} className="text-gray-600 hover:text-red-600">{t('nav_logout')}</button>
+                  <button onClick={handleLogout} className="text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400">{t('nav_logout')}</button>
                   <ThemeToggle />
                   <LanguageSwitcher />
                 </div>
