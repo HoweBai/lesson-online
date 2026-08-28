@@ -99,7 +99,7 @@ const App = () => {
                   <NavLink href="/" icon="📚" label={t('nav_tutorials')} />
                   <button
                     onClick={() => setShowWizard(true)}
-                    className="flex items-center space-x-2 px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-700 rounded-xl transition-all"
+                    className="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-700 rounded-xl transition-all font-medium"
                   >
                     <span className="text-lg">✨</span>
                     <span className="font-medium">{t('nav_create')}</span>
@@ -165,7 +165,7 @@ const App = () => {
 const NavLink = ({ href, icon, label }: { href: string; icon: string; label: string }) => {
   const navigate = useNavigate();
   return (
-    <button onClick={() => navigate(href)} className="flex items-center space-x-2 px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-700 rounded-xl transition-all">
+    <button onClick={() => navigate(href)} className="flex items-center space-x-2 px-4 py-2 text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-700 rounded-xl transition-all font-medium">
       <span className="text-lg">{icon}</span>
       <span className="font-medium">{label}</span>
     </button>
