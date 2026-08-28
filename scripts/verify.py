@@ -1,0 +1,10 @@
+import paramiko, time
+time.sleep(30)
+c = paramiko.SSHClient()
+c.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+c.connect('119.27.173.222', username='root', password='tlcw_CENTOS@#2023', timeout=15)
+stdin, stdout, stderr = c.exec_command('docker ps --format "{{.Names}} {{.Status}}" | grep frontend')
+print(stdout.read().decode())
+stdin, stdout, stderr = c.exec_command('curl -sk -o /dev/null -w "%{http_code}" https://tlcw.yobeeo.com/')
+print("HTTP:", stdout.read().decode())
+c.close()
