@@ -80,7 +80,7 @@ export const ProfileFormStep = ({ formData, updateFormData }: ProfileFormStepPro
               className={`px-3 py-1 rounded-full text-sm ${
                 formData.preferred_style === style
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
               }`}
             >
               {t(`style_${style}`)}

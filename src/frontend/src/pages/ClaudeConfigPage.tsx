@@ -128,28 +128,28 @@ const ClaudeConfigPage = () => {
 
       {/* Add Form */}
       {showForm && (
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold mb-4">{t('new_configuration_title')}</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-semibold mb-4 dark:text-white">{t('new_configuration_title')}</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">{t('base_url_label', { defaultValue: 'API Base URL' })}</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('base_url_label', { defaultValue: 'API Base URL' })}</label>
               <input
                 type="text"
                 value={formData.base_url}
                 onChange={(e) => setFormData({...formData, base_url: e.target.value})}
                 placeholder="https://api.anthropic.com/v1"
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md p-2 dark:bg-gray-700 dark:text-white"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">{t('api_key')} *</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('api_key')} *</label>
               <input
                 type="password"
                 value={formData.api_key}
                 onChange={(e) => setFormData({...formData, api_key: e.target.value})}
                 placeholder={t("api_key_hint")}
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md p-2 dark:bg-gray-700 dark:text-white"
               />
             </div>
 
@@ -197,7 +197,7 @@ const ClaudeConfigPage = () => {
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300"
+                className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600"
               >
                 {t('cancel')}
               </button>
@@ -209,12 +209,12 @@ const ClaudeConfigPage = () => {
       {/* Configs List */}
       <div className="space-y-3">
         {configs.length === 0 ? (
-          <div className="text-center py-8 bg-white rounded-lg shadow">
-            <p className="text-gray-500">{t('no_configs_found')}</p>
+          <div className="text-center py-8 bg-white dark:bg-gray-800 rounded-lg shadow">
+            <p className="text-gray-500 dark:text-gray-400">{t('no_configs_found')}</p>
           </div>
         ) : (
           configs.map(config => (
-            <div key={config.id} className="bg-white rounded-lg shadow p-4 flex justify-between items-center">
+            <div key={config.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 flex justify-between items-center">
               <div>
                 {config.is_default && (
                   <span className="inline-block px-2 py-1 rounded-full text-xs bg-green-100 text-green-800 mr-2">

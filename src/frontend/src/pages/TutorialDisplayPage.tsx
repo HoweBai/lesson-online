@@ -275,28 +275,28 @@ const TutorialDisplayPage = () => {
             key={section.id}
             className={`theory-section mb-8 rounded-2xl border-l-4 transition-all duration-300 ${
               activeSection === section.id
-                ? 'bg-gradient-to-r from-primary-50 to-accent-50 border-primary-500 shadow-soft'
-                : 'bg-white border-gray-200 hover:border-primary-300'
+                ? 'bg-gradient-to-r from-primary-50 to-accent-50 dark:from-primary-900/30 dark:to-accent-900/30 border-primary-500 shadow-soft'
+                : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-600'
             }`}
             onClick={() => setActiveSection(activeSection === section.id ? null : section.id)}
           >
             <div className="p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <span className="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center text-primary-600 text-sm">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <span className="w-8 h-8 bg-primary-100 dark:bg-primary-900/40 rounded-lg flex items-center justify-center text-primary-600 dark:text-primary-400 text-sm">
                   📖
                 </span>
                 {section.title}
               </h3>
               {section.content.theoreticalExplanation && (
-                <div className="prose prose-lg max-w-none text-gray-700">
+                <div className="prose prose-lg max-w-none text-gray-700 dark:text-gray-300">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {section.content.theoreticalExplanation}
                   </ReactMarkdown>
                 </div>
               )}
               {section.content.overview && (
-                <div className="mt-4 p-4 bg-blue-50 rounded-xl border border-blue-200">
-                  <p className="text-gray-700">{section.content.overview}</p>
+                <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+                  <p className="text-gray-700 dark:text-gray-200">{section.content.overview}</p>
                 </div>
               )}
               {section.content.diagrams && (
@@ -304,7 +304,7 @@ const TutorialDisplayPage = () => {
                   {section.content.diagrams.map((diag: any, i: number) => (
                     <div key={i} className="rounded-xl overflow-hidden shadow-md">
                       <img src={diag.url} alt={diag.caption} className="max-w-full h-auto" />
-                      <p className="text-sm text-gray-600 mt-2 text-center px-4">{diag.caption}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-2 text-center px-4">{diag.caption}</p>
                     </div>
                   ))}
                 </div>
@@ -319,26 +319,26 @@ const TutorialDisplayPage = () => {
             key={section.id}
             className={`formula-section mb-8 rounded-2xl border-l-4 transition-all duration-300 ${
               activeSection === section.id
-                ? 'bg-gradient-to-r from-accent-50 to-primary-50 border-accent-500 shadow-soft'
-                : 'bg-white border-gray-200 hover:border-accent-300'
+                ? 'bg-gradient-to-r from-accent-50 to-primary-50 dark:from-accent-900/30 dark:to-primary-900/30 border-accent-500 shadow-soft'
+                : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-accent-300 dark:hover:border-accent-600'
             }`}
             onClick={() => setActiveSection(activeSection === section.id ? null : section.id)}
           >
             <div className="p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <span className="w-8 h-8 bg-accent-100 rounded-lg flex items-center justify-center text-accent-600 text-sm">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <span className="w-8 h-8 bg-accent-100 dark:bg-accent-900/40 rounded-lg flex items-center justify-center text-accent-600 dark:text-accent-400 text-sm">
                   📐
                 </span>
                 {section.title}
               </h3>
               {section.content.mathematicalFormulas?.map((formula: any, i: number) => (
-                <div key={i} className="formula-card bg-gradient-to-r from-slate-50 to-primary-50 p-5 rounded-xl border border-primary-100 mb-4">
-                  <div className="text-center my-4 font-mono text-lg bg-white p-4 rounded-lg shadow-sm">
+                <div key={i} className="formula-card bg-gradient-to-r from-slate-50 to-primary-50 dark:from-slate-800 dark:to-primary-900/20 p-5 rounded-xl border border-primary-100 dark:border-primary-800 mb-4">
+                  <div className="text-center my-4 font-mono text-lg bg-white dark:bg-gray-700 p-4 rounded-lg shadow-sm">
                     {formula.latex.replace(/\$/g, '')}
                   </div>
-                  <div className="space-y-2 text-sm text-gray-700">
-                    <p><strong className="text-primary-700">{t('derivation')}:</strong> {formula.derivation}</p>
-                    <p><strong className="text-primary-700">{t('explanation')}:</strong> {formula.explanation}</p>
+                  <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                    <p><strong className="text-primary-700 dark:text-primary-400">{t('derivation')}:</strong> {formula.derivation}</p>
+                    <p><strong className="text-primary-700 dark:text-primary-400">{t('explanation')}:</strong> {formula.explanation}</p>
                   </div>
                 </div>
               ))}
@@ -352,17 +352,17 @@ const TutorialDisplayPage = () => {
             key={section.id}
             className={`code-section mb-8 rounded-2xl border-l-4 transition-all duration-300 ${
               activeSection === section.id
-                ? 'bg-slate-900 border-green-500 shadow-soft'
-                : 'bg-white border-gray-200 hover:border-green-300'
+                ? 'bg-slate-900 dark:bg-slate-900 border-green-500 shadow-soft'
+                : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-green-300 dark:hover:border-green-600'
             }`}
             onClick={() => setActiveSection(activeSection === section.id ? null : section.id)}
           >
             <div className="p-6">
               <h3 className={`text-xl font-bold mb-4 flex items-center gap-2 ${
-                activeSection === section.id ? 'text-white' : 'text-gray-900'
+                activeSection === section.id ? 'text-white' : 'text-gray-900 dark:text-white'
               }`}>
                 <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm ${
-                  activeSection === section.id ? 'bg-green-600' : 'bg-green-100 text-green-600'
+                  activeSection === section.id ? 'bg-green-600' : 'bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400'
                 }`}>
                   💻
                 </span>
@@ -372,7 +372,7 @@ const TutorialDisplayPage = () => {
                 <div key={i} className="mb-4">
                   <CodeBlock language={sample.language} code={sample.code} />
                   {sample.explanation && (
-                    <p className="mt-2 text-gray-600 text-sm px-2">{sample.explanation}</p>
+                    <p className="mt-2 text-gray-600 dark:text-gray-400 text-sm px-2">{sample.explanation}</p>
                   )}
                 </div>
               ))}
@@ -386,31 +386,31 @@ const TutorialDisplayPage = () => {
             key={section.id}
             className={`exercise-section mb-8 rounded-2xl border-l-4 transition-all duration-300 ${
               activeSection === section.id
-                ? 'bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-500 shadow-soft'
-                : 'bg-white border-gray-200 hover:border-yellow-300'
+                ? 'bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-yellow-500 shadow-soft'
+                : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-yellow-300 dark:hover:border-yellow-600'
             }`}
             onClick={() => setActiveSection(activeSection === section.id ? null : section.id)}
           >
             <div className="p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <span className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center text-yellow-600 text-sm">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <span className="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/40 rounded-lg flex items-center justify-center text-yellow-600 dark:text-yellow-400 text-sm">
                   ✏️
                 </span>
                 {section.title}
               </h3>
               {section.content.practice_exercises?.map((exercise: any, i: number) => (
-                <div key={i} className="bg-gradient-to-r from-yellow-50 to-orange-50 p-5 rounded-xl border border-yellow-200 mb-4">
-                  <p className="font-medium text-gray-900 mb-3">{exercise.question}</p>
+                <div key={i} className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 p-5 rounded-xl border border-yellow-200 dark:border-yellow-800 mb-4">
+                  <p className="font-medium text-gray-900 dark:text-white mb-3">{exercise.question}</p>
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <span className={`badge ${
                       exercise.difficulty === 'easy' ? 'badge-success' :
-                      exercise.difficulty === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
+                      exercise.difficulty === 'medium' ? 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-300' :
+                      'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-300'
                     }`}>
                       {exercise.difficulty?.charAt(0).toUpperCase() + exercise.difficulty?.slice(1)}
                     </span>
                     {exercise.hint && (
-                      <p className="text-sm text-yellow-700">{t('hint')} {exercise.hint}</p>
+                      <p className="text-sm text-yellow-700 dark:text-yellow-400">{t('hint')} {exercise.hint}</p>
                     )}
                   </div>
                   <button className="mt-3 px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors text-sm font-medium">
@@ -424,9 +424,9 @@ const TutorialDisplayPage = () => {
 
       default:
         return (
-          <div key={section.id} className="mb-8 p-6 bg-white rounded-2xl border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">{section.title}</h3>
-            <p className="text-gray-500 text-sm mt-1">{t('section_type_not_supported')}</p>
+          <div key={section.id} className="mb-8 p-6 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{section.title}</h3>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{t('section_type_not_supported')}</p>
           </div>
         );
     }
@@ -442,15 +442,15 @@ const TutorialDisplayPage = () => {
       <div className="fixed left-0 top-16 bottom-0 z-30 transition-all duration-300">
         <button
           onClick={() => setShowChapterList(!showChapterList)}
-          className="fixed left-0 top-20 z-40 w-10 h-10 bg-white rounded-r-xl shadow-lg flex items-center justify-center text-gray-600 hover:text-primary-600 transition-all"
+          className="fixed left-0 top-20 z-40 w-10 h-10 bg-white dark:bg-gray-800 rounded-r-xl shadow-lg flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-all"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h10M4 18h7" />
           </svg>
         </button>
-        <div className={`bg-white shadow-xl transition-all duration-300 ${showChapterList ? 'w-72' : 'w-0'} overflow-hidden`}>
+        <div className={`bg-white dark:bg-gray-800 shadow-xl transition-all duration-300 ${showChapterList ? 'w-72' : 'w-0'} overflow-hidden`}>
           <div className="p-4">
-            <h3 className="font-bold text-gray-900 mb-3">{t('chapters')}</h3>
+            <h3 className="font-bold text-gray-900 dark:text-white mb-3">{t('chapters')}</h3>
             <div className="space-y-1">
               {chapters.map((ch) => (
                 <button
@@ -464,15 +464,15 @@ const TutorialDisplayPage = () => {
                   }}
                   className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all ${
                     chapter?.chapter_number === ch.chapter_number
-                      ? 'bg-primary-100 text-primary-700 font-semibold'
+                      ? 'bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 font-semibold'
                       : ch.status === 'ready'
-                      ? 'text-gray-700 hover:bg-gray-50'
-                      : 'text-gray-400 cursor-not-allowed'
+                      ? 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                      : 'text-gray-400 dark:text-gray-500 cursor-not-allowed'
                   }`}
                   disabled={ch.status !== 'ready'}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold">
+                    <span className="w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xs font-bold">
                       {ch.chapter_number}
                     </span>
                     <span className="truncate">{ch.title}</span>
@@ -481,7 +481,7 @@ const TutorialDisplayPage = () => {
                 </button>
               ))}
               {chapters.length === 0 && (
-                <p className="text-sm text-gray-500 text-center py-4">{t('no_chapters')}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">{t('no_chapters')}</p>
               )}
             </div>
           </div>
@@ -491,7 +491,7 @@ const TutorialDisplayPage = () => {
       <div className={`min-h-screen py-8 px-4 sm:px-6 lg:px-8 transition-all duration-300 ${showChapterList ? 'ml-72' : 'ml-0'}`}>
       <div className="max-w-4xl mx-auto">
         {/* Top toolbar */}
-        <div className="bg-white rounded-2xl shadow-soft p-4 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-soft p-4 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <button
             onClick={() => navigate('/')}
             className="flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium px-4 py-2 rounded-xl hover:bg-primary-50 transition-all"
@@ -507,8 +507,8 @@ const TutorialDisplayPage = () => {
               disabled={bookmarkLoading}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all font-medium shadow-soft ${
                 isBookmarked
-                  ? 'bg-amber-100 text-amber-700 hover:bg-amber-200'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 hover:bg-amber-200 dark:hover:bg-amber-900/50'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
               } disabled:opacity-50`}
             >
               <span>{isBookmarked ? '🔖' : '📑'}</span>
@@ -516,7 +516,7 @@ const TutorialDisplayPage = () => {
             </button>
             <button
               onClick={handleShare}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 transition-all font-medium shadow-soft"
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all font-medium shadow-soft"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -595,22 +595,22 @@ const TutorialDisplayPage = () => {
         </div>
 
         {/* Chapter header */}
-        <div className="bg-white rounded-2xl shadow-soft p-8 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-soft p-8 mb-6">
           <div className="flex items-center gap-3 mb-4">
             <span className="badge badge-primary text-sm">
               {t('chapter_of', { n: chapter.chapter_number || 1, total: chapter.totalChapters || '?' })}
             </span>
             {chapter.estimatedReadingTimeMin && (
-              <span className="badge bg-gray-100 text-gray-600 text-sm">
+              <span className="badge bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-sm">
                 ⏱ {Math.round(chapter.estimatedReadingTimeMin)} {t('min_read')}
               </span>
             )}
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{chapter.title}</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">{chapter.title}</h1>
           {chapter.prerequisiteTopicsCovered && (
             <div className="flex flex-wrap gap-2 mt-4">
               {chapter.prerequisiteTopicsCovered.map((topic: string, i: number) => (
-                <span key={i} className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm font-medium">
+                <span key={i} className="px-3 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded-full text-sm font-medium">
                   {topic}
                 </span>
               ))}
@@ -619,12 +619,12 @@ const TutorialDisplayPage = () => {
         </div>
 
         {/* Progress bar */}
-        <div className="bg-white rounded-2xl shadow-soft p-4 mb-6">
-          <div className="flex justify-between text-sm text-gray-600 mb-2">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-soft p-4 mb-6">
+          <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
             <span>{t('progress')}</span>
             <span>{Math.round(progress)}%</span>
           </div>
-          <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+          <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
             <div
               className="bg-gradient-to-r from-primary-500 to-accent-500 h-3 rounded-full transition-all duration-500"
               style={{ width: `${progress}%` }}

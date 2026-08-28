@@ -44,7 +44,7 @@ const AdminGuard = ({ children }: AdminGuardProps) => {
             <div className="absolute inset-0 border-4 border-primary-200 rounded-full"></div>
             <div className="absolute inset-0 border-4 border-primary-600 rounded-full border-t-transparent animate-spin"></div>
           </div>
-          <p className="text-gray-500">{t('checking_admin_access')}</p>
+          <p className="text-gray-500 dark:text-gray-400">{t('checking_admin_access')}</p>
         </div>
       </div>
     );

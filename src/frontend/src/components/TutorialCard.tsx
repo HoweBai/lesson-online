@@ -26,7 +26,7 @@ const TutorialCard = ({ tutorial, onClick, onLike, isBookmarked, onBookmark }: T
       <div className="relative mb-4">
         <div className="absolute inset-0 bg-gradient-to-r from-primary-600 to-accent-600 rounded-xl opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
         <div className="flex justify-between items-start mb-3">
-          <h3 className="text-lg font-bold text-gray-900 line-clamp-1 group-hover:text-primary-600 transition-colors duration-300">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white line-clamp-1 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-300">
             {tutorial.title}
           </h3>
           {tutorial.is_public && (
@@ -40,12 +40,12 @@ const TutorialCard = ({ tutorial, onClick, onLike, isBookmarked, onBookmark }: T
       </div>
 
       {/* Description */}
-      <p className="text-gray-600 text-sm mb-4 line-clamp-2 min-h-[2.5em] group-hover:text-gray-700 transition-colors duration-300">
+      <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2 min-h-[2.5em] group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-300">
         {tutorial.description || t('no_description')}
       </p>
 
       {/* Meta information */}
-      <div className="flex flex-wrap gap-3 text-xs text-gray-500 mb-4">
+      <div className="flex flex-wrap gap-3 text-xs text-gray-500 dark:text-gray-400 mb-4">
         <span className="flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-1 rounded-lg group-hover:bg-blue-100 transition-colors duration-300">
           <span>📖</span> {tutorial.total_chapters || 0} {t('chapters')}
         </span>
@@ -57,7 +57,7 @@ const TutorialCard = ({ tutorial, onClick, onLike, isBookmarked, onBookmark }: T
         </span>
         {onBookmark && (
           <span className={`flex items-center gap-1 px-2 py-1 rounded-lg transition-colors duration-300 ${
-            isBookmarked ? 'bg-amber-100 text-amber-700' : 'bg-gray-50 text-gray-400'
+            isBookmarked ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400' : 'bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500'
           }`}>
             <span>{isBookmarked ? '🔖' : '📑'}</span> {isBookmarked ? t('bookmarked') : t('bookmark')}
           </span>
@@ -65,8 +65,8 @@ const TutorialCard = ({ tutorial, onClick, onLike, isBookmarked, onBookmark }: T
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between pt-4 border-t border-gray-100 group-hover:border-primary-200 transition-colors duration-300">
-        <span className="text-xs text-gray-400">
+      <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700 group-hover:border-primary-200 dark:group-hover:border-primary-800 transition-colors duration-300">
+        <span className="text-xs text-gray-400 dark:text-gray-500">
           {t('created', { defaultValue: `Created ${formatDistanceToNow(new Date(tutorial.created_at), { addSuffix: true })}` })}
         </span>
         {onLike && (
@@ -75,7 +75,7 @@ const TutorialCard = ({ tutorial, onClick, onLike, isBookmarked, onBookmark }: T
               e.stopPropagation();
               onLike(e);
             }}
-            className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200 hover:scale-105"
+            className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-all duration-200 hover:scale-105"
           >
             <span>❤️</span> {t('like')}
           </button>
@@ -86,7 +86,7 @@ const TutorialCard = ({ tutorial, onClick, onLike, isBookmarked, onBookmark }: T
               e.stopPropagation();
               onBookmark(e);
             }}
-            className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200 hover:scale-105"
+            className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-lg transition-all duration-200 hover:scale-105"
           >
             <span>{isBookmarked ? '🔖' : '📑'}</span> {isBookmarked ? t('bookmarked') : t('bookmark')}
           </button>

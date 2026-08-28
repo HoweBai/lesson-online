@@ -177,7 +177,7 @@ const ProfilePage = () => {
                     <span>{t('overall_progress')}</span>
                     <span>{Math.round(((progress.completed_chapters || 0) / (progress.total_chapters || 1)) * 100)}%</span>
                   </div>
-                  <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+                  <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
                     <div
                       className="bg-gradient-to-r from-primary-500 to-accent-500 h-3 rounded-full transition-all duration-500"
                       style={{ width: `${((progress.completed_chapters || 0) / (progress.total_chapters || 1)) * 100}%` }}
@@ -216,9 +216,9 @@ const ProfilePage = () => {
                   <span
                     key={topic}
                     className={`px-3 py-1.5 rounded-full text-sm font-medium ${
-                      level === 'advanced' ? 'bg-green-100 text-green-700' :
-                      level === 'intermediate' ? 'bg-yellow-100 text-yellow-700' :
-                      'bg-gray-100 text-gray-600'
+                      level === 'advanced' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' :
+                      level === 'intermediate' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400' :
+                      'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
                     }`}
                   >
                     {topic.replace(/_/g, ' ')} · {level}
@@ -328,7 +328,7 @@ const ProfilePage = () => {
                       className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                         formData.preferred_style === style
                           ? 'bg-gradient-to-r from-primary-600 to-accent-600 text-white shadow-soft'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
                       }`}
                     >
                       {t(`style_${style}`, { defaultValue: style.charAt(0).toUpperCase() + style.slice(1) })}
@@ -362,8 +362,8 @@ const StatRow = ({ label, value, icon, color }: { label: string; value: string |
     orange: 'text-orange-600',
   };
   return (
-    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
-      <span className="text-gray-600 flex items-center gap-2">
+    <div className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
+      <span className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
         <span>{icon}</span> {label}
       </span>
       <span className={`font-bold ${colorClasses[color] || 'text-gray-900'}`}>{value}</span>
@@ -372,9 +372,9 @@ const StatRow = ({ label, value, icon, color }: { label: string; value: string |
 };
 
 const InfoRow = ({ label, value }: { label: string; value: string }) => (
-  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-    <span className="text-gray-500 text-sm w-32 flex-shrink-0">{label}:</span>
-    <span className="font-medium text-gray-900">{value}</span>
+  <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
+    <span className="text-gray-500 dark:text-gray-400 text-sm w-32 flex-shrink-0">{label}:</span>
+    <span className="font-medium text-gray-900 dark:text-white">{value}</span>
   </div>
 );
 

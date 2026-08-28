@@ -29,7 +29,7 @@ const CodeBlock = ({ language, code, highlightLines }: CodeBlockProps) => {
 
   return (
     <div className="code-block bg-gray-900 text-green-400 rounded-lg overflow-hidden shadow-md">
-      <div className="bg-gray-800 px-4 py-2 flex justify-between items-center text-sm font-mono">
+      <div className="bg-gray-800 dark:bg-gray-700 px-4 py-2 flex justify-between items-center text-sm font-mono">
         <span>{language.toUpperCase()}</span>
         {highlightLines && (
           <span className="text-yellow-400">

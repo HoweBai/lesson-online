@@ -48,10 +48,10 @@ class GlobalErrorHandlerInner extends Component<GlobalErrorHandlerProps & WithTr
             </button>
             {this.state.error && (
               <details className="mt-6 text-left max-w-lg mx-auto">
-                <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-700">
+                <summary className="text-sm text-gray-500 dark:text-gray-400 cursor-pointer hover:text-gray-700 dark:hover:text-gray-300">
                   {t('error_details', { defaultValue: 'Error details' })}
                 </summary>
-                <pre className="mt-2 p-4 bg-white rounded-xl shadow-soft text-xs text-red-600 overflow-auto max-h-48">
+                <pre className="mt-2 p-4 bg-gray-100 dark:bg-gray-700 rounded-xl shadow-soft text-xs text-red-600 dark:text-red-400 overflow-auto max-h-48">
                   {this.state.error.stack}
                 </pre>
               </details>

@@ -68,8 +68,8 @@ const CommentSection = ({ tutorialId }: CommentSectionProps) => {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-soft p-6 mt-8">
-      <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-soft p-6 mt-8">
+      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
         <span>💬</span> {t('comments')} ({comments.length})
       </h3>
 
@@ -80,7 +80,7 @@ const CommentSection = ({ tutorialId }: CommentSectionProps) => {
           onChange={(e) => setNewComment(e.target.value)}
           placeholder={t('write_comment')}
           rows={3}
-          className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+          className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none dark:bg-gray-700 dark:text-white"
         />
         <div className="mt-2 flex justify-end">
           <button

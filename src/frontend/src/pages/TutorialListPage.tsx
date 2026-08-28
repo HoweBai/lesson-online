@@ -142,19 +142,19 @@ const TutorialListPage = ({ onOpenWizard }: TutorialListPageProps) => {
 
         {/* Tabs and Actions */}
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
-          <div className="flex items-center gap-2 bg-white p-1 rounded-2xl shadow-soft">
+          <div className="flex items-center gap-2 bg-white dark:bg-gray-800 p-1 rounded-2xl shadow-soft">
             <button
               onClick={() => setActiveTab('public')}
               className={`px-6 py-2.5 rounded-xl font-semibold transition-all duration-200 ${
                 activeTab === 'public'
                   ? 'bg-gradient-to-r from-primary-600 to-accent-600 text-white shadow-md'
-                  : 'text-gray-600 hover:text-primary-600 hover:bg-primary-50'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-700'
               }`}
             >
               <span className="flex items-center gap-2">
                 🌍 {t('tab_public')}
                 <span className={`text-xs px-2 py-0.5 rounded-full ${
-                  activeTab === 'public' ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+                  activeTab === 'public' ? 'bg-white/20 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
                 }`}>
                   {tutorials.filter(t => t.is_public).length}
                 </span>
@@ -165,13 +165,13 @@ const TutorialListPage = ({ onOpenWizard }: TutorialListPageProps) => {
               className={`px-6 py-2.5 rounded-xl font-semibold transition-all duration-200 ${
                 activeTab === 'mine'
                   ? 'bg-gradient-to-r from-primary-600 to-accent-600 text-white shadow-md'
-                  : 'text-gray-600 hover:text-primary-600 hover:bg-primary-50'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-gray-700'
               }`}
             >
               <span className="flex items-center gap-2">
                 👤 {t('tab_mine')}
                 <span className={`text-xs px-2 py-0.5 rounded-full ${
-                  activeTab === 'mine' ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+                  activeTab === 'mine' ? 'bg-white/20 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
                 }`}>
                   {tutorials.filter(t => !t.is_public).length}
                 </span>
@@ -191,7 +191,7 @@ const TutorialListPage = ({ onOpenWizard }: TutorialListPageProps) => {
         </div>
 
         {/* Search and Filter */}
-        <div className="bg-white rounded-2xl shadow-soft p-4 mb-8">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-soft p-4 mb-8">
           <form className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1 relative">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -210,7 +210,7 @@ const TutorialListPage = ({ onOpenWizard }: TutorialListPageProps) => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-gray-700"
+              className="px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200"
             >
               <option value="publish_time">📅 {t('sort_latest')}</option>
               <option value="views">👁️ {t('sort_views')}</option>
@@ -228,12 +228,12 @@ const TutorialListPage = ({ onOpenWizard }: TutorialListPageProps) => {
 
         {/* Tutorial Grid */}
         {tutorials.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-3xl shadow-soft">
+          <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-3xl shadow-soft">
             <div className="text-6xl mb-4">📭</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
               {activeTab === 'public' ? t('hero_empty_public') : t('hero_empty_mine')}
             </h3>
-            <p className="text-gray-500 mb-6 max-w-md mx-auto">
+            <p className="text-gray-500 dark:text-gray-400 mb-6 max-w-md mx-auto">
               {activeTab === 'public'
                 ? t('hero_cta_public')
                 : t('hero_cta_mine')}
@@ -278,10 +278,10 @@ const TutorialListPage = ({ onOpenWizard }: TutorialListPageProps) => {
 
 // Stat card component
 const StatCard = ({ label, value, icon }: { label: string; value: number; icon: string }) => (
-  <div className="bg-white rounded-2xl p-4 shadow-soft text-center hover:shadow-hover transition-shadow">
+  <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-soft text-center hover:shadow-hover transition-shadow">
     <div className="text-3xl mb-2">{icon}</div>
-    <div className="text-2xl font-bold text-gray-900">{value}</div>
-    <div className="text-sm text-gray-500">{label}</div>
+    <div className="text-2xl font-bold text-gray-900 dark:text-white">{value}</div>
+    <div className="text-sm text-gray-500 dark:text-gray-400">{label}</div>
   </div>
 );
 

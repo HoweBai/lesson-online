@@ -46,13 +46,13 @@ const ShareModal = ({ isOpen, onClose, tutorialId, tutorialTitle, tutorialDescri
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 animate-scale-in">
+      <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-6 animate-scale-in">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold text-gray-900">{t('share_tutorial')}</h3>
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white">{t('share_tutorial')}</h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -61,20 +61,20 @@ const ShareModal = ({ isOpen, onClose, tutorialId, tutorialTitle, tutorialDescri
         </div>
 
         {/* Preview Card */}
-        <div className="bg-gradient-to-br from-primary-50 to-accent-50 rounded-xl p-4 mb-6">
-          <h4 className="font-bold text-gray-900 mb-2">{tutorialTitle}</h4>
-          <p className="text-sm text-gray-600 line-clamp-2">{tutorialDescription || 'AI-powered personalized learning tutorial'}</p>
+        <div className="bg-gradient-to-br from-primary-50 to-accent-50 dark:from-primary-900/20 dark:to-accent-900/20 rounded-xl p-4 mb-6">
+          <h4 className="font-bold text-gray-900 dark:text-white mb-2">{tutorialTitle}</h4>
+          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{tutorialDescription || 'AI-powered personalized learning tutorial'}</p>
         </div>
 
         {/* Share Link */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">{t('share_link')}</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('share_link')}</label>
           <div className="flex gap-2">
             <input
               type="text"
               value={shareUrl}
               readOnly
-              className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-600"
+              className="flex-1 px-3 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm text-gray-600 dark:text-gray-300"
             />
             <button
               onClick={handleCopy}
